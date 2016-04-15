@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="params">
+		<field name="@block_tooltip_a" type="rl_block" start="1" />
+		<field name="tip_type" type="radio" class="btn-group" default="text" label="TT_TOOLTIP">
+			<option value="text">RL_TEXT</option>
+			<option value="image">RL_IMAGE</option>
+		</field>
+		<field name="@toggler_tip_type_text_a" type="rl_toggler" param="tooltip_tip_type" value="text" />
+		<field name="tip_title" type="text" class="input-xxlarge" label="JGLOBAL_TITLE" description="TT_TOOLTIP_TITLE_DESC" />
+		<field name="tip_text" type="textarea" class="input-xxlarge" required="required" label="RL_TEXT_HTML" description="TT_TOOLTIP_TEXT_DESC" />
+		<field name="@toggler_tip_type_text_b" type="rl_toggler" />
+		<field name="@toggler_tip_type_image_a" type="rl_toggler" param="tooltip_tip_type" value="image" />
+		<field name="tip_image" type="media" label="RL_IMAGE" required="required" description="TT_TOOLTIP_IMAGE_DESC" />
+		<field name="tip_image_attribs" type="text" class="input-xxlarge" label="RL_IMAGE_ATTRIBUTES" description="RL_IMAGE_ATTRIBUTES_DESC" />
+		<field name="@toggler_tip_type_image_b" type="rl_toggler" />
+		<field name="@block_tooltip_b" type="rl_block" end="1" />
+
+		<field name="@block_link_a" type="rl_block" start="1" />
+		<field name="link_type" type="radio" class="btn-group" default="text" label="TT_LINK">
+			<option value="text">RL_TEXT</option>
+			<option value="image">RL_IMAGE</option>
+		</field>
+		<field name="@toggler_link_type_text_a" type="rl_toggler" param="tooltip_link_type" value="text" />
+		<field name="link_text" type="textarea" class="input-xxlarge" label="RL_TEXT_HTML" description="TT_LINK_TEXT_DESC" />
+		<field name="@toggler_link_type_text_b" type="rl_toggler" />
+		<field name="@toggler_link_type_image_a" type="rl_toggler" param="tooltip_link_type" value="image" />
+		<field name="link_image" type="media" label="RL_IMAGE" description="TT_LINK_IMAGE_DESC" />
+		<field name="link_image_attribs" type="text" class="input-xxlarge" label="RL_IMAGE_ATTRIBUTES" description="RL_IMAGE_ATTRIBUTES_DESC" />
+		<field name="@toggler_link_type_image_b" type="rl_toggler" />
+		<field name="@block_link_b" type="rl_block" end="1" />
+
+		<field name="class" type="text" label="RL_CSS_CLASS" description="RL_CSS_CLASS_DESC" />
+		<field name="@notice_mode" type="rl_plaintext" label="TT_MODE" description="TT_MODE_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@notice_position" type="rl_plaintext" label="TT_POSITION" description="TT_POSITION_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+</config>

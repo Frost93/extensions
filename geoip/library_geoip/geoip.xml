@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="library" method="upgrade">
+	<name>GeoIP</name>
+	<libraryname>geoip</libraryname>
+	<description></description>
+	<version>1.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<files>
+		<file>geoip.php</file>
+		<file>geoip.xml</file>
+		<file>GeoLite2-City.mmdb</file>
+		<file>GeoLite2-City.mmdb.date.txt</file>
+		<folder>vendor</folder>
+	</files>
+</extension>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="system" method="upgrade">
+	<name>plg_system_geoip</name>
+	<description>PLG_SYSTEM_GEOIP_DESC</description>
+	<version>1.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="GeoIP">
+			http://download.regularlabs.com/updates.xml?e=geoip&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="geoip">geoip.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>fields</folder>
+		<folder>helpers</folder>
+		<folder>language</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="plg_system_betterpreview" />
+				<field name="@license" type="rl_license" extension="GEOIP" />
+				<field name="@version" type="rl_version" extension="GEOIP" />
+				<field name="@header" type="rl_header"
+					   label="GEOIP"
+					   description="GEOIP_DESC"
+					   url="https://www.regularlabs.com/geoip" />
+				<field name="@note_maxmind_copyright" type="rl_note"
+					   description="GEO_MAXMIND_COPYRIGHT,&lt;a href=&quot;http://www.maxmind.com&quot; target=&quot;_blank&quot;&gt;http://www.maxmind.com&lt;/a&gt;" />
+			</fieldset>
+			<fieldset name="GEO_UPDATE" addfieldpath="/plugins/system/geoip/fields">
+				<field name="@note_database_version" type="geoip_version" label="GEO_DATABASE_VERSION" />
+				<field name="@update" type="rl_ajax" class="btn btn-success" url="index.php?geoip_update=1" text="GEO_UPDATE" label="GEO_UPDATE_DATABASE" />
+
+				<field name="@block_a" type="rl_block" start="1" />
+				<field name="@note_update" type="rl_note" description="GEO_UPDATE_DATABASE_DESC" />
+				<field name="@note_maxmind_copyright2" type="rl_note"
+					   description="GEO_MAXMIND_COPYRIGHT,&lt;a href=&quot;http://www.maxmind.com&quot; target=&quot;_blank&quot;&gt;http://www.maxmind.com&lt;/a&gt;" />
+				<field name="@block_b" type="rl_block" end="1" />
+
+				<field name="@broken_database" type="radio" class="btn-group btn-group-yesno" default="0" label="GEO_BROKEN_DATABASE">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field name="@toggler_broken_database_a" type="rl_toggler" param="@broken_database" value="1" />
+				<field name="@note_force_update" type="rl_note" description="GEO_FORCE_UPDATE_DATABASE_DESC" />
+				<field name="@force_update" type="rl_ajax" url="index.php?geoip_update=1&amp;force=1" text="GEO_FORCE_UPDATE"
+					   label="GEO_FORCE_UPDATE_DATABASE" />
+				<field name="@toggler_broken_database_b" type="rl_toggler" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

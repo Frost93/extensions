@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="system" method="upgrade">
+	<name>plg_system_dummycontent</name>
+	<description>PLG_SYSTEM_DUMMYCONTENT_DESC</description>
+	<version>3.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="NoNumber Dummy Content">
+			http://download.regularlabs.com/updates.xml?e=dummycontent&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="dummycontent">dummycontent.php</filename>
+		<filename>helper.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>helpers</folder>
+		<folder>language</folder>
+		<folder>wordlists</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_mod_articles_category" type="rl_loadlanguage" extension="mod_articles_category" admin="0" />
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="plg_system_dummycontent" />
+				<field name="@license" type="rl_license" extension="DUMMY_CONTENT" />
+				<field name="@version" type="rl_version" extension="DUMMY_CONTENT" />
+				<field name="@header" type="rl_header"
+					   label="DUMMY_CONTENT"
+					   description="DUMMY_CONTENT_DESC"
+					   url="https://www.regularlabs.com/dummycontent" />
+			</fieldset>
+			<fieldset name="basic">
+				<field name="type" type="list" default="kitchenSink" label="DC_DEFAULT_TYPE" description="DC_DEFAULT_TYPE_DESC">
+					<option value="kitchenSink">DC_KITCHENSINK</option>
+					<option value="paragraphs">DC_PARAGRAPHS</option>
+					<option value="sentences">DC_SENTENCES</option>
+					<option value="words">DC_WORDS</option>
+					<option value="list">DC_LIST</option>
+				</field>
+
+				<field name="@toggler_type_paragraphs_a" type="rl_toggler" param="type" value="paragraphs" />
+				<field name="paragraphs_count" type="list" default="5" class="input-mini" label="DC_DEFAULT_PARAGRAPHS_COUNT"
+					   description="DC_DEFAULT_PARAGRAPHS_COUNT_DESC">
+					<option value="1">J1</option>
+					<option value="2">J2</option>
+					<option value="3">J3</option>
+					<option value="4">J4</option>
+					<option value="5">J5</option>
+					<option value="6">J6</option>
+					<option value="7">J7</option>
+					<option value="8">J8</option>
+					<option value="9">J9</option>
+					<option value="10">J10</option>
+				</field>
+				<field name="@toggler_wordlist_paragraphs_b" type="rl_toggler" />
+
+				<field name="@toggler_type_sentences_a" type="rl_toggler" param="type" value="sentences" />
+				<field name="sentences_count" type="text" default="10" class="input-mini" label="DC_DEFAULT_SENTENCES_COUNT"
+					   description="DC_DEFAULT_SENTENCES_COUNT_DESC" />
+				<field name="@toggler_wordlist_sentences_b" type="rl_toggler" />
+
+				<field name="@toggler_type_words_a" type="rl_toggler" param="type" value="words" />
+				<field name="words_count" type="text" default="200" class="input-mini" label="DC_DEFAULT_WORDS_COUNT"
+					   description="DC_DEFAULT_WORDS_COUNT_DESC" />
+				<field name="@toggler_wordlist_words_b" type="rl_toggler" />
+
+				<field name="@toggler_type_list_a" type="rl_toggler" param="type" value="list" />
+				<field name="list_count" type="list" default="0" label="DC_DEFAULT_LIST_ITEM_COUNT" description="DC_DEFAULT_LIST_ITEM_COUNT_DESC">
+					<option value="0">RL_RANDOM</option>
+					<option value="2">J2</option>
+					<option value="3">J3</option>
+					<option value="4">J4</option>
+					<option value="5">J5</option>
+					<option value="6">J6</option>
+					<option value="7">J7</option>
+					<option value="8">J8</option>
+					<option value="9">J9</option>
+					<option value="10">J10</option>
+				</field>
+				<field name="list_type" type="list" default="" label="DC_DEFAULT_LIST_TYPE" description="DC_DEFAULT_LIST_TYPE_DESC">
+					<option value="">RL_RANDOM</option>
+					<option value="ol">DC_ORDERED</option>
+					<option value="ul">DC_UNORDERED</option>
+				</field>
+				<field name="@toggler_type_list_b" type="rl_toggler" />
+
+				<field name="@notice_wordlist" type="rl_plaintext" label="DC_WORD_LIST" description="DC_WORD_LIST_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+
+				
+				<field name="@notice_diacritics" type="rl_plaintext" label="DC_DIACRITICS" description="DC_DIACRITICS_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+
+				<field name="@block_images_a" type="rl_block" start="1" label="DC_IMAGES" />
+				<field name="@notice_image_service" type="rl_plaintext" label="DC_IMAGE_SERVICE" description="DC_IMAGE_SERVICE_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+			</fieldset>
+
+			<fieldset name="advanced">
+				<field name="@block_tag_a" type="rl_block" start="1" label="RL_TAG_SYNTAX" />
+				<field name="tag" type="text" default="dummy" label="DC_TAG" description="DC_TAG_DESC" />
+				<field name="tag_characters" type="list" default="{.}" class="input-small" label="RL_TAG_CHARACTERS"
+					   description="RL_TAG_CHARACTERS_DESC">
+					<option value="{.}">{...}</option>
+					<option value="[.]">[...]</option>
+					<option value="{{.}}">{{...}}</option>
+					<option value="[[.]]">[[...]]</option>
+					<option value="[:.:]">[:...:]</option>
+					<option value="[%.%]">[%...%]</option>
+				</field>
+				<field name="@block_tag_b" type="rl_block" end="1" />
+				<field name="@notice_disabled_components" type="rl_plaintext" label="RL_DISABLE_ON_COMPONENTS" description="RL_DISABLE_ON_COMPONENTS_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="enable_admin" type="radio" class="btn-group" default="0" label="RL_ENABLE_IN_ADMIN" description="RL_ENABLE_IN_ADMIN_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+			</fieldset>
+
+			<fieldset name="RL_SETTINGS_EDITOR_BUTTON">
+				<field name="button_text" type="text" default="Dummy Content" label="RL_BUTTON_TEXT" description="RL_BUTTON_TEXT_DESC" />
+				<field name="enable_frontend" type="radio" class="btn-group" default="1" label="RL_ENABLE_IN_FRONTEND" description="RL_ENABLE_IN_FRONTEND_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field name="@block_tag_b" type="rl_block" end="1" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

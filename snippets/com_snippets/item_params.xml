@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="details">
+		<field name="published" type="radio" class="btn-group" default="1" label="JPUBLISHED" description="RL_PUBLISHED_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="name" type="text" size="100" default="" label="JGLOBAL_TITLE" description="SNP_NAME_DESC" />
+		<field name="alias" type="text" size="100" default="" label="SNP_SNIPPET_ID" description="SNP_SNIPPET_ID_DESC" />
+		<field name="description" type="rl_textareaplus" width="400" height="80" default="" label="JGLOBAL_DESCRIPTION" description="SNP_DESCRIPTION_DESC" />
+		<field name="category" type="rl_simplecategories" default="" table="snippets" label="JCATEGORY" description="JGLOBAL_CHOOSE_CATEGORY_DESC" />
+
+		<field name="@notice_button_enable" type="rl_plaintext" label="SNP_SHOW_IN_EDITOR_BUTTON" description="SNP_SHOW_IN_EDITOR_BUTTON_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content">
+		<field name="content" type="rl_editor" />
+	</fieldset>
+</config>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<replacements>
+	<name>Example XML file for ReReplacer</name>
+	<description>This is an example file to show you how to build up an xml file with multiple replacements for ReReplacer.</description>
+	<version>7.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<items>
+		<item>
+			<search>word1,word2,word3</search>
+			<replace>replace1,replace2,replace3</replace>
+		</item>
+		<item>
+			<search>Some replacement</search>
+			<replace>with extra overruling parameters</replace>
+			<params>
+				<param name="area" value="everywhere" />
+				<param name="enable_tags" value="1" />
+			</params>
+		</item>
+		<item>
+			<search>A ([r|R])egular [e|E]xpression search</search>
+			<replace>And \1eplacement</replace>
+			<params>
+				<param name="regex" value="1" />
+				<param name="casesensitive" value="1" />
+			</params>
+		</item>
+		<item>
+			<!-- Wrap text with html tags in <![CDATA[ and ]]>
+			-->
+			<search><![CDATA[replace something with <strong>HTML</strong>]]></search>
+			<replace><![CDATA[with <u>something</u> else]]></replace>
+			<!-- Escape characters in values, like: < > "
+			-->
+			<params>
+				<param name="between_start" value="&lt;div class=&quot;start&quot;&gt;" />
+				<param name="between_end" value="&lt;/div&gt;" />
+			</params>
+		</item>
+	</items>
+</replacements>

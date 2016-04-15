@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="details">
+		<field name="published" type="radio" class="btn-group btn-group-yesno" default="1" label="JPUBLISHED" description="RL_PUBLISHED_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="name" type="text" class="span12" default="" label="JGLOBAL_TITLE" description="CT_NAME_DESC" />
+		<field name="description" type="rl_textareaplus" class="span12" height="160" default="" label="JGLOBAL_DESCRIPTION" description="CT_DESCRIPTION_DESC" />
+		<field name="category" type="rl_simplecategories" default="" table="contenttemplater" label="JCATEGORY" description="JGLOBAL_CHOOSE_CATEGORY_DESC" />
+	</fieldset>
+
+	<fieldset name="-content">
+		<field name="@block_editor" type="note" class="alert alert-info" description="CT_CONTENT_DESC" />
+		<field name="content" type="rl_editor" />
+	</fieldset>
+
+	<fieldset name="-content-settings">
+		<field name="@block_content-settings" type="note" class="alert alert-info" description="CT_CONTENT_SETTINGS_DESC" />
+		<field name="override_settings" type="radio" class="btn-group btn-group-yesno" default="0" label="CT_OVERRIDE_SETTINGS"
+			   description="CT_OVERRIDE_SETTINGS_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="@toggler_override_1a" type="rl_toggler" param="override_settings" value="0" />
+		<field name="@block_override_1" type="note" class="alert alert-info" description="CT_OVERRIDE_DISABLED_DESC" />
+		<field name="@toggler_override_1b" type="rl_toggler" />
+		<field name="@toggler_override_2a" type="rl_toggler" param="override_settings" value="1" />
+		<field name="@block_override_2" type="note" class="alert alert-info" description="CT_OVERRIDE_ENABLED_DESC" />
+		<field name="@toggler_override_2b" type="rl_toggler" />
+	</fieldset>
+
+	<fieldset name="-content-general-left">
+		<field name="jform_title" type="text" size="30" default="" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" />
+		<field
+				name="jform_alias" type="text" size="30" default="" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC"
+				hint="JFIELD_ALIAS_PLACEHOLDER" />
+		<field name="jform_catid" type="rl_content" group="categories" default="-1" multiple="0" show_ignore="1" label="JCATEGORY"
+			   description="JFIELD_CATEGORY_DESC" />
+		<field name="@toggler_cat_k2_a" type="rl_toggler" param="has_k2" value="1" />
+		<field name="@notice_categories_k2" type="rl_plaintext" label="RL_K2_CATEGORIES" description="" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@toggler_cat_k2_b" type="rl_toggler" />
+		<field name="@toggler_cat_zoo_a" type="rl_toggler" param="has_zoo" value="1" />
+		<field name="@notice_categories_zoo" type="rl_plaintext" label="RL_ZOO_CATEGORIES" description="" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@toggler_cat_zoo_b" type="rl_toggler" />
+		<field name="jform_tags" type="rl_tags" multiple="true" default="" label="JTAG" description="JTAG_DESC" />
+	</fieldset>
+	<fieldset name="-content-general-right">
+		<field
+				name="jform_state" type="rl_list" default="-1" form_default="1" class="span12"
+				label="JSTATUS" description="JFIELD_PUBLISHED_DESC">
+			<option value="-1">RL_IGNORE</option>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+		<field name="@toggler_published_a" type="rl_toggler" param="has_k2" value="1" />
+		<field name="@notice_published" type="rl_plaintext" label="JPUBLISHED" description="JFIELD_PUBLISHED_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@toggler_published_b" type="rl_toggler" />
+		<field
+				name="jform_access" type="accesslevel" default="-1" form_default="1" class="span12"
+				label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC">
+			<option value="-1">RL_IGNORE</option>
+		</field>
+		<field
+				name="jform_featured" type="rl_list" default="-1" form_default="0" class="span12"
+				label="JFEATURED" description="COM_CONTENT_FIELD_FEATURED_DESC">
+			<option value="-1">RL_IGNORE</option>
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field
+				name="jform_language" type="contentlanguage" default="-1" form_default="*" class="span12"
+				label="JFIELD_LANGUAGE_LABEL" description="COM_CONTENT_FIELD_LANGUAGE_DESC">
+			<option value="-1">RL_IGNORE</option>
+			<option value="*">JALL</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="-content-publishing-left">
+		<field name="@notice_publishing" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content-images">
+		<field name="@notice_images" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content-urls">
+		<field name="@notice_urls" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content-basic">
+		<field name="@notice_basic" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content-editorconfig">
+		<field name="@notice_editorconfig" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="-content-customfields">
+		<field name="@block_customfields" type="note" class="alert alert-info" description="CT_CUSTOM_FIELDS_DESC" />
+		<field name="@notice_customfields" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="publishing-button">
+		<field name="@block_button" type="note" class="alert alert-info" description="CT_EDITOR_BUTTON_LIST_DESC" />
+		<field name="button_enabled" type="radio" class="btn-group btn-group-yesno" default="1" label="CT_SHOW_IN_EDITOR_BUTTON_LIST"
+			   description="CT_SHOW_IN_EDITOR_BUTTON_LIST_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="@toggler_button_a" type="rl_toggler" param="button_enabled" value="1" />
+		<field name="button_enable_in_frontend" type="radio" class="btn-group btn-group-yesno" default="1" label="RL_ENABLE_IN_FRONTEND"
+			   description="CT_ENABLE_BUTTON_IN_FRONTEND_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+			<option value="2">RL_ONLY</option>
+		</field>
+		<field name="button_separate" type="radio" class="btn-group btn-group-yesno" default="0" label="CT_AS_SEPARATE_EDITOR_BUTTON"
+			   description="CT_AS_SEPARATE_EDITOR_BUTTON_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="@toggler_button_enabled_a" type="rl_toggler" param="button_separate" value="1" />
+		<field name="button_name" type="text" class="span12" default="" label="CT_EDITOR_BUTTON_NAME" description="CT_EDITOR_BUTTON_NAME_DESC" />
+		<field name="button_image" type="rl_icons" default="0" show_none="1"
+			   label="CT_EDITOR_ITEM_IMAGE" description="CT_EDITOR_ITEM_IMAGE_DESC" />
+		<field name="@toggler_button_enabled_b" type="rl_toggler" />
+		<field name="@toggler_button_b" type="rl_toggler" />
+	</fieldset>
+
+	<fieldset name="publishing-load">
+		<field name="@notice_block_load" type="note" class="alert alert-info" description="CT_LOAD_BY_DEFAULT_DESC" />
+		<field name="@notice_load_enabled" type="rl_plaintext" label="CT_ENABLE_LOAD_BY_DEFAULT" description="CT_ENABLE_LOAD_BY_DEFAULT_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="publishing-url">
+		<field name="@notice_block_url" type="note" class="alert alert-info" description="CT_LOAD_BY_URL_DESC" />
+		<field name="@notice_url_enabled" type="rl_plaintext" label="CT_ENABLE_LOAD_BY_URL" description="CT_ENABLE_LOAD_BY_URL_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="assignments">
+		<field name="@notice_assignments" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+</config>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="system" method="upgrade">
+	<name>plg_system_cdnforjoomla</name>
+	<description>PLG_SYSTEM_CDNFORJOOMLA_DESC</description>
+	<version>5.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="NoNumber CDN for Joomla!">
+			http://download.regularlabs.com/updates.xml?e=cdnforjoomla&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="cdnforjoomla">cdnforjoomla.php</filename>
+		<filename>helper.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>language</folder>
+	</files>
+
+	<!-- Parameters -->
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="plg_system_cdnforjoomla" />
+				<field name="@license" type="rl_license" extension="CDN_FOR_JOOMLA" />
+				<field name="@version" type="rl_version" extension="CDN_FOR_JOOMLA" />
+				<field name="@header" type="rl_header"
+					   label="CDN_FOR_JOOMLA" description="CDN_FOR_JOOMLA_DESC"
+					   url="https://www.regularlabs.com/cdnforjoomla" />
+			</fieldset>
+			<fieldset name="basic">
+				<field name="@block_cdn_1_a" type="rl_block" class="well-striped" start="1" />
+				<field name="root" type="text" size="60"
+					   default="/"
+					   label="CDN_SITE_ROOT" description="CDN_SITE_ROOT_DESC" />
+				<field name="@block_cdn_cdn_1_a" type="rl_block" start="1" label="CDN_CDN" />
+				<field name="cdn" type="text" size="60"
+					   default="" hint="CDN_DOMAIN_EXAMPLE"
+					   label="CDN_DOMAIN" description="CDN_DOMAIN_DESC" />
+				
+				<field name="@notice_protocol" type="rl_plaintext"
+					   default="RL_ONLY_AVAILABLE_IN_PRO"
+					   label="CDN_PROTOCOL" description="CDN_PROTOCOL_DESC" />
+				<field name="@notice_use_relative_protocol" type="rl_plaintext"
+					   default="RL_ONLY_AVAILABLE_IN_PRO"
+					   label="CDN_USE_RELATIVE_PROTOCOL" description="CDN_USE_RELATIVE_PROTOCOL_DESC" />
+				<field name="@block_cdn_cdn_1_b" type="rl_block" end="1" />
+				<field name="@block_cdn_files_1_a" type="rl_block" start="1" label="CDN_FILES" />
+				<field name="filetypes" type="textarea" cols="40" rows="5"
+					   default="css,js,bmp,gif,jpg,jpeg,ico,png,tif,tiff,svg,doc,docx,odt,pdf,rtf,txt"
+					   label="CDN_FILE_TYPES" description="CDN_FILE_TYPES_DESC" />
+				<field name="ignorefiles" type="textarea" cols="40" rows="5"
+					   default=""
+					   label="CDN_IGNORE_FILES" description="CDN_IGNORE_FILES_DESC" />
+				<field name="enable_in_scripts" type="radio" class="btn-group"
+					   default="1"
+					   label="CDN_ENABLE_IN_SCRIPTS" description="CDN_ENABLE_IN_SCRIPTS_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field name="@notice_enable_versioning" type="rl_plaintext"
+					   default="RL_ONLY_AVAILABLE_IN_PRO"
+					   label="CDN_ENABLE_VERSIONING" description="CDN_ENABLE_VERSIONING_DESC" />
+				<field name="@block_cdn_files_1_b" type="rl_block" end="1" />
+				<field name="@block_cdn_1_b" type="rl_block" end="1" />
+
+				<field name="@block_cdn_2_a" type="rl_block" class="well-striped" start="1" />
+				<field name="@notice_use_extra_2" type="rl_plaintext"
+					   label="CDN_USE_EXTRA_2" description="CDN_USE_EXTRA_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="@notice_use_extra_3" type="rl_plaintext"
+					   label="CDN_USE_EXTRA_3" description="CDN_USE_EXTRA_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="@notice_use_extra_4" type="rl_plaintext"
+					   label="CDN_USE_EXTRA_4" description="CDN_USE_EXTRA_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="@notice_use_extra_5" type="rl_plaintext"
+					   label="CDN_USE_EXTRA_5" description="CDN_USE_EXTRA_DESC"
+					   default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="@block_cdn_2_b" type="rl_block" end="1" />
+
+			</fieldset>
+		</fields>
+	</config>
+</extension>

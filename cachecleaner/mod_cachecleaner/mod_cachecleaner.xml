@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="module" client="administrator" method="upgrade">
+	<name>mod_cachecleaner</name>
+	<description>MOD_CACHECLEANER_DESC</description>
+	<version>5.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="Regular Labs - Cache Cleaner">
+			http://download.regularlabs.com/updates.xml?e=cachecleaner&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename module="mod_cachecleaner">mod_cachecleaner.php</filename>
+		<filename>helper.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>language</folder>
+		<folder>tmpl</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="mod_cachecleaner" admin="1" />
+				<field name="@license" type="rl_license" extension="CACHE_CLEANER" />
+				<field name="@version" type="rl_version" extension="CACHE_CLEANER" />
+				<field name="@dependency" type="rl_dependency"
+					   label="CC_THE_SYSTEM_PLUGIN"
+					   file="/plugins/system/cachecleaner/cachecleaner.php" />
+				<field name="@header" type="rl_header"
+					   label="CACHE_CLEANER"
+					   description="CACHE_CLEANER_DESC"
+					   url="https://www.regularlabs.com/cachecleaner" />
+
+				<field name="@notice_settings" type="rl_plaintext"
+					   description="CC_SETTINGS,&lt;a href=&quot;index.php?option=com_plugins&amp;filter_folder=system&amp;filter_search=cache cleaner&quot; target=&quot;_blank&quot;&gt;,&lt;/a&gt;" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

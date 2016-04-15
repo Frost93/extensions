@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="options" label="JOPTIONS">
+		<field name="ignore_tables" type="text" default="" label="DBR_IGNORE_TABLES" description="DBR_IGNORE_TABLES_DESC" />
+		<field name="@notice_default_table" type="rl_plaintext" label="DBR_DEFAULT_TABLE" description="DBR_DEFAULT_TABLE_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@notice_default_columns" type="rl_plaintext" label="DBR_DEFAULT_COLUMNS" description="DBR_DEFAULT_COLUMNS_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="maxrows" type="list" default="50" label="DBR_MAXIMUM_ROW_COUNT" description="DBR_MAXIMUM_ROW_COUNT_DESC">
+			<option value="50">50</option>
+			<option value="">* 100</option>
+			<option value="">* 200</option>
+			<option value="">* 500</option>
+			<option value="">* 1000</option>
+		</field>
+		<field name="@toggler_maxrows_a" type="rl_toggler" param="maxrows" value="" />
+		<field name="@notice_maxrows" type="rl_plaintext" label="" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@toggler_maxrows_b" type="rl_toggler" />
+		<field name="show_alert" type="radio" class="btn-group" default="1" label="DBR_SHOW_WARNING" description="DBR_SHOW_WARNING_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_update_notification" type="radio" class="btn-group" default="1" label="RL_SHOW_UPDATE_NOTIFICATION"
+			   description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="@notice_show_copyright" type="rl_plaintext" label="RL_SHOW_COPYRIGHT" description="RL_SHOW_COPYRIGHT_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+	</fieldset>
+
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" filter="rules" validate="rules"
+			   component="com_dbreplacer" section="component" />
+	</fieldset>
+</config>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="system" method="upgrade">
+	<name>plg_system_emailprotector</name>
+	<description>PLG_SYSTEM_EMAILPROTECTOR_DESC</description>
+	<version>3.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="NoNumber Email Protector">
+			http://download.regularlabs.com/updates.xml?e=emailprotector&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="emailprotector">emailprotector.php</filename>
+		<filename>helper.php</filename>
+		<filename>jhtmlemail.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>language</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage_emailcloak" type="rl_loadlanguage" extension="plg_content_emailcloak" />
+				<field name="@loadlanguage_emailprotector" type="rl_loadlanguage" extension="plg_system_emailprotector" />
+				<field name="@version" type="rl_version" extension="EMAIL_PROTECTOR" />
+				<field name="@header" type="rl_header"
+					   label="EMAIL_PROTECTOR"
+					   description="EMAIL_PROTECTOR_DESC"
+					   url="https://www.regularlabs.com/emailprotector" />
+			</fieldset>
+
+			<fieldset name="basic">
+				<field name="mode" type="list" default="2"
+					   description="PLG_CONTENT_EMAILCLOAK_MODE_DESC"
+					   label="PLG_CONTENT_EMAILCLOAK_MODE_LABEL">
+					<option value="0">PLG_CONTENT_EMAILCLOAK_NONLINKABLE</option>
+					<option value="1">PLG_CONTENT_EMAILCLOAK_LINKABLE</option>
+					<option value="2">EP_AS_IS</option>
+				</field>
+				<field name="spoof" type="radio" default="0" label="EP_SPOOF" description="EP_SPOOF_DESC">
+					<option value="0">EP_EMAIL_FORMAT_0</option>
+					<option value="1">EP_EMAIL_FORMAT_1</option>
+				</field>
+				<field name="protect_in_feeds" type="radio" default="1" label="EP_PROTECT_IN_FEEDS" description="EP_PROTECT_IN_FEEDS_DESC">
+					<option value="0">JNO</option>
+					<option value="1">EP_EMAIL_FORMAT_1</option>
+					<option value="2">EP_CUSTOM_STRING</option>
+				</field>
+				<field name="@toggler_protect_in_feeds_a" type="rl_toggler" param="protect_in_feeds" value="2" />
+				<field name="feed_text" type="text" default="XXX" label="EP_FEED_TEXT" description="EP_FEED_TEXT_DESC" />
+				<field name="@toggler_protect_in_feeds_b" type="rl_toggler" />
+				<field name="protect_in_js" type="radio" class="btn-group" default="1" label="EP_PROTECT_IN_JS" description="EP_PROTECT_IN_JS_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

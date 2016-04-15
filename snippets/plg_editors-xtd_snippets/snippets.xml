@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="editors-xtd" method="upgrade">
+	<name>plg_editors-xtd_snippets</name>
+	<description>PLG_EDITORS-XTD_SNIPPETS_DESC</description>
+	<version>5.0.0</version>
+	<creationDate>April 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<files>
+		<filename plugin="snippets">snippets.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>language</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="plg_editors-xtd_snippets" />
+				<field name="@license" type="rl_license" extension="SNIPPETS" />
+				<field name="@version" type="rl_version" extension="SNIPPETS" />
+				<field name="@dependency1" type="rl_dependency"
+					   label="SNP_THE_COMPONENT"
+					   file="/administrator/components/com_snippets/snippets.php" />
+				<field name="@dependency2" type="rl_dependency"
+					   label="SNP_THE_SYSTEM_PLUGIN"
+					   file="/plugins/system/snippets/snippets.php" />
+				<field name="@header" type="rl_header"
+					   label="SNIPPETS"
+					   description="SNIPPETS_DESC"
+					   url="https://www.regularlabs.com/snippets" />
+
+				<field name="@notice_settings" type="rl_plaintext"
+					   description="SNP_SETTINGS,&lt;a href=&quot;index.php?option=com_snippets&quot; target=&quot;_blank&quot;&gt;,&lt;/a&gt;" />
+				<field name="@notice" type="rl_plaintext" label="" default="RL_ONLY_AVAILABLE_IN_PRO" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

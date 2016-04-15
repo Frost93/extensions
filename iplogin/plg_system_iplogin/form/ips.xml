@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+		<fieldset name="params"
+				  label="IPL_IP_LOGIN"
+				  description=""
+				  addfieldpath="/plugins/system/iplogin/fields"
+		>
+			<field name="@note_ips" type="iplogin_desc" class="alert" label="IPL_IP_LOGIN_DESC" />
+			<field name="@note_current_ip" type="iplogin_currentip" label="IPL_CURRENT_IP" />
+
+			<field name="@block_ip1_a" type="rl_block" start="1" />
+			<field name="ip1_enabled" type="radio" class="btn-group" default="0" label="RL_ENABLE_IN" description="RL_ENABLE_IN_DESC">
+				<option value="0">JNONE</option>
+				<option value="1">RL_BOTH</option>
+				<option value="admin">RL_ADMIN</option>
+				<option value="site">RL_FRONTEND</option>
+			</field>
+			<field name="ip1_ip" type="text" label="IPL_IP" description="IPL_IP_DESC" />
+			<field name="@note_ip1_ip" type="rl_plaintext" label="IPL_IP_RANGE" description="IPL_IP_RANGE_DESC"
+				   default="RL_ONLY_AVAILABLE_IN_PRO" />
+			<field name="ip1_key" type="iplogin_key" label="IPL_KEY" description="IPL_KEY_DESC" />
+			<field name="@note_ip1_note" type="rl_plaintext" label="JFIELD_NOTE_LABEL" description="IPL_NOTE_DESC"
+				   default="RL_ONLY_AVAILABLE_IN_PRO" />
+			<field name="@block_ip1_b" type="rl_block" end="1" />
+
+			<field name="@note_pro" type="note" class="alert" description="IPL_PRO_DESC" />
+
+		</fieldset>
+	</fields>
+</form>

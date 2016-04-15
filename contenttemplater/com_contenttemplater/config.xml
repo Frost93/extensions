@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="options" label="JOPTIONS">
+		<field name="@loadlanguage" type="rl_loadlanguage" extension="com_contenttemplater" />
+		<field name="@block_button_a" type="rl_block" start="1" label="RL_SETTINGS_EDITOR_BUTTON" />
+		<field name="enable_frontend" type="radio" class="btn-group" default="1" label="RL_ENABLE_IN_FRONTEND" description="RL_ENABLE_IN_FRONTEND_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+			<option value="2">RL_ONLY</option>
+		</field>
+		<field name="button_text" type="text" default="Content Template" size="40" label="RL_BUTTON_TEXT" description="RL_BUTTON_TEXT_DESC" />
+		<field name="button_icon" type="radio" class="btn-group" default="1" label="RL_SHOW_ICON" description="RL_SHOW_ICON_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_confirm" type="radio" class="btn-group" default="0" label="CT_ASK_BEFORE_INSERTING_TEMPLATE"
+			   description="CT_ASK_BEFORE_INSERTING_TEMPLATE_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="orderby" type="list" default="" label="CT_ORDERBY" description="CT_ORDERBY_DESC">
+			<option value="">JFIELD_ORDERING_LABEL</option>
+			<option value="name">JGLOBAL_TITLE</option>
+		</field>
+		<field name="display_categories" type="list" default="grouped" label="CT_DISPLAY_CATEGORIES" description="CT_DISPLAY_CATEGORIES_DESC">
+			<option value="grouped">CT_DISPLAY_CATEGORIES_GROUPED</option>
+			<option value="titled">CT_DISPLAY_CATEGORIES_TITLED</option>
+			<option value="" disabled="disabled">CT_DISPLAY_CATEGORIES_SEPARATE</option>
+			<option value="" disabled="disabled">RL_ONLY_AVAILABLE_IN_PRO_LIST_OPTION</option>
+		</field>
+		<field name="open_in_modal" type="radio" class="btn-group" default="2" label="CT_OPEN_IN_MODAL" description="CT_OPEN_IN_MODAL_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+			<option value="2">JGLOBAL_AUTO</option>
+		</field>
+		<field name="@toggler_button_select_1a" type="rl_toggler" param="open_in_modal" value="2" />
+		<field name="switch_to_modal" type="text" default="5" size="4" label="CT_SWITCH_TO_MODAL" description="CT_SWITCH_TO_MODAL_DESC" />
+		<field name="@toggler_button_select_1b" type="rl_toggler" />
+		<field name="@block_button_b" type="rl_block" end="1" />
+
+		<field name="@block_load_a" type="rl_block" start="1" label="CT_AUTO_LOAD" />
+		<field name="@notice_url_delay" type="rl_plaintext" label="CT_LOAD_DELAY" description="CT_LOAD_DELAY_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@block_load_b" type="rl_block" end="1" />
+
+		<field name="@block_other_a" type="rl_block" start="1" label="RL_OTHER_SETTINGS" />
+		<field name="contact_table" type="text" default="contact_details" label="CT_CONTACT_TABLE" description="CT_CONTACT_TABLE_DESC" />
+		<field name="show_update_notification" type="radio" class="btn-group" default="1" label="RL_SHOW_UPDATE_NOTIFICATION"
+			   description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="@notice_show_copyright" type="rl_plaintext" label="RL_SHOW_COPYRIGHT" description="RL_SHOW_COPYRIGHT_DESC"
+			   default="RL_ONLY_AVAILABLE_IN_PRO" />
+		<field name="@block_other_b" type="rl_block" end="1" />
+	</fieldset>
+
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" filter="rules" validate="rules"
+			   component="com_contenttemplater" section="component" />
+	</fieldset>
+</config>
