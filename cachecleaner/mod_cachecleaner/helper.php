@@ -42,9 +42,9 @@ class ModCacheCleaner
 			var cachecleaner_msg_failure = '" . addslashes(html_entity_decode(JText::_('CC_CACHE_COULD_NOT_BE_CLEANED'))) . "';";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
 		RLFunctions::script('cachecleaner/script.min.js', '5.0.0');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 		RLFunctions::stylesheet('cachecleaner/style.min.css', '5.0.0');
 
 		$text_ini = strtoupper(str_replace(' ', '_', $this->params->icon_text));

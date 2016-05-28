@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.0
+ * @version         7.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,6 +29,7 @@ class Com_ReReplacerInstallerScript extends Com_ReReplacerInstallerScriptHelper
 		$this->createTable();
 		$this->fixOldFormatInDatabase();
 		$this->deleteOldFiles();
+		$this->fixAssetsRules();
 	}
 
 	public function createTable()
@@ -147,6 +148,13 @@ class Com_ReReplacerInstallerScript extends Com_ReReplacerInstallerScriptHelper
 				JPATH_SITE . '/components/com_rereplacer',
 			)
 		);
+	}
+
+	public function fixAssetsRules($rules = '')
+	{
+		$rules = '{"core.admin":[],"core.manage":[],"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}';
+
+		parent::fixAssetsRules($rules);
 	}
 
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -51,8 +51,8 @@ class PlgButtonArticlesAnywherePopup
 		RLFunctions::loadLanguage('plg_system_articlesanywhere');
 		RLFunctions::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		require_once JPATH_ADMINISTRATOR . '/components/com_content/helpers/content.php';
 
@@ -528,10 +528,11 @@ class PlgButtonArticlesAnywherePopup
 		<script type="text/javascript">
 			function articlesanywhere_jInsertEditorText(id) {
 				(function($) {
-					var t_start  = '<?php echo addslashes($tag_start); ?>';
-					var t_end    = '<?php echo addslashes($tag_end); ?>';
-					var td_start = '<?php echo addslashes($tag_data_start); ?>';
-					var td_end   = '<?php echo addslashes($tag_data_end); ?>';
+					var t_start      = '<?php echo addslashes($tag_start); ?>';
+					var t_end        = '<?php echo addslashes($tag_end); ?>';
+					var td_start     = '<?php echo addslashes($tag_data_start); ?>';
+					var td_end       = '<?php echo addslashes($tag_data_end); ?>';
+					var content_type = '<?php echo addslashes($content_type); ?>';
 
 					var str = '';
 
@@ -589,7 +590,14 @@ class PlgButtonArticlesAnywherePopup
 							+ td_start + '/div' + td_end;
 					}
 
-					str = t_start + '<?php echo $plugin_tag; ?> ' + <?php echo $content_type == 'k2' ? '\'type="k2" id="\' + id + \'"\'' : 'id'; ?> +t_end
+
+					if (content_type == 'k2') {
+						id = 'type="k2" id="' + id.replace(/"/g, '\\"') + '"';
+					} else if (id.match(/[\"\'\|\:,]/)) {
+						id = 'title="' + id.replace(/"/g, '\\"') + '"';
+					}
+
+					str = t_start + '<?php echo $plugin_tag; ?> ' + id + t_end
 						+ str.trim()
 						+ t_start + '/<?php echo $plugin_tag; ?>' + t_end;
 

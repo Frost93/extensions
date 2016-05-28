@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         GeoIp
- * @version         1.0.0
+ * @version         1.2.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,9 +15,8 @@ class PlgSystemGeoIP extends JPlugin
 {
 	public function __construct(&$subject, $config)
 	{
-		// only in html
-		if (JFactory::getDocument()->getType() != 'html'
-			|| !JFactory::getApplication()->isAdmin()
+		// only in admin if geoip_update=1 is found in the url
+		if (!JFactory::getApplication()->isAdmin()
 			|| !JFactory::getApplication()->input->getInt('geoip_update')
 		)
 		{

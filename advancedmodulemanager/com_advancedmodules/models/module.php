@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -1349,11 +1349,19 @@ class AdvancedModulesModelModule extends JModelAdmin
 			return false;
 		}
 
+		$db = $this->getDbo();
+
+		// Remove unused assets entry (uses core com_modules rules)
+		$query = $db->getQuery(true)
+			->delete('#__assets')
+			->where('name = ' . $db->quote('com_advancedmodules.module.' . (int) $table->id));
+		$db->setQuery($query);
+		$db->execute();
+
 		// Trigger the after save event.
 		$dispatcher->trigger($this->event_after_save, array($context, &$table, $isNew));
 
 		// Compute the extension id of this module in case the controller wants it.
-		$db    = $this->getDbo();
 		$query = $db->getQuery(true)
 			->select('extension_id')
 			->from('#__extensions AS e')

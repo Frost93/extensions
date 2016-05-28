@@ -1,6 +1,6 @@
 /**
  * @package         Tabs
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -166,7 +166,7 @@ var RegularLabsTabs = null;
 				return;
 			}
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"');
+			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
 
 			if ($anchor.length == 0) {
 				return;
@@ -399,7 +399,7 @@ var RegularLabsTabs = null;
 
 			var scroll = false;
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"');
+			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
 
 			// No accompanying link found
 			if ($anchor.length == 0) {

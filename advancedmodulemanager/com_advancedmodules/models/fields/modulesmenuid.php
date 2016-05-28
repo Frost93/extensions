@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,7 +27,7 @@ class JFormFieldModulesMenuId extends JFormFieldList
 	public function getOptions()
 	{
 		$clientId = JFactory::getApplication()->input->get('client_id', 0, 'int');
-		$options = ModulesHelper::getMenuItemAssignmentOptions($clientId);
+		$options  = ModulesHelper::getMenuItemAssignmentOptions($clientId);
 
 		return array_merge(parent::getOptions(), $options);
 	}

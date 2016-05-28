@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -19,17 +19,37 @@ class Com_RegularLabsManagerInstallerScript extends Com_RegularLabsManagerInstal
 	public $alias          = 'extensionmanager';
 	public $extname        = 'regularlabsmanager';
 	public $extension_type = 'component';
+	public $is_nonumber    = false;
+
+	public function onBeforeInstall()
+	{
+		$this->is_nonumber = (JFactory::getApplication()->input->get('option') == 'com_nonumbermanager');
+	}
 
 	public function onAfterInstall()
 	{
+		$this->fixAssetsRules();
+
 		// Check if old NoNumber Extension Manager is still installed
 		if (!JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_nonumbermanager'))
 		{
 			return;
 		}
 
-		$this->copyParamsFromNoNumberExtensionManager();
-		$this->preUninstallNoNumberExtensionManager();
+		if ($this->is_nonumber)
+		{
+			$this->copyParamsFromNoNumberExtensionManager();
+			$this->preUninstallNoNumberExtensionManager();
+
+			return;
+		}
+
+		$this->uninstallNoNumberExtensionManager();
+	}
+
+	private function uninstallNoNumberExtensionManager()
+	{
+		$this->uninstallComponent('com_nonumbermanager', false);
 	}
 
 	private function copyParamsFromNoNumberExtensionManager()

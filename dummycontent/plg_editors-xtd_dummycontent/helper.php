@@ -39,7 +39,7 @@ class PlgButtonDummyContentHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_dummycontent');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		$icon = 'reglab icon-dummycontent';
 		$link = 'index.php?rl_qp=1'

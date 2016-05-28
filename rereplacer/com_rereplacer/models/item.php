@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.0
+ * @version         7.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -323,12 +323,6 @@ class ReReplacerModelItem extends JModelAdmin
 			if (trim($data['search']) == '')
 			{
 				$this->setError(JText::_('RR_THE_ITEM_MUST_HAVE_SOMETHING_TO_SEARCH_FOR'));
-
-				return $newdata;
-			}
-			else if (strlen(trim($data['search'])) < 3)
-			{
-				$this->setError(JText::sprintf('RR_THE_SEARCH_STRING_SHOULD_BE_LONGER', 2));
 
 				return $newdata;
 			}

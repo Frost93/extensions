@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -13,12 +13,12 @@ defined('_JEXEC') or die;
 
 class PlgSystemArticlesAnywhereHelperReplace
 {
-	var $helpers         = array();
-	var $params          = null;
-	var $aid             = null;
-	var $data            = null;
-	var $current_article = null;
-	var $message         = '';
+	var $helpers            = array();
+	var $params             = null;
+	var $aid                = null;
+	var $data               = null;
+	var $current_article_id = null;
+	var $message            = '';
 
 	public function __construct()
 	{
@@ -30,8 +30,8 @@ class PlgSystemArticlesAnywhereHelperReplace
 		list($tag_start, $tag_end) = $this->getTagCharacters(true);
 
 		// Break/paragraph start and end tags
-		$this->params->breaks_start = RLTags::getRegexSurroundingTagPre(array('div', 'p', 'span', 'h[0-6]'));
-		$this->params->breaks_end   = RLTags::getRegexSurroundingTagPost(array('div', 'p', 'span', 'h[0-6]'));
+		$this->params->breaks_start = RLTags::getRegexSurroundingTagPre(array('p'));
+		$this->params->breaks_end   = RLTags::getRegexSurroundingTagPost(array('p'));
 		$breaks_start               = $this->params->breaks_start;
 		$breaks_end                 = $this->params->breaks_end;
 		$spaces                     = RLTags::getRegexSpaces();
@@ -42,39 +42,27 @@ class PlgSystemArticlesAnywhereHelperReplace
 			. ')';
 
 		$this->params->regex = '#'
-			. '(?P<start_pre>' . $breaks_start . ')'
-			. $tag_start . $this->params->tags . $spaces . '(?P<id>' . $inside_tag . ')' . $tag_end
-			. '(?P<start_post>' . $breaks_end . ')'
-
-			. '(?P<start_div>(?:'
-			. $breaks_start
-			. $tag_start . 'div(?: ' . $inside_tag . ')?' . $tag_end
-			. $breaks_end
-			. '\s*)?)'
-
-			. '(?P<pre>' . $breaks_start . ')'
+			. '(?P<opening_tags_before_open>' . $breaks_start . ')'
+			. $tag_start . $this->params->tags . '(?:' . $spaces . '(?P<id>' . $inside_tag . '))?' . $tag_end
+			. '(?P<closing_tags_after_open>' . $breaks_end . ')'
+			. '\s*'
+			. '(?P<opening_tags_before_content>' . $breaks_start . ')'
 			. '(?P<html>.*?)'
-			. '(?P<post>' . $breaks_end . ')'
-
-			. '(?P<end_div>(?:\s*'
-			. $breaks_start
-			. $tag_start . '/div' . $tag_end
-			. $breaks_end
-			. ')?)'
-
-			. '(?P<end_pre>' . $breaks_start . ')'
+			. '(?P<closing_tags_after_content>' . $breaks_end . ')'
+			. '\s*'
+			. '(?P<opening_tags_before_close>' . $breaks_start . ')'
 			. $tag_start . '/\2' . $tag_end
-			. '(?P<end_post>' . $breaks_end . ')'
+			. '(?P<closing_tags_after_close>' . $breaks_end . ')'
 			. '#s';
 
 		$this->aid = JFactory::getUser()->getAuthorisedViewLevels();
 	}
 
-	public function _(&$string, $area = 'article', $context = '', $current_article = null)
+	public function _(&$string, $area = 'article', $context = '', $current_article_id = null)
 	{
-		if (!is_null($current_article))
+		if (!is_null($current_article_id))
 		{
-			$this->current_article = $current_article;
+			$this->current_article_id = $current_article_id;
 		}
 
 		if (!is_string($string) || $string == '')
@@ -212,9 +200,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 			$regex .= 'u';
 		}
 
-		preg_match_all($regex, $string, $matches, PREG_SET_ORDER);
-
-		if (empty($matches))
+		if (!preg_match($regex, $string))
 		{
 			$string = $pre_string . $string . $post_string;
 
@@ -231,6 +217,8 @@ class PlgSystemArticlesAnywhereHelperReplace
 			)
 			&& preg_match_all($regex, $string, $matches, PREG_SET_ORDER))
 		{
+			$this->cleanMatches($matches);
+
 			$items = $this->helpers->_('items')->_($matches, $this->message);
 
 			$this->processMatch($string, $items);
@@ -239,6 +227,20 @@ class PlgSystemArticlesAnywhereHelperReplace
 		}
 
 		$string = $pre_string . $string . $post_string;
+	}
+
+	private function cleanMatches(&$matches)
+	{
+		foreach ($matches as &$match)
+		{
+			foreach ($match as $k => $v)
+			{
+				if ($k && is_numeric($k))
+				{
+					unset($match[$k]);
+				}
+			}
+		}
 	}
 
 	public function processMatch(&$string, $items)
@@ -254,26 +256,36 @@ class PlgSystemArticlesAnywhereHelperReplace
 	{
 		$output = $this->getOutputHtml(implode('', $this->data->output));
 
-		if ($this->params->place_comments)
-		{
-			$output = $this->params->comment_start . $output . $this->params->comment_end;
-		}
-
 		$string = RLText::strReplaceOnce($this->data->original_string, $output, $string);
 	}
 
 	public function getOutputHtml($html)
 	{
-		$string = RLTags::fixBrokenHtmlTags(
-			$this->data->start_pre
+		if (empty($this->data->opening_tags_main) || empty($this->data->closing_tags_main))
+		{
+			return
+				$this->data->opening_tags_main
+				. $this->fixBrokenHtmlTags($html)
+				. $this->data->closing_tags_main;
+		}
+
+		return $this->fixBrokenHtmlTags(
+			$this->data->opening_tags_main
 			. $html
-			. $this->data->end_post
+			. $this->data->closing_tags_main
 		);
+	}
 
-		// Remove trailing empty paragraph
-		$string = preg_replace('#<p>\s*</p>\s*^#s', '', $string);
+	private function fixBrokenHtmlTags($string)
+	{
+		$string = RLTags::fixBrokenHtmlTags($string);
 
-		return $string;
+		if (!$this->params->place_comments)
+		{
+			return $string;
+		}
+
+		return $this->params->comment_start . $string . $this->params->comment_end;
 	}
 
 	public function getTagCharacters($quote = false)

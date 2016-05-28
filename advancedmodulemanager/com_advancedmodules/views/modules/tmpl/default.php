@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -51,7 +51,7 @@ if ($showcolors)
 	JFactory::getDocument()->addScriptDeclaration($script);
 }
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_advancedmodules'); ?>" method="post" name="adminForm" id="adminForm">
 	<?php if (!empty($this->sidebar)) : ?>

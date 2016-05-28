@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -88,7 +88,7 @@ class PlgSystemRegularLabsQuickPageHelper
 		JFactory::getDocument()->addScript(JUri::root(true) . '/administrator/templates/isis/js/template.js');
 		JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/administrator/templates/isis/css/template.css');
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
 
 		$file = JPATH_SITE . '/' . $file;
 

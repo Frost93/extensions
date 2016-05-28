@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         CDN for Joomla!
- * @version         5.0.0
+ * @version         5.2.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -83,6 +83,7 @@ class PlgSystemCDNforJoomlaHelper
 		{
 			return false;
 		}
+
 
 		$filetypes = $this->getFileTypes($this->params->{'filetypes' . $setid});
 
@@ -228,8 +229,13 @@ class PlgSystemCDNforJoomlaHelper
 	{
 		$changed = 0;
 
-		foreach ($searches as $search)
+		foreach ($searches as $word => $search)
 		{
+			if (!is_numeric($word) && strpos($string, $word) == false)
+			{
+				continue;
+			}
+
 			$changed = $this->replaceBySearch($string, $search);
 		}
 
@@ -330,12 +336,9 @@ class PlgSystemCDNforJoomlaHelper
 			return;
 		}
 
-		$urls = $this->getUrlList();
+		$url = $this->getUrlRegex();
 
-		foreach ($urls as $url)
-		{
-			$this->setSearchesByUrl($url);
-		}
+		$this->setSearchesByUrl($url);
 	}
 
 	/*
@@ -343,35 +346,28 @@ class PlgSystemCDNforJoomlaHelper
 	 * '\1http(s)://' . $this->params->cdn . '/\3\4'
 	 * \2 is used to reference the possible starting quote
 	 */
-	private function getUrlList()
+	private function getUrlRegex()
 	{
 		// Domain url or root path
-		$url = preg_quote(str_replace('https://', 'http://', JUri::root()), '#');
-		$url .= '|' . preg_quote(str_replace(array('http://', 'https://'), '//', JUri::root()), '#');
+		$roots   = array();
+		$roots[] = 'LSLASH';
+		$roots[] = str_replace(array('http\\://', 'https\\://'), '(?:https?\:)?//', preg_quote(JUri::root(), '#'));
 
 		if (JUri::root(1))
 		{
-			$url .= '|' . preg_quote(JUri::root(1) . '/', '#');
+			$roots[] = preg_quote(JUri::root(1) . '/', '#');
 		}
 
 		$filetypes = implode('|', $this->params->set->filetypes);
 		$root      = preg_quote($this->params->set->root, '#');
 
-		$urls = array();
-
-		// Absolute path
-		$urls[] = '(?:' . $url . ')' . $root . '([^ \?QUOTES]+\.(?:' . $filetypes . ')(?:\?[^QUOTES]*)?)';
-		// Relative path
-		$urls[] = 'LSLASH' . $root . '([a-z0-9-_]+/[^ \?QUOTES]+\.(?:' . $filetypes . ')(?:\?[^QUOTES]*)?)';
-		// Relative path - file in root
-		$urls[] = 'LSLASH' . $root . '([a-z0-9-_]+[^ \?\/QUOTES]+\.(?:' . $filetypes . ')(?:\?[^QUOTES]*)?)';
-
-		return $urls;
+		return
+			'(?:' . implode('|', $roots) . ')' . $root
+			. '([a-z0-9-_]+(?:/[^ \?QUOTES]+|[^ \?\/QUOTES]+)\.(?:' . $filetypes . ')(?:\?[^QUOTES]*)?)';
 	}
 
 	private function setSearchesByUrl($url)
 	{
-
 		$url_regex = '\s*' . str_replace('QUOTES', '"\'', $url) . '\s*';
 
 		if ($this->params->set->enable_in_scripts)
@@ -383,13 +379,18 @@ class PlgSystemCDNforJoomlaHelper
 		$url_regex                 = str_replace('LSLASH', '/?', $url_regex);
 		$url_regex_can_have_spaces = str_replace('[^ ', '[^', $url_regex);
 
-		$this->params->set->searches[] = '#((?:' . $this->params->tag_attribs . ')\s*(["\']))' . $url_regex_can_have_spaces . '(\2)#i'; // attrib="..."
-		$this->params->set->searches[] = '#((?:' . $this->params->tag_attribs . ')())' . $url_regex . '([\s|>])#i'; // attrib=...
-		$this->params->set->searches[] = '#(url\(\s*((?:["\'])?))' . $url_regex_can_have_spaces . '(\2\s*\))#i'; // url(...) or url("...")
+		// attrib="..."
+		$this->params->set->searches[] = '#((?:' . $this->params->tag_attribs . ')\s*(["\']))' . $url_regex_can_have_spaces . '(\2)#i';
+		// attrib=...
+		$this->params->set->searches[] = '#((?:' . $this->params->tag_attribs . ')())' . $url_regex . '([\s|>])#i';
+		// url(...) or url("...")
+		$this->params->set->searches[] = '#(url\(\s*((?:["\'])?))' . $url_regex_can_have_spaces . '(\2\s*\))#i';
+		// "image" : "..."
+		$this->params->set->searches['image'] = '#((["\'])image\2\s*:\s*\2)' . $url_regex_can_have_spaces . '(\2)#i';
 
 		// add ')' to the no quote checks
-		$url_regex                     = '\s*' . str_replace('QUOTES', '"\'\)', $url) . '\s*';
-		$this->params->set->searches[] = '#(url\(\s*())' . $url_regex . '(\s*\))#i'; // url(...)
+		$url_regex                          = '\s*' . str_replace('QUOTES', '"\'\)', $url) . '\s*';
+		$this->params->set->searches['url('] = '#(url\(\s*())' . $url_regex . '(\s*\))#i'; // url(...)
 	}
 
 	private function getSearchTagAttributes()

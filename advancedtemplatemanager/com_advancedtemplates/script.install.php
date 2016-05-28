@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -42,6 +42,7 @@ class Com_AdvancedTemplatesInstallerScript extends Com_AdvancedTemplatesInstalle
 		$this->removeAdminMenu();
 		$this->removeFrontendComponentFromDB();
 		$this->deleteOldFiles();
+		$this->fixAssetsRules();
 	}
 
 	public function createTable()
@@ -96,6 +97,20 @@ class Com_AdvancedTemplatesInstallerScript extends Com_AdvancedTemplatesInstalle
 				JPATH_SITE . '/components/com_advancedtemplates',
 			)
 		);
+	}
+
+	public function fixAssetsRules($rules = '')
+	{
+		$rules = '{"core.admin":[],"core.manage":[],"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}';
+
+		parent::fixAssetsRules($rules);
+
+		// Remove unused assets entry (uses com_templates)
+		$query = $this->db->getQuery(true)
+			->delete('#__assets')
+			->where('name LIKE ' . $this->db->quote('com_advancedtemplates.style.%'));
+		$this->db->setQuery($query);
+		$this->db->execute();
 	}
 
 }

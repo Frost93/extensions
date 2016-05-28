@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -19,6 +19,8 @@ class JFormFieldRL_Icons extends RLFormField
 
 	protected function getInput()
 	{
+		RLFunctions::stylesheet('regularlabs/style.min.css');
+
 		$this->params = $this->element->attributes();
 		$value        = $this->value;
 		if (!is_array($value))

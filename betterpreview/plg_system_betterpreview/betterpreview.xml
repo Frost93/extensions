@@ -2,7 +2,7 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_betterpreview</name>
 	<description>PLG_SYSTEM_BETTERPREVIEW_DESC</description>
-	<version>5.0.0</version>
+	<version>5.0.1</version>
 	<creationDate>April 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Better Preview">
+		<server type="extension" priority="1" name="Regular Labs Better Preview">
 			http://download.regularlabs.com/updates.xml?e=betterpreview&amp;type=.xml
 		</server>
 	</updateservers>

@@ -1,6 +1,6 @@
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -383,6 +383,8 @@ var ContentTemplater = null;
 				for (var n = 0, nlen = names.length; n < nlen; n++) {
 					selects.push(types[t] + '[name=' + names[n] + ']');
 					selects.push(types[t] + '[name=' + names[n] + '\\[\\]]');
+					selects.push(types[t] + '[name=jform\\[' + names[n] + '' + '\\]]');
+					selects.push(types[t] + '[name=jform\\[' + names[n] + '' + '\\]\\[\\]]');
 				}
 			}
 

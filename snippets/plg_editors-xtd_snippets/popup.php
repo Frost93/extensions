@@ -97,8 +97,8 @@ class PlgButtonSnippetsPopup
 		RLFunctions::loadLanguage('plg_system_regularlabs');
 		RLFunctions::loadLanguage('com_snippets');
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		// Add scripts and styles
 		$script = "

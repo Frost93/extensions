@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -108,7 +108,7 @@ class AdvancedTemplatesViewTemplates extends JViewLegacy
 		}
 		else
 		{
-			JToolbarHelper::title(JText::sprintf('ATM_HEADING', JText::_('COM_TEMPLATES_SUBMENU_TEMPLATES')), 'advancedtemplatemanager icon-reglab');
+			JToolbarHelper::title(JText::sprintf('ATP_HEADING', JText::_('COM_TEMPLATES_SUBMENU_TEMPLATES')), 'advancedtemplatemanager icon-reglab');
 		}
 
 		if ($canDo->get('core.admin'))

@@ -71,7 +71,7 @@ class SnippetsViewList extends JViewLegacy
 
 		$viewLayout = JFactory::getApplication()->input->get('layout', 'default');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 		RLFunctions::stylesheet('snippets/style.min.css', '5.0.0');
 
 		if ($viewLayout == 'import')

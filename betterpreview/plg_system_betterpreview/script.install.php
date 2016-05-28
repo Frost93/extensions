@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -37,10 +37,23 @@ class PlgSystemBetterPreviewInstallerScript extends PlgSystemBetterPreviewInstal
 			`url` VARCHAR(255) NOT NULL,
 			`sef` VARCHAR(255) NOT NULL,
 			`created` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-			PRIMARY KEY  (`url`(50))
+			KEY  (`url`(50))
 		) DEFAULT CHARSET=utf8;";
 		$this->db->setQuery($query);
 		$this->db->execute();
+
+		$query = 'SHOW INDEX FROM ' . $this->db->quoteName('#__betterpreview_sefs');
+		$this->db->setQuery($query);
+		$index = $this->db->loadObject();
+
+		if (!empty($index->Key_name) && $index->Key_name == 'PRIMARY')
+		{
+			$query = 'ALTER TABLE ' . $this->db->quoteName('#__betterpreview_sefs')
+				. ' DROP INDEX ' . $this->db->quoteName($index->Key_name) . ','
+				. ' ADD INDEX ' . $this->db->quoteName('url') . ' (' . $this->db->quoteName('url') . '(50));';
+			$this->db->setQuery($query);
+			$this->db->execute();
+		}
 
 		// delete all cached sef urls
 		$this->db->truncateTable('#__betterpreview_sefs');

@@ -48,9 +48,9 @@ class PlgButtonTooltipsPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_tooltips');
 		RLFunctions::loadLanguage('plg_system_tooltips');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		// Tag character start and end
 		list($tag_start, $tag_end) = explode('.', $this->params->tag_characters);

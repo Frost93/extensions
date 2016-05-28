@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -37,7 +37,7 @@ class PlgButtonBetterPreview extends JPlugin
 	}
 
 	/*
-	 * Below methods are general functions used in most of the NoNumber extensions
+	 * Below methods are general functions used in most of the Regular Labs extensions
 	 * The reason these are not placed in the Regular Labs Library files is that they also
 	 * need to be used when the Regular Labs Library is not installed
 	 */

@@ -105,9 +105,9 @@ class PlgButtonDummyContentPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_dummycontent');
 		RLFunctions::loadLanguage('plg_system_dummycontent');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 		?>
 		<div class="header">
 			<div class="container-fluid">

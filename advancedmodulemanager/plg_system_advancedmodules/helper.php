@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -101,7 +101,7 @@ class PlgSystemAdvancedModulesHelper
 			JHtml::_('jquery.framework');
 
 			require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
-			RLFunctions::script('advancedmodules/frontediting.min.js', '6.0.0');
+			RLFunctions::script('advancedmodules/frontediting.min.js', '6.0.1');
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -30,13 +30,19 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 		$this->data = (object) array(
 			'article' => null,
-			'total'   => 1,
-			'count'   => 1,
-			'even'    => 0,
-			'uneven'  => 1,
-			'first'   => 1,
-			'last'    => 1,
+			'current' => true,
 		);
+		$this->setNumbers(1, 1);
+	}
+
+	public function setNumbers($total, $count)
+	{
+		$this->data->total  = $total;
+		$this->data->count  = $count;
+		$this->data->even   = ($count % 2) == 0;
+		$this->data->uneven = ($count % 2) != 0;
+		$this->data->first  = $count == 1;
+		$this->data->last   = $count == $total;
 	}
 
 	public function handleIfStatements(&$string, &$article)
@@ -271,7 +277,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 	private function passIfStatementPHP($statement)
 	{
 		$php = html_entity_decode($statement);
-		$php = str_replace('=', '==', $php);
+		$php = preg_replace('#([^<>])=([^<>])#', '\1==\2', $php);
 
 		// replace keys with $article->key
 		$php = '$article->' . preg_replace('#\s*(&&|&&|\|\|)\s*#', ' \1 $article->', $php);
@@ -364,17 +370,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	public function getTagValues($string)
 	{
-		if (strpos($string, ':') !== false
-			&& preg_match('#^([a-z]+ )?[a-z]+:[a-z0-9\|]#si', $string)
-		)
-		{
-			$tag = $this->getTagValuesFromOldSyntax($string);
-		}
-		else
-		{
-			$string = preg_replace('#^(.*?) #s', 'type="\1" ', $string);
-			$tag    = RLTags::getValuesFromString($string, 'type');
-		}
+		$tag = $this->getTagValuesFromString($string);
 
 		$key_aliases = array(
 			'limit'      => array('letters', 'letter_limit', 'characters', 'character_limit'),
@@ -386,6 +382,25 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		RLTags::replaceKeyAliases($tag, $key_aliases);
 
 		return $tag;
+	}
+
+	public function getTagValuesFromString($string)
+	{
+		if (preg_match('#^layout[ \:]([^=]+)$#', $string, $match))
+		{
+			$string = 'layout layout="' . trim($match['1']) . '"';
+		}
+
+		if (strpos($string, ':') !== false
+			&& preg_match('#^([a-z]+ )?[a-z]+\s*:\s*[a-z0-9\|]#si', $string)
+		)
+		{
+			return $this->getTagValuesFromOldSyntax($string);
+		}
+
+		$string = preg_replace('#^(.*?) #s', 'type="\1" ', $string);
+
+		return RLTags::getValuesFromString($string, 'type');
 	}
 
 	public function getTagValuesFromOldSyntax($string)
@@ -523,8 +538,12 @@ class PlgSystemArticlesAnywhereHelperDataTags
 				return $this->processTagDiv($tag);
 
 			// URL
-			case ($tag->type == 'url'):
+			case ($tag->type == 'url' || $tag->type == 'nonsefurl'):
 				return $this->getArticleUrl();
+
+			// SEF URL
+			case ($tag->type == 'sefurl'):
+				return JRoute::_($this->getArticleUrl());
 
 			// Link tag
 			case ($tag->type == 'link'):

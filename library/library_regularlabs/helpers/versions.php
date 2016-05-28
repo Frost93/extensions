@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -34,7 +34,7 @@ class RLVersions
 
 		JHtml::_('jquery.framework');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
 		$url    = 'download.regularlabs.com/extensions.xml?j=3&e=' . $alias;
 		$script = "
 			jQuery(document).ready(function() {
@@ -118,14 +118,14 @@ class RLVersions
 		JHtml::_('behavior.modal');
 		jimport('joomla.filesystem.file');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
 		JFactory::getDocument()->addScriptDeclaration(
 			"
 			var NNEM_TIMEOUT = " . (int) $config->get('timeout', 5) . ";
 			var NNEM_TOKEN = '" . JSession::getFormToken() . "';
 		"
 		);
-		RLFunctions::script('regularlabsmanager/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabsmanager/script.min.js', '5.4.0');
 
 		$url = 'http://download.regularlabs.com?ext=' . $alias . '&j=3';
 
@@ -181,7 +181,7 @@ class RLVersions
 
 		$alias = RLFunctions::getAliasByName($name);
 
-		$jed_url = 'http://r.egu.la/jed-' . $alias . '#reviews';
+		$jed_url = 'http://regl.io/jed-' . $alias . '#reviews';
 
 		return
 			html_entity_decode(

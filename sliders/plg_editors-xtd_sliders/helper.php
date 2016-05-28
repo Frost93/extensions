@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -52,7 +52,7 @@ class PlgButtonSlidersHelper
 	{
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		$button = new JObject;
 
@@ -78,8 +78,8 @@ class PlgButtonSlidersHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_sliders');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		$this->params->tag_open      = preg_replace('#[^a-z0-9-_]#s', '', $this->params->tag_open);
 		$this->params->tag_close     = preg_replace('#[^a-z0-9-_]#s', '', $this->params->tag_close);

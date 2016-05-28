@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Modules Anywhere">
+		<server type="extension" priority="1" name="Regular Labs Modules Anywhere">
 			http://download.regularlabs.com/updates.xml?e=modulesanywhere&amp;type=.xml
 		</server>
 	</updateservers>

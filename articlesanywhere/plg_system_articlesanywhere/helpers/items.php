@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -20,6 +20,7 @@ class PlgSystemArticlesAnywhereHelperItems
 	private $content_items        = array();
 	private $content_items_to_ids = array();
 	private $current_article      = null;
+	private $current_article_id   = null;
 	private $message              = null;
 
 	public function __construct()
@@ -93,49 +94,75 @@ class PlgSystemArticlesAnywhereHelperItems
 			return '';
 		}
 
-		$output = array();
+		list($tag_start, $tag_end) = $this->getDataTagCharacters();
+
+		if (empty($this->data->content))
+		{
+			$this->data->content = $tag_start . 'layout' . $tag_end;
+		}
+
+		$total = 0;
 
 		foreach ($this->data->sets as $item)
 		{
 			$content_items = $this->getContentItemsBySet($item);
+
+			if (!empty($content_items) && is_array($content_items))
+			{
+				$content_items = array_filter($content_items);
+			}
 
 			if (empty($content_items))
 			{
 				continue;
 			}
 
-			foreach ($content_items as $content_item)
+			foreach ($content_items as $i => $content_item)
 			{
 				if (empty($content_item))
 				{
+					unset($content_items[$i]);
 					continue;
 				}
+			}
+
+			$total += count($content_items);
+
+			$item->content_items = $content_items;
+		}
+
+		$output = array();
+
+		$count = 1;
+
+		foreach ($this->data->sets as $item)
+		{
+			if (empty($item->content_items))
+			{
+				if (!empty($item->empty))
+				{
+					$output[] =
+						$this->data->opening_tags_item
+						. $item->empty
+						. $this->data->closing_tags_item;
+				}
+
+				continue;
+			}
+
+			foreach ($item->content_items as $content_item)
+			{
+				$helper = 'datatags';
+
+				$this->helpers->_($helper)->setNumbers($total, $count++);
+				$this->helpers->_($helper)->data->current = ($content_item->id == $this->getCurrentArticleId($item->type));
 
 				$html = $this->getOutput($item, $content_item);
 
-				list($start_div, $end_div) = $this->getDivTags();
-
-				// Don't add surrounding divs if there is nothing to output (not only comments)
-				if (preg_match('#^\s*(<\!--[^>]*-->)*\s*$#', $html))
-				{
-					$start_div = array('pre' => '', 'post' => '');
-					$end_div   = array('pre' => '', 'post' => '');
-				}
-
-				$html =
-					$this->data->start_post
-					. $start_div['pre']
-					. $start_div['post']
-					. $this->data->pre
-
+				$output[] =
+					$this->data->opening_tags_item
 					. $html
-
-					. $this->data->post
-					. $end_div['pre']
-					. $end_div['post']
-					. $this->data->end_pre;
-
-				$output[] = $html;
+					. $this->data->closing_tags_item;
 			}
 		}
 
@@ -248,7 +275,7 @@ class PlgSystemArticlesAnywhereHelperItems
 		$db = JFactory::getDbo();
 
 		$query = $db->getQuery(true)
-			->select($db->quoteName('t.name'))
+			->select($db->quoteName('tags.name'))
 			->from($db->quoteName('#__k2_tags', 'tags'))
 			->join('LEFT', $db->quoteName('#__k2_tags_xref', 'xref')
 				. ' ON ' . $db->quoteName('xref.tagID') . ' = ' . $db->quoteName('tags.id'))
@@ -314,10 +341,10 @@ class PlgSystemArticlesAnywhereHelperItems
 
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true)
-				->select('*')
-				->select('CONCAT("' . $type . '_", ' . $db->quoteName('id') . ') AS type_id')
-				->select($db->quoteName('access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
-				->from($db->quoteName('#__' . $table));
+				->select('a.*')
+				->select('CONCAT("' . $type . '_", ' . $db->quoteName('a.id') . ') AS type_id')
+				->select($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
+				->from($db->quoteName('#__' . $table, 'a'));
 
 			$conditions = array();
 
@@ -329,12 +356,12 @@ class PlgSystemArticlesAnywhereHelperItems
 					continue;
 				}
 
-				$where = $db->quoteName('title') . ' = ' . $db->quote(RLText::html_entity_decoder($id));
-				$where .= ' OR ' . $db->quoteName('alias') . ' = ' . $db->quote(RLText::html_entity_decoder($id));
+				$where = $db->quoteName('a.title') . ' = ' . $db->quote(RLText::html_entity_decoder($id));
+				$where .= ' OR ' . $db->quoteName('a.alias') . ' = ' . $db->quote(RLText::html_entity_decoder($id));
 
 				if (is_numeric($id))
 				{
-					$where .= ' OR ' . $db->quoteName('id') . ' = ' . $id;
+					$where .= ' OR ' . $db->quoteName('a.id') . ' = ' . $id;
 				}
 
 				$conditions[] = $where;
@@ -380,7 +407,7 @@ class PlgSystemArticlesAnywhereHelperItems
 		{
 			if (is_numeric($id))
 			{
-				$numeric[] = $id;
+				$numeric[] = $db->quote($id);
 				continue;
 			}
 
@@ -410,8 +437,8 @@ class PlgSystemArticlesAnywhereHelperItems
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->clear()
-			->select($db->quoteName('id'))
-			->from($db->quoteName('#__' . $table));
+			->select($db->quoteName('a.id'))
+			->from($db->quoteName('#__' . $table, 'a'));
 
 		if ($table == 'content')
 		{
@@ -420,8 +447,8 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		if (!empty($titles))
 		{
-			$wheres[] = $db->quoteName($title) . ' IN (' . implode(',', $titles) . ')';
-			$wheres[] = $db->quoteName('alias') . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.' . $title) . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.alias') . ' IN (' . implode(',', $titles) . ')';
 
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -431,8 +458,8 @@ class PlgSystemArticlesAnywhereHelperItems
 			$wheres = array();
 			foreach ($likes as $like)
 			{
-				$wheres[] = $db->quoteName($title) . ' LIKE ' . $like;
-				$wheres[] = $db->quoteName('alias') . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.' . $title) . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.alias') . ' LIKE ' . $like;
 			}
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -443,19 +470,19 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		if (!$ignore_language)
 		{
-			$query->where($db->quoteName('language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+			$query->where($db->quoteName('a.language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 		}
 
 		if (!$ignore_state)
 		{
-			$where = $db->quoteName('published') . ' = 1';
+			$where = $db->quoteName('a.published') . ' = 1';
 
 			$query->where($where);
 		}
 
 		if (!$ignore_access)
 		{
-			$query->where($db->quoteName('access') . ' IN (' . implode(', ', $this->aid) . ')');
+			$query->where($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ')');
 		}
 
 		$db->setQuery($query);
@@ -486,14 +513,14 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		$query = $this->getContentItemQuery($item);
 
-		$query->where($db->quoteName('catid') . ' IN (' . implode(',', $cat_ids) . ')');
+		$query->where($db->quoteName('a.catid') . ' IN (' . implode(',', $cat_ids) . ')');
 
 		if (!empty($item->is_tag))
 		{
 			$item_ids   = $this->getTagItemIds($item);
 			$item_ids[] = 0;
 
-			$query->where($db->quoteName('id') . ' IN (' . implode(',', $item_ids) . ')');
+			$query->where($db->quoteName('a.id') . ' IN (' . implode(',', $item_ids) . ')');
 		}
 
 		$db->setQuery($query, (int) $offset, (int) $limit);
@@ -510,20 +537,20 @@ class PlgSystemArticlesAnywhereHelperItems
 			return $ids;
 		}
 
-		$table = 'content';
+		$table = 'tags';
 		$title = 'title';
 		$alias = 'alias';
 
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->clear()
-			->select($db->quoteName('id'))
-			->from($db->quoteName('#__' . $table));
+			->select($db->quoteName('a.id'))
+			->from($db->quoteName('#__' . $table, 'a'));
 
 		if (!empty($titles))
 		{
-			$wheres[] = $db->quoteName($title) . ' IN (' . implode(',', $titles) . ')';
-			$wheres[] = $db->quoteName($alias) . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.' . $title) . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.' . $alias) . ' IN (' . implode(',', $titles) . ')';
 
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -533,8 +560,8 @@ class PlgSystemArticlesAnywhereHelperItems
 			$wheres = array();
 			foreach ($likes as $like)
 			{
-				$wheres[] = $db->quoteName($title) . ' LIKE ' . $like;
-				$wheres[] = $db->quoteName($alias) . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.' . $title) . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.' . $alias) . ' LIKE ' . $like;
 			}
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -545,17 +572,17 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		if (!$ignore_language && $item->type != 'k2')
 		{
-			$query->where($db->quoteName('language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+			$query->where($db->quoteName('a.language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 		}
 
 		if (!$ignore_state)
 		{
-			$query->where($db->quoteName('published') . ' = 1');
+			$query->where($db->quoteName('a.published') . ' = 1');
 		}
 
 		if (!$ignore_access && $item->type != 'k2')
 		{
-			$query->where($db->quoteName('access') . ' IN (' . implode(', ', $this->aid) . ')');
+			$query->where($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ')');
 		}
 
 		$db->setQuery($query);
@@ -608,7 +635,7 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		$query = $this->getContentItemQuery($item);
 
-		$query->where($db->quoteName('id') . ' IN (' . implode(',', $item_ids) . ')');
+		$query->where($db->quoteName('a.id') . ' IN (' . implode(',', $item_ids) . ')');
 
 		$db->setQuery($query, (int) $offset, (int) $limit);
 
@@ -655,17 +682,17 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		if (!empty($ids))
 		{
-			$wheres[] = $db->quoteName($title) . ' IN (' . implode(',', $ids) . ')';
-			$wheres[] = $db->quoteName('alias') . ' IN (' . implode(',', $ids) . ')';
-			$wheres[] = $db->quoteName('id') . ' IN (' . implode(',', $ids) . ')';
+			$wheres[] = $db->quoteName('a.' . $title) . ' IN (' . implode(',', $ids) . ')';
+			$wheres[] = $db->quoteName('a.alias') . ' IN (' . implode(',', $ids) . ')';
+			$wheres[] = $db->quoteName('a.id') . ' IN (' . implode(',', $ids) . ')';
 
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
 
 		if (!empty($titles))
 		{
-			$wheres[] = $db->quoteName($title) . ' IN (' . implode(',', $titles) . ')';
-			$wheres[] = $db->quoteName('alias') . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.' . $title) . ' IN (' . implode(',', $titles) . ')';
+			$wheres[] = $db->quoteName('a.alias') . ' IN (' . implode(',', $titles) . ')';
 
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -675,8 +702,8 @@ class PlgSystemArticlesAnywhereHelperItems
 			$wheres = array();
 			foreach ($likes as $like)
 			{
-				$wheres[] = $db->quoteName($title) . ' LIKE ' . $like;
-				$wheres[] = $db->quoteName('alias') . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.' . $title) . ' LIKE ' . $like;
+				$wheres[] = $db->quoteName('a.alias') . ' LIKE ' . $like;
 			}
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
@@ -755,14 +782,22 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getContentItemQuery($item)
 	{
-		$table = 'content';
+		$table     = 'content';
+		$cat_table = 'categories';
+		$cat_title = 'title';
 
 		$db = JFactory::getDbo();
 
 		$query = $db->getQuery(true)
-			->select('*')
-			->select($db->quoteName('access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
-			->from($db->quoteName('#__' . $table));
+			->select(array(
+				'a.*',
+				$db->quoteName('c.' . $cat_title, 'cat_title'),
+				$db->quoteName('c.' . $cat_title, 'cat_name'),
+				$db->quoteName('c.alias', 'cat_alias'),
+			))
+			->select($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
+			->from($db->quoteName('#__' . $table, 'a'))
+			->join('LEFT', $db->quoteName('#__' . $cat_table, 'c') . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName('a.catid'));
 
 		$this->setQueryConditions($query, $item);
 
@@ -773,16 +808,15 @@ class PlgSystemArticlesAnywhereHelperItems
 	{
 		$db = JFactory::getDbo();
 
-		$ignore_language    = isset($item->ignore_language) ? $item->ignore_language : $this->params->ignore_language;
-		$ignore_state       = isset($item->ignore_state) ? $item->ignore_state : $this->params->ignore_state;
-		$ignore_access      = isset($item->ignore_access) ? $item->ignore_access : $this->params->ignore_access;
-		$ordering           = isset($item->ordering) ? $item->ordering : $this->params->ordering;
-		$ordering_direction = isset($item->ordering_direction) ? $item->ordering_direction : $this->params->ordering_direction;
+		$ignore_language = isset($item->ignore_language) ? $item->ignore_language : $this->params->ignore_language;
+		$ignore_state    = isset($item->ignore_state) ? $item->ignore_state : $this->params->ignore_state;
+		$ignore_access   = isset($item->ignore_access) ? $item->ignore_access : $this->params->ignore_access;
 
+		
 
 		if (!$ignore_language)
 		{
-			$query->where($db->quoteName('language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+			$query->where($db->quoteName('a.language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 		}
 
 		if (!$ignore_state)
@@ -791,66 +825,66 @@ class PlgSystemArticlesAnywhereHelperItems
 			$now      = $jnow->toSql();
 			$nullDate = $db->getNullDate();
 
-			$where = $db->quoteName('state') . ' = 1';
+			$where = $db->quoteName('a.state') . ' = 1';
 
 			$query->where($where)
-				->where('( ' . $db->quoteName('publish_up') . ' <= ' . $db->quote($now) . ' )')
-				->where('( ' . $db->quoteName('publish_down') . ' = ' . $db->quote($nullDate) . ' OR ' . $db->quoteName('publish_down') . ' >= ' . $db->quote($now) . ' )');
+				->where('( ' . $db->quoteName('a.publish_up') . ' <= ' . $db->quote($now) . ' )')
+				->where('( ' . $db->quoteName('a.publish_down') . ' = ' . $db->quote($nullDate)
+					. ' OR ' . $db->quoteName('a.publish_down') . ' >= ' . $db->quote($now) . ' )');
 		}
 
 		if (!$ignore_access)
 		{
-			$query->where($db->quoteName('access') . ' IN (' . implode(', ', $this->aid) . ')');
+			$query->where($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ')');
 		}
-
-		if ($ordering == 'random')
-		{
-			$query->order('RAND()');
-
-			return;
-		}
-
-		if (strpos($ordering, ' ') !== false)
-		{
-			list($ordering, $ordering_direction) = explode(' ', $ordering, 2);
-		}
-
-		$query->order($db->quoteName($ordering) . ' ' . $ordering_direction);
+		$query->order($db->quoteName('a.ordering') . ' ASC');
 	}
 
 	private function getItem($data)
 	{
-		$sets = $this->getTagValues($data['id']);
+		$sets = $this->getTagValues($data);
 
 		if (empty($sets))
 		{
 			return null;
 		}
 
+		$opening_tags_main = RLTags::removeEmptyHtmlTagPairs(
+			$data['opening_tags_before_open']
+			. $data['closing_tags_after_open']
+		);
+
+		$opening_tags_item = $data['opening_tags_before_content'];
+
+		$closing_tags_item = $data['closing_tags_after_content'];
+
+		$closing_tags_main = RLTags::removeEmptyHtmlTagPairs(
+			$data['opening_tags_before_close']
+			. $data['closing_tags_after_close']
+		);
+
 		return (object) array(
-			'original_string' => $data['0'],
-			'tag'             => $data['tag'],
-			'content'         => $data['html'],
-			'start_pre'       => $data['start_pre'],
-			'end_pre'         => $data['end_pre'],
-			'start_post'      => $data['start_post'],
-			'end_post'        => $data['end_post'],
-			'start_div'       => $data['start_div'],
-			'end_div'         => $data['end_div'],
-			'pre'             => $data['pre'],
-			'post'            => $data['post'],
-			'sets'            => $sets,
+			'original_string'   => $data['0'],
+			'tag'               => $data['tag'],
+			'content'           => $data['html'],
+			'opening_tags_main' => $opening_tags_main,
+			'closing_tags_main' => $closing_tags_main,
+			'opening_tags_item' => $opening_tags_item,
+			'closing_tags_item' => $closing_tags_item,
+			'sets'              => $sets,
 		);
 	}
 
-	private function getTagValues($string)
+	private function getTagValues($data)
 	{
+		$string = html_entity_decode($data['id']);
+
 		if (strpos($string, '="') == false)
 		{
-			$string = $this->convertTagToNewSyntax($string);
+			$string = $this->convertTagToNewSyntax($string, $data['tag']);
 		}
 
-		$parts = $string;
+		$parts = array($string);
 
 		$known_boolean_keys = array(
 			'ignore_language', 'ignore_access', 'ignore_state',
@@ -877,7 +911,7 @@ class PlgSystemArticlesAnywhereHelperItems
 			$set->ids = array();
 
 
-			if (!isset($set->id))
+			if (empty($set->id))
 			{
 				$set->id = 'current';
 			}
@@ -915,12 +949,12 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getCurrentArticle($item)
 	{
-		if (isset($this->helpers->_('replace')->current_article->id))
+		if (!is_null($this->current_article))
 		{
-			return $this->helpers->_('replace')->current_article;
+			return $this->current_article;
 		}
 
-		$id = $this->getCurrentArticleId($item);
+		$id = $this->getCurrentArticleId($item->type);
 
 		if (empty($id))
 		{
@@ -929,17 +963,46 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		$item->id = $id;
 
-		return $this->getSingleContentItem($item);
+		$this->current_article = $this->getSingleContentItem($item, $id);
+
+		return $this->current_article;
 	}
 
-	private function getCurrentArticleId($item)
+	private function getCurrentArticleId($type = 'joomla')
 	{
+		if (!is_null($this->current_article_id))
+		{
+			return $this->current_article_id;
+		}
+
+		$this->current_article_id = $this->findCurrentArticleId($type);
+
+		return $this->current_article_id;
+	}
+
+	private function findCurrentArticleId($type = 'joomla')
+	{
+		if (!is_null($this->current_article_id))
+		{
+			return $this->current_article_id;
+		}
+
+		if (!is_null($this->helpers->_('replace')->current_article_id))
+		{
+			return $this->helpers->_('replace')->current_article_id;
+		}
+
+		if (isset($this->current_article->id))
+		{
+			return $this->current_article->id;
+		}
+
 		if (isset($this->current_article->link) && preg_match('#&(?:amp;)?id=([0-9]*)#', $this->current_article->link, $match))
 		{
 			return $match['1'];
 		}
 
-		if ($item->type == 'joomla' && $this->params->option == 'com_content' && JFactory::getApplication()->input->get('view') == 'article')
+		if ($type == 'joomla' && $this->params->option == 'com_content' && JFactory::getApplication()->input->get('view') == 'article')
 		{
 			return JFactory::getApplication()->input->getInt('id', 0);
 		}
@@ -948,7 +1011,7 @@ class PlgSystemArticlesAnywhereHelperItems
 		return 0;
 	}
 
-	private function convertTagToNewSyntax($string)
+	private function convertTagToNewSyntax($string, $tag_type)
 	{
 		RLTags::protectSpecialChars($string);
 
@@ -972,8 +1035,8 @@ class PlgSystemArticlesAnywhereHelperItems
 
 			$parts = explode(':', $set);
 
-			$attributes   = array();
-			$attributes[] = 'id="' . array_pop($parts) . '"';
+			$id         = array_pop($parts);
+			$attributes = array();
 
 			foreach ($parts as $part)
 			{
@@ -996,11 +1059,17 @@ class PlgSystemArticlesAnywhereHelperItems
 						$attributes[] = 'limit="' . $part . '"';
 						break;
 
+					case ($tag_type == $this->params->article_tag):
+						$id = $part . ':' . $id;
+						break;
+
 					default:
 						$attributes[] = 'ordering="' . trim($part) . '"';
 						break;
 				}
 			}
+
+			array_unshift($attributes, 'id="' . $id . '"');
 
 			$set = implode(' ', $attributes);
 		}
@@ -1066,12 +1135,5 @@ class PlgSystemArticlesAnywhereHelperItems
 		}
 
 		return array($start, $end);
-	}
-
-	public function getDivTags()
-	{
-		list($tag_start, $tag_end) = $this->getTagCharacters(true);
-
-		return RLTags::getDivTags($this->data->start_div, $this->data->end_div, $tag_start, $tag_end);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.0.0
+ * @version         5.1.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -33,10 +33,11 @@ $script = "
 		" . $alert . "
 	}
 	var DBR_root = '" . JUri::root() . "';
+	var DBR_INVALID_QUERY = '" . addslashes(JText::_('DBR_INVALID_QUERY')) . "';
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
-RLFunctions::script('dbreplacer/script.min.js', '5.0.0');
-RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+RLFunctions::script('dbreplacer/script.min.js', '5.1.0');
+RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
 
 // Version check
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/versions.php';

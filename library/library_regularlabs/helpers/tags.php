@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -87,7 +87,7 @@ class RLTags
 			$string
 		);
 
-		if (!preg_match_all('#<.*?>#s', $string, $tags))
+		if (!preg_match_all('#(<.*?>|{.*?}|\[.*?\])#s', $string, $tags))
 		{
 			return;
 		}
@@ -312,61 +312,19 @@ class RLTags
 	}
 
 	/*
-	 * fixes surround html tags placed by the pre and post parts
-	 *
-	 * @var $parts  array  array consisting of 3 strings, pre, main and post
-	 */
-	public static function fixSurroundingHtmlTags($parts, $elements = array('p', 'span'))
-	{
-		if (count($parts) != 3)
-		{
-			return implode('', $parts);
-		}
-
-		list($pre, $main, $post) = $parts;
-
-		// remove open/close tag pairs inside the pre and post strings
-		$pre  = self::removeEmptyHtmlTagPairs($pre);
-		$post = self::removeEmptyHtmlTagPairs($post);
-
-		if (empty($pre) && empty($post))
-		{
-			// No need to check main string for tags
-			return self::fixBrokenHtmlTags($pre . $main . $post);
-		}
-
-		// No need to check main string for tags
-		if (strpos($main, '</') === false)
-		{
-			return $pre . $main . $post;
-		}
-
-		return self::fixBrokenHtmlTags($pre . $main . $post);
-	}
-
-	/*
-	 * parses string through DOMDocument to fix missing html closing tags and such
+	 * parses string through Tidy/DOMDocument to fix missing html closing tags and such
 	 */
 	public static function fixBrokenHtmlTags($string)
 	{
-		$doc = new DOMDocument();
+		require_once JPATH_LIBRARIES . '/regularlabs/helpers/htmlfix.php';
 
-		$doc->substituteEntities = false;
-
-		$string = function_exists('mb_convert_encoding')
-			? mb_convert_encoding($string, 'html-entities', 'utf-8')
-			: utf8_encode($string);
-
-		@$doc->loadHTML($string);
-		$string = $doc->saveHTML();
-
-		return preg_replace('#^.*?<body>(.*?)</body>.*?$#s', '\1', $string);
+		return RLHtmlFix::_($string);
 	}
 
 	/*
 	 * remove empty tags
 	 */
-	private static function removeEmptyHtmlTagPairs($string, $elements = array('p', 'span'))
+	public static function removeEmptyHtmlTagPairs($string, $elements = array('p', 'span'))
 	{
 		$breaks = '(?:<br ?/?>\s*)*';
 
@@ -378,7 +336,7 @@ class RLTags
 		return $string;
 	}
 
-	// @Deprecated: use fixSurroundingHtmlTags
+	// @Deprecated: use fixBrokenHtmlTags
 	public static function cleanSurroundingTags($tags, $elements = array('p', 'span'))
 	{
 		require_once __DIR__ . '/text.php';
@@ -428,7 +386,7 @@ class RLTags
 		return $new_tags;
 	}
 
-	// @Deprecated: use fixSurroundingHtmlTags ???
+	// @Deprecated: use fixBrokenHtmlTags ???
 	public static function fixSurroundingTags($tags)
 	{
 		$keys = array_keys($tags);
@@ -487,20 +445,24 @@ class RLTags
 		return $new_tags;
 	}
 
-	private static function getBlockElements()
+	private static function getBlockElements($exclude = array())
 	{
-		return array(
+		if (!is_array($exclude))
+		{
+			$exclude = array($exclude);
+		}
+
+		$elements = array(
 			'div', 'p', 'pre',
 			'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
 		);
+
+		return array_diff($elements, $exclude);
 	}
 
-	private static function getBlockElementsNoDiv()
+	private static function getBlockElementsNoDiv($exclude = array())
 	{
-		return array(
-			'p', 'pre',
-			'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-		);
+		return array_diff(self::getBlockElements($exclude), array('div'));
 	}
 
 	private static function getInlineElements()

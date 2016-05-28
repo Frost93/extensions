@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -26,11 +26,11 @@ $query = $db->getQuery(true)
 $db->setQuery($query);
 $contact = $db->loadObject();
 
-RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 ?>
 
-<form action="<?php echo JRoute::_('index.php?option=com_contenttemplater&id=' . ( int ) $this->item->id); ?>" method="post"
+<form action="<?php echo JRoute::_('index.php?option=com_contenttemplater'); ?>" method="post"
       name="adminForm" id="item-form" class="form-validate form-horizontal">
 	<div class="row-fluid">
 		<div class="span9 span-md-8">
@@ -240,6 +240,7 @@ RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
 	</div>
 
 	<input type="hidden" name="task" value="">
+	<input type="hidden" name="id" value="<?php echo (int) $this->item->id; ?>">
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 

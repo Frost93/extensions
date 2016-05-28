@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber IP Login">
+		<server type="extension" priority="1" name="Regular Labs IP Login">
 			http://download.regularlabs.com/updates.xml?e=iplogin&amp;type=.xml
 		</server>
 	</updateservers>

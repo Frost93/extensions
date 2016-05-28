@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Cache Cleaner">
+		<server type="extension" priority="1" name="Regular Labs Cache Cleaner">
 			http://download.regularlabs.com/updates.xml?e=cachecleaner&amp;type=.xml
 		</server>
 	</updateservers>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -64,7 +64,7 @@ class PlgSystemTabs extends JPlugin
 	}
 
 	/*
-	 * Below methods are general functions used in most of the NoNumber extensions
+	 * Below methods are general functions used in most of the Regular Labs extensions
 	 * The reason these are not placed in the Regular Labs Library files is that they also
 	 * need to be used when the Regular Labs Library is not installed
 	 */
@@ -74,7 +74,7 @@ class PlgSystemTabs extends JPlugin
 	 *
 	 * @return object The plugins helper object
 	 */
-	private function getHelper()
+	public function getHelper()
 	{
 		// Already initialized, so return
 		if ($this->_init)

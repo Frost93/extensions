@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber What? Nothing!">
+		<server type="extension" priority="1" name="Regular Labs What? Nothing!">
 			http://download.regularlabs.com/updates.xml?e=whatnothing&amp;type=.xml
 		</server>
 	</updateservers>

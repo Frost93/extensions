@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -97,13 +97,13 @@ class PlgSystemArticlesAnywhereInstallerScript extends PlgSystemArticlesAnywhere
 	{
 		JFile::delete(
 			array(
-				JPATH_PLUGINS . '/system/articlesanywhere/article.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/articles.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/articlesk2.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/process.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/tag.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/tags.php',
-				JPATH_PLUGINS . '/system/articlesanywhere/tagsk2.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/article.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/articles.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/articlesk2.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/process.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/tag.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/tags.php',
+				JPATH_PLUGINS . '/system/articlesanywhere/helpers/tagsk2.php',
 			)
 		);
 	}

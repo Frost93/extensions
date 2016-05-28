@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         CDN for Joomla!
- * @version         5.0.0
+ * @version         5.2.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -50,8 +50,8 @@ class PlgSystemCDNforJoomlaInstallerScript extends PlgSystemCDNforJoomlaInstalle
 			return;
 		}
 
-		// The new protocol setting is found, so no need to do anything
-		if (isset($params->protocol))
+		// The new web protocol setting is found, so no need to do anything
+		if (isset($params->web_protocol))
 		{
 			return;
 		}
@@ -130,11 +130,11 @@ class PlgSystemCDNforJoomlaInstallerScript extends PlgSystemCDNforJoomlaInstalle
 
 			case 1:
 			default:
-				$protocol = 'same';
+				$protocol = 'both';
 				break;
 		}
 
-		$params->{'protocol' . $setid} = $protocol;
+		$params->{'web_protocol' . $setid} = $protocol;
 		unset($params->{'enable_https' . $setid});
 	}
 }

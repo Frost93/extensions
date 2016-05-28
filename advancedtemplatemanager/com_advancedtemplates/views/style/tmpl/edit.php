@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,8 +48,8 @@ if (JFactory::getUser()->authorise('core.admin'))
 }
 
 JFactory::getDocument()->addScriptDeclaration($script);
-RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-RLFunctions::script('regularlabs/toggler.min.js', '16.4.11567');
+RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
+RLFunctions::script('regularlabs/toggler.min.js', '16.5.10919');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_advancedtemplates&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm"

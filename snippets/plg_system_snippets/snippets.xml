@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Snippets">
+		<server type="extension" priority="1" name="Regular Labs Snippets">
 			http://download.regularlabs.com/updates.xml?e=snippets&amp;type=.xml
 		</server>
 	</updateservers>

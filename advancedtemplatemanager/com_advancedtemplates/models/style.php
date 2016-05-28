@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -586,6 +586,15 @@ class AdvancedTemplatesModelStyle extends JModelAdmin
 			$this->setError($table_adv->getError());
 		}
 
+		$db = $this->getDbo();
+
+		// Remove unused assets entry (uses core com_templates rules)
+		$query = $db->getQuery(true)
+			->delete('#__assets')
+			->where('name = ' . $db->quote('com_advancedtemplates.style.' . (int) $table->id));
+		$db->setQuery($query);
+		$db->execute();
+
 		//
 		// Process the menu link mappings.
 		//
@@ -609,7 +618,6 @@ class AdvancedTemplatesModelStyle extends JModelAdmin
 		if ($user->authorise('core.edit', 'com_menus') && $table->client_id == 0)
 		{
 			$n    = 0;
-			$db   = $this->getDbo();
 			$user = JFactory::getUser();
 
 			if (!empty($data['assigned']) && is_array($data['assigned']))

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.0.0
+ * @version         5.1.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,8 +24,6 @@ class DBReplacer
 {
 	function render()
 	{
-		$this->db = JFactory::getDbo();
-
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
 		$parameters   = RLParameters::getInstance();
 		$this->config = $parameters->getComponentParams('com_dbreplacer');
@@ -87,9 +85,11 @@ class DBReplacer
 			die('Invalid data found in URL!');
 		}
 
+		$db = JFactory::getDbo();
+
 		$query = 'SHOW COLUMNS FROM `' . trim($this->params->table) . '`';
-		$this->db->setQuery($query);
-		$columns = $this->db->loadColumn();
+		$db->setQuery($query);
+		$columns = $db->loadColumn();
 
 		return $columns;
 	}
@@ -107,22 +107,34 @@ class DBReplacer
 			return '';
 		}
 
-		$html = array();
-
-		$html[] = '<p><a class="btn btn-default" onclick="RLDBReplacer.toggleInactiveColumns();">' . JText::_('DBR_TOGGLE_INACTIVE_COLUMNS') . '</a></p>';
-
 		$columns = $this->implodeParams($this->params->columns);
 
 		$cols = $this->getColumns();
-		$rows = $this->getRows($max);
+
+		$rows = $this->getRows($cols, $max);
+
+		if (is_null($rows))
+		{
+			return $this->getMessage(JText::_('DBR_INVALID_QUERY'), 'error');
+		}
+
+		if (empty($rows))
+		{
+			return $this->getMessage(JText::_('DBR_ROW_COUNT_NONE'));
+		}
+
+		$html = array();
+
 		if (count($rows) > $max - 1)
 		{
-			$html[] = '<p>' . JText::sprintf('DBR_MAXIMUM_ROW_COUNT_REACHED', $max) . '</p>';
+			$html[] = $this->getMessage(JText::sprintf('DBR_MAXIMUM_ROW_COUNT_REACHED', $max), 'warning');
 		}
 		else
 		{
-			$html[] = '<p>' . JText::sprintf('DBR_ROW_COUNT', count($rows)) . '</p>';
+			$html[] = $this->getMessage(JText::sprintf('DBR_ROW_COUNT', count($rows)));
 		}
+
+		$html[] = '<p><a class="btn btn-default" onclick="RLDBReplacer.toggleInactiveColumns();">' . JText::_('DBR_TOGGLE_INACTIVE_COLUMNS') . '</a></p>';
 
 		$html[] = '<table class="table table-striped" id="dbr_results">';
 		$html[] = '<thead><tr>';
@@ -147,7 +159,12 @@ class DBReplacer
 		return implode("\n", $html);
 	}
 
-	function getTableRow($rows, $cols)
+	private function getMessage($text = '', $type = 'info')
+	{
+		return '<div class="alert alert-' . $type . '">' . $text . '</div>';
+	}
+
+	private function getTableRow($rows, $cols)
 	{
 		$columns = $this->implodeParams($this->params->columns);
 		$search  = str_replace('||space||', ' ', $this->params->search);
@@ -282,82 +299,146 @@ class DBReplacer
 		return implode('', $html);
 	}
 
-	function getRows($max = 100)
+	function getRows($cols, $max = 100)
 	{
 		if (preg_match('#[^a-z0-9-_\#]#i', $this->params->table))
 		{
 			die('Invalid data found in URL!');
 		}
 
-		$table   = $this->params->table;
+		$db    = JFactory::getDbo();
+		$table = $this->params->table;
+
+		$select_colums = $cols;
+		array_walk($select_colums, function (&$col, $key, $db)
+		{
+			$col = $db->quoteName($col);
+		}, $db);
+
+		$query = $db->getQuery(true)
+			->select($select_colums)
+			->from($db->quoteName(trim($table)));
+
+		$where = $this->getWhereClause($cols);
+		if (!empty($where))
+		{
+			$query->where('(' . implode(' OR ', $where) . ')');
+		}
+
+
+		$db->setQuery($query, 0, $max);
+
+		return $db->loadObjectList();
+	}
+
+	function getWhereClause($cols = array())
+	{
 		$columns = $this->params->columns;
+
+		if (empty($columns))
+		{
+			return false;
+		}
 
 		$s = str_replace('||space||', ' ', $this->params->search);
 
-		$where = '';
-		if ($columns)
+		if (empty($s))
 		{
-			$likes = array();
-			if ($s != '')
+			return false;
+		}
+
+		$likes = array();
+
+		switch ($s)
+		{
+			case 'NULL' :
+				$likes[] = 'IS NULL';
+				$likes[] = '= ""';
+				break;
+
+			case '*':
+				$likes[] = ' != \'-something it would never be!!!-\'';
+				break;
+
+			default:
+				$dbs = $s;
+
+					$dbs = preg_quote($dbs);
+					// replace multiple whitespace (with at least one enter) with regex whitespace match
+					$dbs = preg_replace('#\s*\n\s*#s', '\s*', $dbs);
+
+				// escape slashes
+				$dbs = str_replace('\\', '\\\\', $dbs);
+				// escape single quotes
+				$dbs = str_replace('\'', '\\\'', $dbs);
+				// remove the lazy character: doesn't work in mysql
+				$dbs = str_replace(array('*?', '+?'), array('*', '+'), $dbs);
+				// change \s to [:space:]
+				$dbs = str_replace('\s', '[[:space:]]', $dbs);
+
+				$likes[] = $this->params->case
+					? 'RLIKE BINARY \'' . $dbs . '\''
+					: 'RLIKE \'' . $dbs . '\'';
+				break;
+		}
+
+		$db      = JFactory::getDbo();
+		$columns = $this->implodeParams($columns);
+		$where   = array();
+
+		foreach ($columns as $column)
+		{
+			foreach ($likes as $like)
 			{
-				if ($s == 'NULL')
-				{
-					$likes[] = 'IS NULL';
-					$likes[] = '= ""';
-				}
-				else if ($s == '*')
-				{
-					$likes[] = ' != \'something it would never be!!!\'';
-				}
-				else
-				{
-					$dbs = $s;
-
-						$dbs = preg_quote($dbs);
-						// replace multiple whitespace (with at least one enter) with regex whitespace match
-						$dbs = preg_replace('#\s*\n\s*#s', '\s*', $dbs);
-
-					// escape slashes
-					$dbs = str_replace('\\', '\\\\', $dbs);
-					// escape single quotes
-					$dbs = str_replace('\'', '\\\'', $dbs);
-					// remove the lazy character: doesn't work in mysql
-					$dbs = str_replace(array('*?', '+?'), array('*', '+'), $dbs);
-					// change \s to [:space:]
-					$dbs = str_replace('\s', '[[:space:]]', $dbs);
-
-					if ($this->params->case)
-					{
-						$likes[] = 'RLIKE BINARY \'' . $dbs . '\'';
-					}
-					else
-					{
-						$likes[] = 'RLIKE \'' . $dbs . '\'';
-					}
-				}
-			}
-
-			if (!empty($likes))
-			{
-				$columns = $this->implodeParams($columns);
-				$where   = array();
-				foreach ($columns as $column)
-				{
-					foreach ($likes as $like)
-					{
-						$where[] = '`' . trim($column) . '` ' . $like;
-					}
-				}
-				$where = ' WHERE ( ' . implode(' OR ', $where) . ' )';
+				$where[] = $db->quoteName(trim($column)) . ' ' . $like;
 			}
 		}
 
-		$query = 'SELECT * FROM `' . trim($table) . '`'
-			. $where
-			. ' LIMIT ' . (int) $max;
-		$this->db->setQuery($query);
+		return $where;
+	}
 
-		return $this->db->loadObjectList();
+	function getCustomWhereClause($cols = array())
+	{
+		if (empty($this->params->where))
+		{
+			return false;
+		}
+
+		$custom_where = trim(str_replace('WHERE ', '', trim($this->params->where)));
+
+		if (empty($custom_where))
+		{
+			return false;
+		}
+
+		if (empty($cols))
+		{
+			return $custom_where;
+		}
+
+		array_walk($cols, function (&$col)
+		{
+			$col = preg_quote($col, '#');
+		});
+
+		$regex = '#(^| )(' . implode('|', $cols) . ')( +(?:=|\!|IS |IN |LIKE ))#s';
+		preg_match_all($regex, $custom_where, $matches, PREG_SET_ORDER);
+
+		if (!empty($matches))
+		{
+			$db = JFactory::getDbo();
+
+			foreach ($matches as $match)
+			{
+				$custom_where = str_replace(
+					$match['0'],
+					$match['1'] . $db->quoteName($match['2']) . $match['3'],
+					$custom_where
+				);
+			}
+		}
+
+		return $custom_where;
 	}
 
 	function implodeParams($params)
@@ -366,8 +447,10 @@ class DBReplacer
 		{
 			return $params;
 		}
+
 		$params = explode(',', $params);
 		$p      = array();
+
 		foreach ($params as $param)
 		{
 			if (trim($param) != '')

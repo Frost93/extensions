@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -87,7 +87,7 @@ class PlgSystemArticlesAnywhereHelper
 
 		if (JFactory::getDocument()->getType() != 'html')
 		{
-			$this->helpers->_('items')->replace($html, 'body');
+			$this->helpers->_('replace')->_($html, 'body');
 			$this->helpers->_('clean')->cleanLeftoverJunk($html);
 
 			JFactory::getApplication()->setBody($html);
@@ -111,6 +111,8 @@ class PlgSystemArticlesAnywhereHelper
 
 	public function replaceItems(&$string, $area = 'articles', $context = '', &$article)
 	{
-		$this->helpers->_('replace')->_($string, $area, $context, $article);
+		$article_id = isset($article->id) ? $article->id : null;
+
+		$this->helpers->_('replace')->_($string, $area, $context, $article_id);
 	}
 }

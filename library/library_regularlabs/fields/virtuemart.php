@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -104,6 +104,13 @@ class JFormFieldRL_VirtueMart extends RLFormGroupField
 		}
 
 		VmConfig::loadConfig();
+
+		if (!empty(VmConfig::$vmlang))
+		{
+			$this->language = str_replace('-', '_', strtolower(VmConfig::$vmlang));
+
+			return $this->language;
+		}
 
 		$active_languages = VmConfig::get('active_languages', array());
 

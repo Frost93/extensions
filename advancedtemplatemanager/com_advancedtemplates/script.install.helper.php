@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -534,6 +534,18 @@ class Com_AdvancedTemplatesInstallerScriptHelper
 
 			JFolder::delete($folder);
 		}
+	}
+
+	public function fixAssetsRules($rules = '{"core.admin":[],"core.manage":[]}')
+	{
+		// replace default rules value {} with the correct initial value
+		$query = $this->db->getQuery(true)
+			->update($this->db->quoteName('#__assets'))
+			->set($this->db->quoteName('rules') . ' = ' . $this->db->quote($rules))
+			->where($this->db->quoteName('title') . ' = ' . $this->db->quote('com_' . $this->extname))
+			->where($this->db->quoteName('rules') . ' = ' . $this->db->quote('{}'));
+		$this->db->setQuery($query);
+		$this->db->execute();
 	}
 
 	private function updateUpdateSites()

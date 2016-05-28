@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,10 +15,12 @@ require_once JPATH_SITE . '/components/com_content/views/article/view.html.php';
 
 class ArticlesAnywhereArticleView extends ContentViewArticle
 {
-	public function setParams($id, $template, $layout)
+	public function setParams($id, $template, $layout, $params)
 	{
 		require_once JPATH_SITE . '/components/com_content/models/article.php';
 		$model = new ContentModelArticle;
+
+		$this->plugin_params = $params;
 
 		$this->item  = $model->getItem($id);
 		$this->state = $model->getState();
@@ -27,8 +29,8 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 
 		$this->item->article_layout = $template . ':' . $layout;
 
-		$this->_addPath('template', JPATH_SITE . '/templates/' . $template . '/html/com_content/article');
 		$this->_addPath('template', JPATH_SITE . '/components/com_content/views/article/tmpl');
+		$this->_addPath('template', JPATH_SITE . '/templates/' . $template . '/html/com_content/article');
 	}
 
 	public function display($tpl = null)
@@ -81,6 +83,25 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 		$item->event                       = new stdClass;
 		$item->event->beforeDisplayContent = '';
 		$item->event->afterDisplayContent  = '';
+
+		if ($this->plugin_params->force_content_triggers)
+		{
+			// Process the content plugins.
+			$dispatcher = JEventDispatcher::getInstance();
+			JPluginHelper::importPlugin('content');
+
+			$dispatcher->trigger('onContentPrepare', array('com_content.article', &$item, &$item->params, 0));
+
+			$results                        = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$item->params, 0));
+			$item->event->afterDisplayTitle = trim(implode("\n", $results));
+
+			$results                           = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$item->params, 0));
+			$item->event->beforeDisplayContent = trim(implode("\n", $results));
+
+			$results                          = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$item->params, 0));
+			$item->event->afterDisplayContent = trim(implode("\n", $results));
+		}
+
 		// Escape strings for HTML output
 		$this->pageclass_sfx = htmlspecialchars($this->item->params->get('pageclass_sfx'));
 

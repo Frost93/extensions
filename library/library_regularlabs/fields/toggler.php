@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -60,8 +60,8 @@ class RLFieldToggler
 		$div    = $this->get('div', 0);
 
 		JHtml::_('jquery.framework');
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::script('regularlabs/toggler.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('regularlabs/toggler.min.js');
 
 		$param = preg_replace('#^\s*(.*?)\s*$#', '\1', $param);
 		$param = preg_replace('#\s*\|\s*#', '|', $param);

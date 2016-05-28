@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,11 +48,11 @@ class PlgButtonContentTemplaterHelper
 		JHtml::_('bootstrap.framework');
 		JHtml::_('bootstrap.popover');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::script('contenttemplater/script.min.js', '6.0.0');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('contenttemplater/script.min.js', '6.0.1');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
-		RLFunctions::stylesheet('contenttemplater/button.min.css', '6.0.0');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
+		RLFunctions::stylesheet('contenttemplater/button.min.css', '6.0.1');
 
 		$buttons = array();
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,9 +48,9 @@ class PlgButtonSlidersPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_sliders');
 		RLFunctions::loadLanguage('plg_system_sliders');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		// Tag character start and end
 		list($tag_start, $tag_end) = explode('.', $this->params->tag_characters);
@@ -67,8 +67,8 @@ class PlgButtonSlidersPopup
 		";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('sliders/popup.min.js', '6.0.0');
-		RLFunctions::stylesheet('sliders/popup.min.css', '6.0.0');
+		RLFunctions::script('sliders/popup.min.js', '6.0.2');
+		RLFunctions::stylesheet('sliders/popup.min.css', '6.0.2');
 
 		echo $this->getHTML();
 	}

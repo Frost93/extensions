@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -50,7 +50,7 @@ class PlgButtonArticlesAnywhereHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_articlesanywhere');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$icon = 'reglab icon-articlesanywhere';
 		$link = 'index.php?rl_qp=1'

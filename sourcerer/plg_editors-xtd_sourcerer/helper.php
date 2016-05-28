@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sourcerer
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,7 +48,7 @@ class PlgButtonSourcererHelper
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$icon = 'reglab icon-sourcerer';
 		$link = 'index.php?rl_qp=1'

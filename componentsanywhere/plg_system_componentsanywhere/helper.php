@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Components Anywhere
- * @version         3.0.0
+ * @version         3.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -634,7 +634,9 @@ class PlgSystemComponentsAnywhereHelper
 				. '</script>' . "\n";
 		}
 
-		$inline_head_scripts[] = implode("\n", $data->custom);
+		$inline_head_scripts[] = is_array($data->custom)
+			? implode("\n", $data->custom)
+			: (string) $data->custom;
 
 		if (!empty($inline_head_styles))
 		{

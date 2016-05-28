@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -471,14 +471,14 @@ class RLProtect
 		{
 			if (RLText::is_alphanumeric($tag['0']))
 			{
-				continue;
+				$tag = '{' . $tag;
 			}
 
-			$tags[$i] = '{' . $tag;
+			$tags[$i] = $tag;
 
 			if ($include_closing_tags)
 			{
-				$tags[] = '{/' . $tag;
+				$tags[] = preg_replace('#^([^a-z0-9]+)#', '\1/', $tag);
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -175,10 +175,10 @@ class PlgSystemBetterPreview extends JPlugin
 				JHtml::_('jquery.framework');
 				JHtml::_('bootstrap.tooltip');
 
-				RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-				RLFunctions::script('betterpreview/script.min.js', '5.0.0');
-				RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
-				RLFunctions::stylesheet('betterpreview/style.min.css', '5.0.0');
+				RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+				RLFunctions::script('betterpreview/script.min.js', '5.0.1');
+				RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+				RLFunctions::stylesheet('betterpreview/style.min.css', '5.0.1');
 
 				break;
 		}

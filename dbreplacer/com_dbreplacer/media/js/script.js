@@ -1,6 +1,6 @@
 /**
  * @package         DB Replacer
- * @version         5.0.0
+ * @version         5.1.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -81,7 +81,14 @@ var RLDBReplacer = null;
 					self._insertData(data, field);
 				},
 				error  : function(data) {
-					self._finishLoad();
+					var text = DBR_INVALID_QUERY;
+					var pos  = data.statusText.indexOf('SQL=SELECT');
+					if (pos > 1 && data.statusText.indexOf('You have an error') < 0) {
+						text = text + '<br />' + data.statusText.substr(0, pos);
+					}
+					self._insertData(
+						'<div class="alert alert-danger">' + text + '</div>',
+						field);
 				}
 			});
 		},
@@ -232,7 +239,7 @@ var RLDBReplacer = null;
 
 		_multipleSelectValues: function(el) {
 			var vals = [];
-			for (j = 0; j < el.options.length; j++) {
+			for (var j = 0; j < el.options.length; j++) {
 				if (el.options[j].selected) {
 					vals[vals.length] = el.options[j].value;
 				}

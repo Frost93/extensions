@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Dummy Content">
+		<server type="extension" priority="1" name="Regular Labs Dummy Content">
 			http://download.regularlabs.com/updates.xml?e=dummycontent&amp;type=.xml
 		</server>
 	</updateservers>

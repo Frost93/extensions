@@ -1,6 +1,6 @@
 /**
  * @package         Sliders
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -21,6 +21,7 @@ var RegularLabsSlidersPopup = null;
 
 	RegularLabsSlidersPopup = {
 		texts   : ['alias', 'mainclass', 'class'],
+		classes : ['icon'],
 		booleans: [
 			'icon',
 		],
@@ -95,6 +96,18 @@ var RegularLabsSlidersPopup = null;
 			$.each(data, function(i, item) {
 				var id    = 'slider_' + (i + 1);
 				var extra = [];
+
+				console.log(item);
+				$.each(self.classes, function(s, clss) {
+					if (item['class'] === undefined) {
+						return;
+					}
+
+					var regex     = new RegExp('(^| )' + clss + '( |$)');
+					item['class'] = item['class'].replace(regex, '$2');
+
+					item[clss] = true;
+				});
 
 				$.each(item, function(key, value) {
 					if (key == 'content') {
@@ -242,6 +255,21 @@ var RegularLabsSlidersPopup = null;
 					}
 				});
 
+
+				$.each(self.classes, function(s, clss) {
+					if (parameters[clss] === undefined) {
+						return;
+					}
+
+					if (parameters['class'] === undefined) {
+						parameters['class'] = clss;
+						delete parameters[clss];
+						return;
+					}
+
+					parameters['class'] += ' ' + clss;
+					delete parameters[clss];
+				});
 
 				var content = $('#' + el.id + '_content').html().trim();
 

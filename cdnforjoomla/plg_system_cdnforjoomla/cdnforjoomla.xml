@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_cdnforjoomla</name>
 	<description>PLG_SYSTEM_CDNFORJOOMLA_DESC</description>
-	<version>5.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>5.2.1</version>
+	<creationDate>May 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber CDN for Joomla!">
+		<server type="extension" priority="1" name="Regular Labs CDN for Joomla!">
 			http://download.regularlabs.com/updates.xml?e=cdnforjoomla&amp;type=.xml
 		</server>
 	</updateservers>
@@ -42,6 +42,9 @@
 				<field name="root" type="text" size="60"
 					   default="/"
 					   label="CDN_SITE_ROOT" description="CDN_SITE_ROOT_DESC" />
+				<field name="@notice_web_protocol" type="rl_plaintext"
+					   default="RL_ONLY_AVAILABLE_IN_PRO"
+					   label="CDN_WEB_PROTOCOL" description="CDN_WEB_PROTOCOL_DESC" />
 				<field name="@block_cdn_cdn_1_a" type="rl_block" start="1" label="CDN_CDN" />
 				<field name="cdn" type="text" size="60"
 					   default="" hint="CDN_DOMAIN_EXAMPLE"

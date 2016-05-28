@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -98,8 +98,8 @@ class RLHtml
 
 		RLFunctions::loadLanguage('com_modules', JPATH_ADMINISTRATOR);
 
-		RLFunctions::script('regularlabs/multiselect.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/multiselect.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/multiselect.min.js');
+		RLFunctions::stylesheet('regularlabs/multiselect.min.css');
 
 		$html = array();
 

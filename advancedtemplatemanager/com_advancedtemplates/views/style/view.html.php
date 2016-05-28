@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -152,7 +152,7 @@ class AdvancedTemplatesViewStyle extends JViewLegacy
 		else
 		{
 			$title = $this->item->title . ' [' . $this->item->template . ']';
-			JToolbarHelper::title(JText::sprintf('ATM_HEADING_TEMPLATE_STYLE', $title), 'advancedtemplatemanager icon-reglab');
+			JToolbarHelper::title(JText::sprintf('ATP_HEADING_TEMPLATE_STYLE', $title), 'advancedtemplatemanager icon-reglab');
 		}
 
 		// If not checked out, can save the item.

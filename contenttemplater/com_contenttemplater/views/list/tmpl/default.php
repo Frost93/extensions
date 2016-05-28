@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -19,8 +19,8 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
-RLFunctions::stylesheet('contenttemplater/style.min.css', '6.0.0');
+RLFunctions::stylesheet('regularlabs/style.min.css');
+RLFunctions::stylesheet('contenttemplater/style.min.css', '6.0.1');
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));

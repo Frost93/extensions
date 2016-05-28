@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.0
+ * @version         7.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -62,13 +62,6 @@ class ReReplacerTableItem extends JTable
 		if (trim($this->search) == '')
 		{
 			$this->setError(JText::_('RR_THE_ITEM_MUST_HAVE_SOMETHING_TO_SEARCH_FOR'));
-
-			return false;
-		}
-
-		if (strlen(trim($this->search)) < 3)
-		{
-			$this->setError(JText::sprintf('RR_THE_SEARCH_STRING_SHOULD_BE_LONGER', 2));
 
 			return false;
 		}

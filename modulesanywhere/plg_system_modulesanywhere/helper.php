@@ -646,10 +646,10 @@ class PlgSystemModulesAnywhereHelper
 			$params->style = isset($params->style) && $params->style ? $params->style . '-' . $chrome : $chrome;
 		}
 
-		$module->params  = json_encode($params);
-		$document        = clone JFactory::getDocument();
-		$renderer        = $document->setType('html')->loadRenderer('module');
-		$html            = $renderer->render($module, array('style' => $module->style, 'name' => ''));
+		$module->params = json_encode($params);
+		$document       = clone JFactory::getDocument();
+		$renderer       = $document->setType('html')->loadRenderer('module');
+		$html           = $renderer->render($module, array('style' => $module->style, 'name' => ''));
 
 
 		// don't return html on article level when caching is set

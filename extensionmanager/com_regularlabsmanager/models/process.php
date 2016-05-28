@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -62,7 +62,7 @@ class RegularLabsManagerModelProcess extends JModelItem
 
 		if (!$target = JInstallerHelper::downloadPackage($url))
 		{
-			die(JText::_('RLEM_ERROR_CANNOT_DOWNLOAD_FILE'));
+			die(JText::_('RLEM_ERROR_CANNOT_DOWNLOAD_FILE') . ' [' . $url . ']');
 		}
 
 		$target = JFactory::getConfig()->get('tmp_path') . '/' . $target;

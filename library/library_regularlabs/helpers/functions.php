@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -76,6 +76,11 @@ class RLFunctions
 
 	public static function script($file, $version = '')
 	{
+		if (strpos($file, 'regularlabs/') === 0)
+		{
+			$version = '16.5.22807';
+		}
+
 		if (!$file = self::getFileByFolder('js', $file))
 		{
 			return;
@@ -84,7 +89,7 @@ class RLFunctions
 		if (!empty($version))
 		{
 			/* >>> [NONE] >>> */
-			$version = $version == '11.0.0' ? '1.2.3' : $version;
+			$version = $version == '5.4.0' ? '1.2.3' : $version;
 			/* <<< [NONE] <<< */
 			$file .= '?v=' . $version;
 		}
@@ -94,6 +99,11 @@ class RLFunctions
 
 	public static function stylesheet($file, $version = '')
 	{
+		if (strpos($file, 'regularlabs/') === 0)
+		{
+			$version = '16.5.22807';
+		}
+
 		if (!$file = self::getFileByFolder('css', $file))
 		{
 			return;
@@ -102,7 +112,7 @@ class RLFunctions
 		if (!empty($version))
 		{
 			/* >>> [NONE] >>> */
-			$version = $version == '11.0.0' ? '1.2.3' : $version;
+			$version = $version == '5.4.0' ? '1.2.3' : $version;
 			/* <<< [NONE] <<< */
 			$file .= '?v=' . $version;
 		}

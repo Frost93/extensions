@@ -19,8 +19,8 @@ require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
 RLFunctions::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
-RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_snippets&id=' . ( int ) $this->item->id); ?>" method="post"

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -45,6 +45,7 @@ class Com_AdvancedModulesInstallerScript extends Com_AdvancedModulesInstallerScr
 		$this->removeAdminMenu();
 		$this->removeFrontendComponentFromDB();
 		$this->deleteOldFiles();
+		$this->fixAssetsRules();
 	}
 
 	private function createTable()
@@ -315,6 +316,20 @@ class Com_AdvancedModulesInstallerScript extends Com_AdvancedModulesInstallerScr
 				JPATH_SITE . '/plugins/system/advancedmodules/modulehelper.php',
 			)
 		);
+	}
+
+	public function fixAssetsRules($rules = '')
+	{
+		$rules = '{"core.admin":[],"core.manage":[],"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}';
+
+		parent::fixAssetsRules($rules);
+
+		// Remove unused assets entry (uses com_modules)
+		$query = $this->db->getQuery(true)
+			->delete('#__assets')
+			->where('name LIKE ' . $this->db->quote('com_advancedmodules.module.%'));
+		$this->db->setQuery($query);
+		$this->db->execute();
 	}
 
 }

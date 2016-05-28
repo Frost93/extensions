@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Tooltips">
+		<server type="extension" priority="1" name="Regular Labs Tooltips">
 			http://download.regularlabs.com/updates.xml?e=tooltips&amp;type=.xml
 		</server>
 	</updateservers>

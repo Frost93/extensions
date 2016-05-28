@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -592,11 +592,6 @@ class PlgSystemTabsHelperReplace
 		}
 
 		$class = $this->getItemClass($item, 'tab-pane rl_tabs-pane nn_tabs-pane');
-		if ($this->params->fade)
-		{
-			$class .= ' fade' . ($item->open ? ' in' : '');
-		}
-		/* <<< [PRO] <<< */
 
 		$html[] = '<div class="' . trim($class) . '" id="' . $item->id . '"'
 			. ' role="tabpanel" aria-labelledby="tab-' . $item->id . '" aria-hidden="' . ($item->open ? 'false' : 'true') . '">';

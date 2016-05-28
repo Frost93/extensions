@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -217,7 +217,7 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 		}
 		else
 		{
-			JToolbarHelper::title(JText::sprintf('ATM_HEADING_TEMPLATE', $this->template->name), 'advancedtemplatemanager icon-reglab');
+			JToolbarHelper::title(JText::sprintf('ATP_HEADING_TEMPLATE', $this->template->name), 'advancedtemplatemanager icon-reglab');
 		}
 
 		// Add a Apply and save button

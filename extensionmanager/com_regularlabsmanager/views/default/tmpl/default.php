@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -28,8 +28,8 @@ $config            = JComponentHelper::getParams('com_regularlabsmanager');
 $check_data        = $config->get('check_data', 1);
 $hide_notinstalled = $config->get('hide_notinstalled', 0);
 
-RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
+RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 
 $key    = trim($config->get('key'));
 $js_key = $key ? strtolower(substr($key, 0, 8) . md5(substr($key, 8))) : '';
@@ -46,8 +46,8 @@ $script = "
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
 
-RLFunctions::script('regularlabsmanager/script.min.js', '16.4.11567');
-RLFunctions::stylesheet('regularlabsmanager/style.min.css', '16.4.11567');
+RLFunctions::script('regularlabsmanager/script.min.js', '16.5.10919');
+RLFunctions::stylesheet('regularlabsmanager/style.min.css', '16.5.10919');
 
 $script = "
 	jQuery(document).ready(function() {

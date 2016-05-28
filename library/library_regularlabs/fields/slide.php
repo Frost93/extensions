@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -26,7 +26,7 @@ class JFormFieldRL_Slide extends RLFormField
 	{
 		$this->params = $this->element->attributes();
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$label       = RLText::html_entity_decoder(JText::_($this->get('label')));
 		$description = $this->prepareText($this->get('description'));

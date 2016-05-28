@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sourcerer
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -296,7 +296,7 @@ class PlgSystemSourcererHelper
 
 			// Add the include file if file=... or include=... is used in the {source} tag
 			$file = !empty($data->file) ? $data->file : (!empty($data->include) ? $data->include : '');
-			if (!empty($file) && JFile::exists(JPATH_SITE . '/' . $file))
+			if (!empty($file) && JFile::exists(JPATH_SITE . $this->src_params->include_path . $file))
 			{
 				$content = '<?php include JPATH_SITE . \'' . $this->src_params->include_path . $file . '\'; ?>' . $content;
 			}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -526,7 +526,7 @@ class AdvancedModulesModelModules extends JModelList
 
 			$db->setQuery($query);
 			$mirror_ids = $db->loadColumn();
-			
+
 			$mirror_ids = array_unique($mirror_ids);
 
 			foreach ($mirror_ids as $key => $id)

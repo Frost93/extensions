@@ -42,7 +42,7 @@ class PlgButtonSnippetsHelper
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		$icon = 'reglab icon-snippets';
 		$link = 'index.php?rl_qp=1'

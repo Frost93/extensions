@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -32,7 +32,22 @@ class AdvancedTemplatesTable extends JTable
 			return $this->_title;
 		}
 
-		return $this->_getAssetName();
+		$k = (int) $this->_tbl_key;
+
+		if (empty($this->{$k}))
+		{
+			return parent::_getAssetTitle();
+		}
+
+		$db = $this->getDbo();
+
+		$query = $db->getQuery(true)
+			->select('title')
+			->from('#__template_styles')
+			->where('id = ' . (int) $this->{$k});
+		$db->setQuery($query);
+
+		return $db->loadResult();
 	}
 
 	/**
@@ -43,40 +58,25 @@ class AdvancedTemplatesTable extends JTable
 	 *
 	 * @return  integer
 	 */
-	protected function getAssetParentId(JTable $table = null, $id = null)
+	protected function _getAssetParentId(JTable $table = null, $id = null)
 	{
-		// Initialise variables.
-		$assetId = null;
-		$db      = $this->getDbo();
+		$db = $this->getDbo();
 
 		$query = $db->getQuery(true)
 			->select('id')
 			->from('#__assets')
-			->where('name = ' . $db->quote('com_advancedtemplates'));
-
-		// Get the asset id from the database.
+			->where('name = ' . $db->quote('com_templates'));
 		$db->setQuery($query);
-		if ($result = $db->loadResult())
-		{
-			$assetId = (int) $result;
-		}
 
-		// Return the asset id.
-		if ($assetId)
+		if ($assetId = $db->loadResult())
 		{
 			return $assetId;
 		}
-		else
-		{
-			return parent::_getAssetParentId($table, $id);
-		}
+
+		return parent::_getAssetParentId($table, $id);
 	}
 }
 
 class AdvancedTemplatesTableAdvancedTemplates extends AdvancedTemplatesTable
 {
-	protected function _getAssetParentId(JTable $table = null, $id = null)
-	{
-		return parent::getAssetParentId($table, $id);
-	}
 }

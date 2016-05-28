@@ -13,7 +13,7 @@
 	<scriptfile>script.install.php</scriptfile>
 
 	<updateservers>
-		<server type="extension" priority="1" name="NoNumber Email Protector">
+		<server type="extension" priority="1" name="Regular Labs Email Protector">
 			http://download.regularlabs.com/updates.xml?e=emailprotector&amp;type=.xml
 		</server>
 	</updateservers>

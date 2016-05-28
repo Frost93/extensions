@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.0
+ * @version         2.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -67,7 +67,7 @@ $script = "
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_advancedtemplates'); ?>" method="post" name="adminForm" id="adminForm">
 	<div id="j-sidebar-container" class="span2">

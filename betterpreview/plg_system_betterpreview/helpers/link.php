@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -463,21 +463,24 @@ class HelperBetterPreviewLink extends PlgSystemBetterPreviewHelper
 
 	public function saveUrlsToDB($urls)
 	{
+		$query_urls = array();
+		foreach ($urls as $url)
+		{
+			$query_urls[] = $this->db->quote($url);
+		}
+
 		// remove any records of these urls
 		$this->q->clear()
 			->delete('#__betterpreview_sefs')
-			->where($this->db->quoteName('url') . ' IN (\'' . implode('\',\'', $urls) . '\')');
+			->where($this->db->quoteName('url') . ' IN (' . implode(',', $query_urls) . ')');
 		$this->db->setQuery($this->q);
 		$this->db->execute();
 
 		// add empty url records that will be picked up in the generatesefs page
 		$this->q->clear()
 			->insert('#__betterpreview_sefs')
-			->columns($this->db->quoteName('url'));
-		foreach ($urls as $url)
-		{
-			$this->q->values($this->db->quote($url));
-		}
+			->columns($this->db->quoteName('url'))
+			->values($query_urls);
 
 		$this->db->setQuery($this->q);
 		$this->db->execute();

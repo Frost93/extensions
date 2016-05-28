@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -19,7 +19,7 @@ class AdvancedModulesController extends JControllerLegacy
 	{
 		return parent::display();
 	}
-	
+
 	public function __construct($config = array())
 	{
 		$this->input = JFactory::getApplication()->input;

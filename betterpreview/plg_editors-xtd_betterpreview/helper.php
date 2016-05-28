@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,7 +48,7 @@ class PlgButtonBetterPreviewHelper
 		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		if ($itemId = $this->helper->getItemId($url))
 		{

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -40,8 +40,8 @@ class JFormFieldRL_TextAreaPlus extends RLFormField
 		{
 			JHtml::_('jquery.framework');
 
-			RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-			RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+			RLFunctions::script('regularlabs/script.min.js');
+			RLFunctions::stylesheet('regularlabs/style.min.css');
 
 			$html .= '<br><span role="button" class="rl_resize_textarea rl_maximize"'
 				. ' data-id="' . $this->id . '"  data-min="' . $this->get('height', 80) . '" data-max="' . $resize . '">'

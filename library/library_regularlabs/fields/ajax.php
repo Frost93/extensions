@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,7 +24,7 @@ class JFormFieldRL_Ajax extends RLFormField
 
 		JHtml::_('jquery.framework');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
 
 		$loading = "jQuery(\"#" . $this->id . "\").find(\"span\").attr(\"class\", \"icon-refresh icon-spin\");";
 		$success = "jQuery(\"#" . $this->id . "\").find(\"span\").attr(\"class\", \"icon-ok\");"

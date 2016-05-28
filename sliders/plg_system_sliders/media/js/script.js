@@ -1,6 +1,6 @@
 /**
  * @package         Sliders
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -169,7 +169,7 @@ var RegularLabsSliders = null;
 				return;
 			}
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"');
+			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
 
 			if ($anchor.length == 0) {
 				return;
@@ -355,7 +355,7 @@ var RegularLabsSliders = null;
 			var $anchor = $('a[data-toggle="collapse"][data-id="' + id + '"]');
 
 			if ($anchor.length == 0) {
-				$anchor = $('a#' + id + ',a[name="' + id + '"');
+				$anchor = $('a#' + id + ',a[name="' + id + '"]');
 
 				// No accompanying link found
 				if ($anchor.length == 0) {

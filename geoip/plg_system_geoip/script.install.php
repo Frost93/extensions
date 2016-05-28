@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         GeoIp
- * @version         1.0.0
+ * @version         1.2.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,6 +27,23 @@ class PlgSystemGeoIPInstallerScript extends PlgSystemGeoIPInstallerScriptHelper
 				JPATH_LIBRARIES . '/geoip/maxmind',
 			)
 		);
+
+		require_once JPATH_PLUGINS . '/system/geoip/helpers/updater.php';
+		$updater = new GeoIPUpdater;
+
+		if ($error = $updater->update('City', true))
+		{
+			JFactory::getApplication()->enqueueMessage(
+				JText::_('GEO_MESSAGE_' . $error), 'error'
+			);
+		}
+
+		if ($last_date = $updater->getVersion())
+		{
+			JFactory::getApplication()->enqueueMessage(
+				JText::sprintf('GEO_MESSAGE_UPDATED_TO', JHtml::_('date', $last_date, JText::_('DATE_FORMAT_LC3')))
+			);
+		}
 	}
 
 	public function uninstall($adapter)

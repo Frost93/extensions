@@ -727,9 +727,9 @@ class AddToMenu
 		JHtml::_('behavior.tooltip');
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::script('regularlabs/toggler.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
+		RLFunctions::script('regularlabs/toggler.min.js', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		$uri = JUri::getInstance();
 		?>

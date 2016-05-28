@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -39,8 +39,8 @@ class RLFieldColor
 		$class    = trim('rl_color minicolors ' . $this->get('class'));
 		$disabled = $this->get('disabled') ? ' disabled="disabled"' : '';
 
-		RLFunctions::script('regularlabs/color.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/color.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/color.min.js');
+		RLFunctions::stylesheet('regularlabs/color.min.css');
 
 		$this->value = strtolower(strtoupper(preg_replace('#[^a-z0-9]#si', '', $this->value)));
 

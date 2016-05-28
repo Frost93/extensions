@@ -3,8 +3,8 @@
 	<name>GeoIP</name>
 	<libraryname>geoip</libraryname>
 	<description></description>
-	<version>1.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>1.2.0</version>
+	<creationDate>May 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>

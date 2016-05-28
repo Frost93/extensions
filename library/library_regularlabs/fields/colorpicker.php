@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -44,8 +44,8 @@ class RLFieldColorPicker
 			$action     = ' onchange="' . $this->get('action') . '"';
 		}
 
-		RLFunctions::script('regularlabs/colorpicker.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/colorpicker.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/colorpicker.min.js');
+		RLFunctions::stylesheet('regularlabs/colorpicker.min.css');
 
 		$class = ' class="' . trim('nncolorpicker chzn-done ' . $this->get('class')) . '"';
 

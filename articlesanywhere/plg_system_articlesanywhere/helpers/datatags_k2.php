@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.0.0
+ * @version         5.4.0
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,9 +11,9 @@
 
 defined('_JEXEC') or die;
 
-require_once __DIR__ . '/datetags.php';
+require_once __DIR__ . '/datatags.php';
 
-class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhereHelperTags
+class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhereHelperDataTags
 {
 	public function getArticleUrl()
 	{
@@ -46,29 +46,29 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 		return $this->article->url;
 	}
 
-	public function processTagByType($tag, $extra)
+	public function processTagByType($tag)
 	{
 		switch (true)
 		{
 			// Extra fields
 			case (preg_match('#^extra-[0-9]+$#', $tag, $image_tag)):
-				return $this->processTagDatabase($tag, $extra, true);
+				return $this->processTagDatabase($tag, true);
 
 			default:
-				return parent::processTagByType($tag, $extra);
+				return parent::processTagByType($tag);
 		}
 	}
 
-	public function processTagDatabase($tag, $extra, $return_empty = false)
+	public function processTagDatabase($tag, $return_empty = false)
 	{
 		// Get data from data object, even, uneven, first, last
-		if (isset($this->data->{$tag}) && is_bool($this->data->{$tag}))
+		if (isset($this->data->{$tag->type}) && is_bool($this->data->{$tag->type}))
 		{
-			return $this->data->{$tag} ? 'true' : 'false';
+			return $this->data->{$tag->type} ? 'true' : 'false';
 		}
 
 		// Get data from db columns
-		$string = $this->getTagFromDatabase($tag);
+		$string = $this->getTagFromDatabase($tag->type);
 
 		if ($string === false)
 		{
@@ -76,24 +76,24 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 		}
 
 		// Convert string if it is a date
-		$string = $this->convertDateToString($string, $extra);
+		$string = $this->convertDateToString($string, isset($tag->format) ? $tag->format : '');
 
 		return $string;
 	}
 
-	private function getTagFromDatabase($tag)
+	private function getTagFromDatabase($tag_type)
 	{
-		if (isset($this->article->{$tag}))
+		if (isset($this->article->{$tag_type}))
 		{
-			return $this->article->{$tag};
+			return $this->article->{$tag_type};
 		}
 
-		return $this->getTagFromExtraField($tag);
+		return $this->getTagFromExtraField($tag_type);
 	}
 
-	private function getTagFromExtraField($tag)
+	private function getTagFromExtraField($tag_type)
 	{
-		$string = $this->getExtraFieldValue($this->article->extra_fields, $tag, $this->article->catid);
+		$string = $this->getExtraFieldValue($this->article->extra_fields, $tag_type, $this->article->catid);
 
 		if ($string === false)
 		{
@@ -134,7 +134,8 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 			return false;
 		}
 
-		$uri                    = JUri::getInstance();
+		$uri = JUri::getInstance();
+
 		$this->article->editurl = JRoute::_('index.php?option=com_k2&view=item&task=edit&cid=' . $this->article->id . '&return=' . base64_encode($uri));
 
 		return $this->article->editurl;
@@ -143,7 +144,7 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 	/*
 	 * Retrieve data from k2 extra fields
 	 */
-	private function getExtraFieldValue(&$extra, $data, $catid)
+	private function getExtraFieldValue(&$extra, $tag_type, $catid)
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -155,7 +156,7 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 		$db->setQuery($query);
 		$extragroup = $db->loadResult();
 
-		if (!$extragroup)
+		if (empty($extragroup))
 		{
 			return false;
 		}
@@ -166,17 +167,17 @@ class PlgSystemArticlesAnywhereHelperDataTags_K2 extends PlgSystemArticlesAnywhe
 			->where('e.group = ' . (int) $extragroup)
 			->where('e.published = 1');
 
-		$where = 'e.name = ' . $db->quote($data);
-		if (substr($data, 0, 6) == 'extra-' && is_numeric(substr($data, 6)))
+		$where = 'e.name = ' . $db->quote($tag_type);
+		if (substr($tag_type, 0, 6) == 'extra-' && is_numeric(substr($tag_type, 6)))
 		{
-			$where = '(' . $where . ' OR e.id = ' . (int) substr($data, 6) . ')';
+			$where = '(' . $where . ' OR e.id = ' . (int) substr($tag_type, 6) . ')';
 		}
 		$query->where($where);
 
 		$db->setQuery($query);
 		$extrafield = $db->loadObject();
 
-		if (!$extrafield)
+		if (empty($extrafield))
 		{
 			return false;
 		}

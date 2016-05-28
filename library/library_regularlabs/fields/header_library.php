@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -34,7 +34,7 @@ class JFormFieldRL_Header_Library extends JFormFieldRL_Header
 			'IP Login',
 			'Modals',
 			'Modules Anywhere',
-			'NoNumber Extension Manager',
+			'Regular Labs Extension Manager',
 			'ReReplacer',
 			'Sliders',
 			'Snippets',
@@ -44,10 +44,10 @@ class JFormFieldRL_Header_Library extends JFormFieldRL_Header
 			'What? Nothing!',
 		);
 
-		$list = '<ul><li>'.implode('</li><li>', $extensions) . '</li></ul>';
+		$list = '<ul><li>' . implode('</li><li>', $extensions) . '</li></ul>';
 
 		$warning = '';
-		if(isset($this->element->attributes()['warning']))
+		if (isset($this->element->attributes()['warning']))
 		{
 			$warning = '<div class="alert alert-danger">' . JText::_($this->element->attributes()['warning']) . '</div>';
 		}

@@ -124,9 +124,9 @@
 		</field>
 		<field name="@toggler_button_enabled_a" type="rl_toggler" param="button_separate" value="1" />
 		<field name="button_name" type="text" class="span12" default="" label="CT_EDITOR_BUTTON_NAME" description="CT_EDITOR_BUTTON_NAME_DESC" />
+		<field name="@toggler_button_enabled_b" type="rl_toggler" />
 		<field name="button_image" type="rl_icons" default="0" show_none="1"
 			   label="CT_EDITOR_ITEM_IMAGE" description="CT_EDITOR_ITEM_IMAGE_DESC" />
-		<field name="@toggler_button_enabled_b" type="rl_toggler" />
 		<field name="@toggler_button_b" type="rl_toggler" />
 	</fieldset>
 

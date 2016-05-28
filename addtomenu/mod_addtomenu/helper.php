@@ -80,9 +80,9 @@ class ModAddToMenu
 		$script = "var addtomenu_root = '" . JUri::root() . "';";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
 		RLFunctions::script('addtomenu/script.min.js', '5.0.0');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 		RLFunctions::stylesheet('addtomenu/style.min.css', '5.0.0');
 
 		// set height for popup

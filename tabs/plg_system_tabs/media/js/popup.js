@@ -1,6 +1,6 @@
 /**
  * @package         Tabs
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -124,7 +124,6 @@ var RegularLabsTabsPopup = null;
 
 						default:
 							if (key == 'slideshow') {
-								console.log(value);
 								self.setRadioOption('tab_1[slideshow_radio]', 1);
 								value = value == 1 ? '' : value;
 							}

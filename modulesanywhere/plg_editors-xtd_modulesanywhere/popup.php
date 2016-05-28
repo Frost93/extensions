@@ -52,8 +52,8 @@ class PlgButtonModulesAnywherePopup
 		RLFunctions::loadLanguage('plg_system_modulesanywhere');
 		RLFunctions::loadLanguage('com_modules', JPATH_ADMINISTRATOR);
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
 
 		// Initialize some variables
 		$db     = JFactory::getDbo();

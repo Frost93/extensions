@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.0
+ * @version         5.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,8 +29,8 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 
 		JHtml::_('jquery.framework');
 
-		RLFunctions::script('betterpreview/preview.min.js', '5.0.0');
-		RLFunctions::stylesheet('betterpreview/preview.min.css', '5.0.0');
+		RLFunctions::script('betterpreview/preview.min.js', '5.0.1');
+		RLFunctions::stylesheet('betterpreview/preview.min.css', '5.0.1');
 
 		$has_changes = 0;
 		$data        = JFactory::getApplication()->input->get('previewdata', array(), 'array');

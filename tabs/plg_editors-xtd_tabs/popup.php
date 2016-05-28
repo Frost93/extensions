@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,9 +48,9 @@ class PlgButtonTabsPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_tabs');
 		RLFunctions::loadLanguage('plg_system_tabs');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
+		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.5.10919');
+		RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 
 		// Tag character start and end
 		list($tag_start, $tag_end) = explode('.', $this->params->tag_characters);
@@ -67,8 +67,8 @@ class PlgButtonTabsPopup
 		";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('tabs/popup.min.js', '6.0.0');
-		RLFunctions::stylesheet('tabs/popup.min.css', '6.0.0');
+		RLFunctions::script('tabs/popup.min.js', '6.0.3');
+		RLFunctions::stylesheet('tabs/popup.min.css', '6.0.3');
 
 		echo $this->getHTML();
 	}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -53,8 +53,8 @@ class PlgButtonContentTemplaterData
 			return;
 		}
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$nocontent   = JFactory::getApplication()->input->getInt('nocontent', 0);
 		$unprotected = (JFactory::getUser()->authorise('core.manage', 'com_contenttemplater')) ? JFactory::getApplication()->input->getInt('unprotect') : 0;

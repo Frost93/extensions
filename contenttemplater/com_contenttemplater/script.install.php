@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.0
+ * @version         6.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -30,6 +30,7 @@ class Com_ContentTemplaterInstallerScript extends Com_ContentTemplaterInstallerS
 		$this->createTable();
 		$this->fixOldFormatInDatabase();
 		$this->deleteOldFiles();
+		$this->fixAssetsRules();
 	}
 
 	public function createTable()
@@ -166,6 +167,13 @@ class Com_ContentTemplaterInstallerScript extends Com_ContentTemplaterInstallerS
 				JPATH_SITE . '/components/com_contenttemplater',
 			)
 		);
+	}
+
+	public function fixAssetsRules($rules = '')
+	{
+		$rules = '{"core.admin":[],"core.manage":[],"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}';
+
+		parent::fixAssetsRules($rules);
 	}
 
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sourcerer
- * @version         6.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -58,9 +58,9 @@ class PlgButtonSourcererPopup
 		RLFunctions::loadLanguage('plg_system_sourcerer');
 
 		JHtml::_('script', 'system/core.js', false, true);
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.11567');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		JFactory::getDocument()->addStyleSheet('//code.jquery.com/ui/1.9.2/themes/smoothness/jquery-ui.css');
 		JFactory::getDocument()->addScript('//code.jquery.com/ui/1.9.2/jquery-ui.js');
@@ -77,8 +77,8 @@ class PlgButtonSourcererPopup
 		";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('sourcerer/script.min.js', '6.0.0');
-		RLFunctions::stylesheet('sourcerer/popup.min.css', '6.0.0');
+		RLFunctions::script('sourcerer/script.min.js', '6.0.2');
+		RLFunctions::stylesheet('sourcerer/popup.min.css', '6.0.2');
 
 		$this->params->code = '<!-- You can place html anywhere within the source tags --><br><br><br><script language=&quot;javascript&quot; type=&quot;text/javascript&quot;><br>    // You can place JavaScript like this<br>    <br></script><br><?php<br>    // You can place PHP like this<br>    <br>?>';
 		$this->params->code = str_replace('<br>', "\n", $this->params->code);

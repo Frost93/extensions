@@ -43,6 +43,7 @@ class KeyCDN
 
 	/**
 	 * @param string $apiKey
+	 *
 	 * @return $this
 	 */
 	public function setApiKey($apiKey)
@@ -62,6 +63,7 @@ class KeyCDN
 
 	/**
 	 * @param string $endpoint
+	 *
 	 * @return $this
 	 */
 	public function setEndpoint($endpoint)
@@ -74,6 +76,7 @@ class KeyCDN
 	/**
 	 * @param string $selectedCall
 	 * @param array  $params
+	 *
 	 * @return string
 	 * @throws Exception
 	 */
@@ -85,6 +88,7 @@ class KeyCDN
 	/**
 	 * @param string $selectedCall
 	 * @param array  $params
+	 *
 	 * @return string
 	 * @throws Exception
 	 */
@@ -96,6 +100,7 @@ class KeyCDN
 	/**
 	 * @param string $selectedCall
 	 * @param array  $params
+	 *
 	 * @return string
 	 * @throws Exception
 	 */
@@ -107,6 +112,7 @@ class KeyCDN
 	/**
 	 * @param string $selectedCall
 	 * @param array  $params
+	 *
 	 * @return string
 	 * @throws Exception
 	 */
@@ -119,6 +125,7 @@ class KeyCDN
 	 * @param string $selectedCall
 	 * @param        $methodType
 	 * @param array  $params
+	 *
 	 * @return string
 	 * @throws Exception
 	 */

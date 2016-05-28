@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -22,8 +22,8 @@ class JFormFieldRL_SimpleCategories extends RLFormField
 	protected function getInput()
 	{
 		JHtml::_('jquery.framework');
-		RLFunctions::script('regularlabs/script.min.js', '16.4.11567');
-		RLFunctions::script('regularlabs/toggler.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('regularlabs/toggler.min.js');
 
 		$this->params = $this->element->attributes();
 
@@ -58,7 +58,7 @@ class JFormFieldRL_SimpleCategories extends RLFormField
 			);
 		}
 
-		RLFunctions::script('regularlabs/simplecategories.min.js', '16.4.11567');
+		RLFunctions::script('regularlabs/simplecategories.min.js');
 
 		$html = array();
 

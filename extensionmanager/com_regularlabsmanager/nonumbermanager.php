@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.0
+ * @version         6.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,6 +24,19 @@ if (!JFactory::getUser()->authorise('core.manage', 'com_nonumbermanager'))
 if (JFactory::getApplication()->input->get('option') != 'com_nonumbermanager')
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+}
+
+if (JFactory::getApplication()->input->get('view') == 'process')
+{
+	echo '
+	<div class="alert alert-warning">
+	<p class="alert-message">
+	Please close this popup before retying to update...
+	<script>if(confirm("The page needs to reload before you can update the other extensions."))window.parent.location.href = window.parent.location;</script>
+	</p>
+	</div>
+	';
+	return;
 }
 
 $db    = JFactory::getDbo();

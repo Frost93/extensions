@@ -2,8 +2,8 @@
 <replacements>
 	<name>Example XML file for ReReplacer</name>
 	<description>This is an example file to show you how to build up an xml file with multiple replacements for ReReplacer.</description>
-	<version>7.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>7.0.1</version>
+	<creationDate>May 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>

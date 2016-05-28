@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.4.11567
+ * @version         16.5.22807
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -316,7 +316,6 @@ class JFormFieldRL_Geo extends RLFormField
 	);
 
 	public $regions = array(
-		//'--AU'   => "",
 		'-AU'    => "Australia",
 		'AU-ACT' => "Australia: Australian Capital Territory",
 		'AU-NSW' => "Australia: New South Wales",
@@ -334,7 +333,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'BE-WHT' => "Belgium: Hainaut",
 		'BE-WLG' => "Belgium: Liege",
 		'BE-VLI' => "Belgium: Limburg",
-		'BE-WLX' => "Belgium: Luxembourg,Luxemburg",
+		'BE-WLX' => "Belgium: Luxembourg, Luxemburg",
 		'BE-WNA' => "Belgium: Namur",
 		'BE-VOV' => "Belgium: Oost-Vlaanderen",
 		'BE-VBR' => "Belgium: Vlaams-Brabant",
@@ -371,19 +370,19 @@ class JFormFieldRL_Geo extends RLFormField
 		'BR-TO' => "Brazil: Tocantins",
 
 		'--CA'  => "", '-CA' => "Canada",
-		'CA-AB' => "Canada: Alberta,Alberta",
-		'CA-BC' => "Canada: British Columbia,British Columbia",
-		'CA-MB' => "Canada: Manitoba,Manitoba",
-		'CA-NB' => "Canada: New Brunswick,New Brunswick",
+		'CA-AB' => "Canada: Alberta",
+		'CA-BC' => "Canada: British Columbia",
+		'CA-MB' => "Canada: Manitoba",
+		'CA-NB' => "Canada: New Brunswick",
 		'CA-NL' => "Canada: Newfoundland and Labrador",
 		'CA-NT' => "Canada: Northwest Territories",
-		'CA-NS' => "Canada: Nova Scotia,Nova Scotia",
+		'CA-NS' => "Canada: Nova Scotia",
 		'CA-NU' => "Canada: Nunavut",
-		'CA-ON' => "Canada: Ontario,Ontario",
-		'CA-PE' => "Canada: Prince Edward Island,Prince Edward Island",
-		'CA-QC' => "Canada: Quebec,Quebec",
-		'CA-SK' => "Canada: Saskatchewan,Saskatchewan",
-		'CA-YT' => "Canada: Yukon Territory,Yukon Territory",
+		'CA-ON' => "Canada: Ontario",
+		'CA-PE' => "Canada: Prince Edward Island",
+		'CA-QC' => "Canada: Quebec",
+		'CA-SK' => "Canada: Saskatchewan",
+		'CA-YT' => "Canada: Yukon Territory",
 
 		'--CN'  => "", '-CN' => "China",
 		'CN-34' => "China: Anhui",
@@ -473,11 +472,15 @@ class JFormFieldRL_Geo extends RLFormField
 		'FR-E'  => "France: Bretagne",
 		'FR-14' => "France: Calvados",
 		'FR-15' => "France: Cantal",
+		'FR-F'  => "France: Centre",
 		'FR-G'  => "France: Champagne-Ardenne",
 		'FR-16' => "France: Charente",
 		'FR-17' => "France: Charente-Maritime",
 		'FR-18' => "France: Cher",
 		'FR-CP' => "France: Clipperton",
+		'FR-19' => "France: Corrèze",
+		'FR-H'  => "France: Corse",
+		'FR-2A' => "France: Corse-du-Sud",
 		'FR-23' => "France: Creuse",
 		'FR-21' => "France: Côte-d'Or",
 		'FR-22' => "France: Côtes-d'Armor",
@@ -512,6 +515,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'FR-36' => "France: Indre",
 		'FR-37' => "France: Indre-et-Loire",
 		'FR-38' => "France: Isère",
+		'FR-39' => "France: Jura",
 		'FR-40' => "France: Landes",
 		'FR-K'  => "France: Languedoc-Roussillon",
 		'FR-L'  => "France: Limousin",
@@ -535,6 +539,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'FR-56' => "France: Morbihan",
 		'FR-57' => "France: Moselle",
 		'FR-58' => "France: Nièvre",
+		'FR-59' => "France: Nord",
 		'FR-O'  => "France: Nord - Pas-de-Calais",
 		'FR-NC' => "France: Nouvelle-Calédonie",
 		'FR-60' => "France: Oise",
@@ -576,9 +581,6 @@ class JFormFieldRL_Geo extends RLFormField
 		'FR-WF' => "France: Wallis-et-Futuna",
 		'FR-89' => "France: Yonne",
 		'FR-78' => "France: Yvelines",
-		'FR-19' => "France: rrèze",
-		'FR-H'  => "France: rse",
-		'FR-2A' => "France: rse-du-Sud",
 		'FR-J'  => "France: Île-de-France",
 
 		'--DE'  => "", '-DE' => "Germany",
@@ -661,7 +663,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'ID-NU' => "Indonesia: Nusa Tenggara",
 		'ID-NB' => "Indonesia: Nusa Tenggara Barat",
 		'ID-NT' => "Indonesia: Nusa Tenggara Timur",
-		'ID-IJ' => "Indonesia: Papua",
+		'ID-PA' => "Indonesia: Papua",
 		'ID-PB' => "Indonesia: Papua Barat",
 		'ID-RI' => "Indonesia: Riau",
 		'ID-SL' => "Indonesia: Sulawesi",
@@ -707,6 +709,8 @@ class JFormFieldRL_Geo extends RLFormField
 		'IT-CT' => "Italy: Catania",
 		'IT-CZ' => "Italy: Catanzaro",
 		'IT-CH' => "Italy: Chieti",
+		'IT-CO' => "Italy: Como",
+		'IT-CS' => "Italy: Cosenza",
 		'IT-CR' => "Italy: Cremona",
 		'IT-KR' => "Italy: Crotone",
 		'IT-CN' => "Italy: Cuneo",
@@ -805,8 +809,6 @@ class JFormFieldRL_Geo extends RLFormField
 		'IT-VV' => "Italy: Vibo Valentia",
 		'IT-VI' => "Italy: Vicenza",
 		'IT-VT' => "Italy: Viterbo",
-		'IT-CO' => "Italy: mo",
-		'IT-CS' => "Italy: senza",
 
 		'--JP'  => "", '-JP' => "Japan",
 		'JP-23' => "Japan: Aichi",
@@ -864,6 +866,9 @@ class JFormFieldRL_Geo extends RLFormField
 		'MX-CAM' => "Mexico: Campeche",
 		'MX-CHP' => "Mexico: Chiapas",
 		'MX-CHH' => "Mexico: Chihuahua",
+		'MX-COA' => "Mexico: Coahuila",
+		'MX-COL' => "Mexico: Colima",
+		'MX-DIF' => "Mexico: Distrito Federal",
 		'MX-DUR' => "Mexico: Durango",
 		'MX-GUA' => "Mexico: Guanajuato",
 		'MX-GRO' => "Mexico: Guerrero",
@@ -887,8 +892,6 @@ class JFormFieldRL_Geo extends RLFormField
 		'MX-VER' => "Mexico: Veracruz",
 		'MX-YUC' => "Mexico: Yucatán",
 		'MX-ZAC' => "Mexico: Zacatecas",
-		'MX-COA' => "Mexico: ahuila",
-		'MX-COL' => "Mexico: lima",
 
 		'--MA'   => "", '-MA' => "Morocco",
 		'MA-AGD' => "Morocco: Agadir-Ida-Outanane",
@@ -977,6 +980,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'NL-FR' => "Netherlands: Friesland",
 		'NL-GE' => "Netherlands: Gelderland",
 		'NL-GR' => "Netherlands: Groningen",
+		'NL-LI' => "Netherlands: Limburg",
 		'NL-NB' => "Netherlands: Noord-Brabant",
 		'NL-NH' => "Netherlands: Noord-Holland",
 		'NL-OV' => "Netherlands: Overijssel",
@@ -1011,11 +1015,12 @@ class JFormFieldRL_Geo extends RLFormField
 		'NG-KW' => "Nigeria: Kwara",
 		'NG-LA' => "Nigeria: Lagos",
 		'NG-NA' => "Nigeria: Nassarawa",
-		'NG-NI' => "Nigeria: Niger,Níger",
+		'NG-NI' => "Nigeria: Niger, Níger",
 		'NG-OG' => "Nigeria: Ogun",
 		'NG-ON' => "Nigeria: Ondo",
 		'NG-OS' => "Nigeria: Osun",
 		'NG-OY' => "Nigeria: Oyo",
+		'NG-PL' => "Nigeria: Plateau",
 		'NG-RI' => "Nigeria: Rivers",
 		'NG-SO' => "Nigeria: Sokoto",
 		'NG-TA' => "Nigeria: Taraba",
@@ -1078,6 +1083,8 @@ class JFormFieldRL_Geo extends RLFormField
 		'PH-CEB' => "Philippines: Cebu",
 		'PH-03'  => "Philippines: Central Luzon (Region III)",
 		'PH-07'  => "Philippines: Central Visayas (Region VII)",
+		'PH-COM' => "Philippines: Compostela Valley",
+		'PH-15'  => "Philippines: Cordillera Administrative Region (CAR)",
 		'PH-11'  => "Philippines: Davao (Region XI)",
 		'PH-DAO' => "Philippines: Davao Oriental",
 		'PH-DAV' => "Philippines: Davao del Norte",
@@ -1106,7 +1113,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'PH-MDR' => "Philippines: Mindoro Oriental",
 		'PH-MSC' => "Philippines: Misamis Occidental",
 		'PH-MSR' => "Philippines: Misamis Oriental",
-		'PH-MOU' => "Philippines: Mountain",
+		'PH-MOU' => "Philippines: Mountain Province",
 		'PH-00'  => "Philippines: National Capital Region",
 		'PH-NEC' => "Philippines: Negroe Occidental",
 		'PH-NER' => "Philippines: Negros Oriental",
@@ -1141,8 +1148,6 @@ class JFormFieldRL_Geo extends RLFormField
 		'PH-ZSI' => "Philippines: Zamboanga Sibugay",
 		'PH-ZAN' => "Philippines: Zamboanga del Norte",
 		'PH-ZAS' => "Philippines: Zamboanga del Sur",
-		'PH-COM' => "Philippines: mpostela Valley",
-		'PH-15'  => "Philippines: rdillera Administrative Region (CAR)",
 
 		'--PT'  => "", '-PT' => "Portugal",
 		'PT-01' => "Portugal: Aveiro",
@@ -1150,6 +1155,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'PT-03' => "Portugal: Braga",
 		'PT-04' => "Portugal: Bragança",
 		'PT-05' => "Portugal: Castelo Branco",
+		'PT-06' => "Portugal: Coimbra",
 		'PT-08' => "Portugal: Faro",
 		'PT-09' => "Portugal: Guarda",
 		'PT-10' => "Portugal: Leiria",
@@ -1163,7 +1169,6 @@ class JFormFieldRL_Geo extends RLFormField
 		'PT-16' => "Portugal: Viana do Castelo",
 		'PT-17' => "Portugal: Vila Real",
 		'PT-18' => "Portugal: Viseu",
-		'PT-06' => "Portugal: imbra",
 		'PT-07' => "Portugal: Évora",
 
 		'--RU'   => "", '-RU' => "Russian Federation",
@@ -1265,7 +1270,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'ES-B'  => "Spain: Barcelona",
 		'ES-BU' => "Spain: Burgos",
 		'ES-CN' => "Spain: Canarias",
-		'ES-CB' => "Spain: Cantabria",
+		'ES-S'  => "Spain: Cantabria",
 		'ES-CS' => "Spain: Castellón",
 		'ES-CL' => "Spain: Castilla y León",
 		'ES-CM' => "Spain: Castilla-La Mancha",
@@ -1275,6 +1280,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'ES-CU' => "Spain: Cuenca",
 		'ES-CC' => "Spain: Cáceres",
 		'ES-CA' => "Spain: Cádiz",
+		'ES-CO' => "Spain: Córdoba",
 		'ES-EX' => "Spain: Extremadura",
 		'ES-GA' => "Spain: Galicia",
 		'ES-GI' => "Spain: Girona",
@@ -1285,7 +1291,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'ES-HU' => "Spain: Huesca",
 		'ES-IB' => "Spain: Illes Balears",
 		'ES-J'  => "Spain: Jaén",
-		'ES-RI' => "Spain: La Rioja",
+		'ES-LO' => "Spain: La Rioja",
 		'ES-GC' => "Spain: Las Palmas",
 		'ES-LE' => "Spain: León",
 		'ES-L'  => "Spain: Lleida",
@@ -1309,6 +1315,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'ES-SO' => "Spain: Soria",
 		'ES-T'  => "Spain: Tarragona",
 		'ES-TE' => "Spain: Teruel",
+		'ES-TO' => "Spain: Toledo",
 		'ES-V'  => "Spain: Valencia / València",
 		'ES-VC' => "Spain: Valenciana, Comunidad / Valenciana, Comunitat",
 		'ES-VA' => "Spain: Valladolid",
@@ -1364,6 +1371,11 @@ class JFormFieldRL_Geo extends RLFormField
 		'GB-CHE' => "United Kingdom: Cheshire East",
 		'GB-CHW' => "United Kingdom: Cheshire West and Chester",
 		'GB-CLK' => "United Kingdom: Clackmannanshire",
+		'GB-CLR' => "United Kingdom: Coleraine",
+		'GB-CWY' => "United Kingdom: Conwy",
+		'GB-CKT' => "United Kingdom: Cookstown",
+		'GB-CON' => "United Kingdom: Cornwall",
+		'GB-COV' => "United Kingdom: Coventry",
 		'GB-CGV' => "United Kingdom: Craigavon",
 		'GB-CRY' => "United Kingdom: Croydon",
 		'GB-CMA' => "United Kingdom: Cumbria",
@@ -1486,7 +1498,7 @@ class JFormFieldRL_Geo extends RLFormField
 		'GB-RDB' => "United Kingdom: Redbridge",
 		'GB-RCC' => "United Kingdom: Redcar and Cleveland",
 		'GB-RFW' => "United Kingdom: Renfrewshire",
-		'GB-RCT' => "United Kingdom: Rhondda, Cynon, Taff (Rhondda, Cynon,Taf)",
+		'GB-RCT' => "United Kingdom: Rhondda, Cynon, Taff (Rhondda, Cynon, Taf)",
 		'GB-RIC' => "United Kingdom: Richmond upon Thames",
 		'GB-RCH' => "United Kingdom: Rochdale",
 		'GB-ROT' => "United Kingdom: Rotherham",
@@ -1551,68 +1563,65 @@ class JFormFieldRL_Geo extends RLFormField
 		'GB-WOR' => "United Kingdom: Worcestershire",
 		'GB-WRX' => "United Kingdom: Wrexham (Wrecsam)",
 		'GB-YOR' => "United Kingdom: York",
-		'GB-CLR' => "United Kingdom: leraine",
-		'GB-CWY' => "United Kingdom: nwy",
-		'GB-CKT' => "United Kingdom: okstown",
-		'GB-CON' => "United Kingdom: rnwall",
-		'GB-COV' => "United Kingdom: ventry",
 
 		'--US'  => "", '-US' => "United States",
-		'US-AL' => "United States: Alabama,Alabama",
-		'US-AK' => "United States: Alaska,Alaska",
-		'US-AS' => "United States: American Samoa,Samoa Americana",
+		'US-AL' => "United States: Alabama",
+		'US-AK' => "United States: Alaska",
+		'US-AS' => "United States: American Samoa, Samoa Americana",
 		'US-AZ' => "United States: Arizona",
-		'US-AR' => "United States: Arkansas,Arkansas",
+		'US-AR' => "United States: Arkansas",
 		'US-CA' => "United States: California",
-		'US-DE' => "United States: Delaware,Delaware",
-		'US-FL' => "United States: Florida,Florida",
-		'US-GA' => "United States: Georgia,Geòrgia",
-		'US-GU' => "United States: Guam,Guam",
-		'US-HI' => "United States: Hawaii,Hawaii",
-		'US-ID' => "United States: Idaho,Idaho",
-		'US-IL' => "United States: Illinois,Illinois",
-		'US-IN' => "United States: Indiana,Indiana",
-		'US-IA' => "United States: Iowa,Iowa",
-		'US-KS' => "United States: Kansas,Kansas",
-		'US-KY' => "United States: Kentucky,Kentucky",
-		'US-LA' => "United States: Louisiana,Louisiana",
-		'US-ME' => "United States: Maine,Maine",
-		'US-MA' => "United States: Massachusetts,Massachusetts",
-		'US-MI' => "United States: Michigan,Michigan",
-		'US-MN' => "United States: Minnesota,Minnesota",
-		'US-MS' => "United States: Mississippi,Mississippi",
-		'US-MO' => "United States: Missouri,Missouri",
-		'US-NE' => "United States: Nebraska,Nebraska",
-		'US-NV' => "United States: Nevada,Nevada",
-		'US-NH' => "United States: New Hampshire,New Hampshire",
-		'US-NJ' => "United States: New Jersey,New Jersey",
-		'US-NM' => "United States: New Mexico,New Mexico",
-		'US-NY' => "United States: New York,New York",
-		'US-NC' => "United States: North Carolina,North Carolina",
-		'US-ND' => "United States: North Dakota,North Dakota",
-		'US-MP' => "United States: Northern Mariana Islands,Illes Marianes del Nord",
-		'US-OH' => "United States: Ohio,Ohio",
-		'US-OK' => "United States: Oklahoma,Oklahoma",
-		'US-OR' => "United States: Oregon,Oregon",
-		'US-PA' => "United States: Pennsylvania,Pennsylvania",
-		'US-PR' => "United States: Puerto Rico,Puerto Rico",
-		'US-RI' => "United States: Rhode Island,Rhode Island",
-		'US-SC' => "United States: South Carolina,South Carolina",
-		'US-SD' => "United States: South Dakota,South Dakota",
-		'US-TN' => "United States: Tennessee,Tennessee",
-		'US-TX' => "United States: Texas,Texas",
-		'US-UM' => "United States: United States Minor Outlying Islands,Illes Perifèriques Menors dels EUA",
-		'US-UT' => "United States: Utah,Utah",
-		'US-VT' => "United States: Vermont,Vermont",
-		'US-VI' => "United States: Virgin Islands,Illes Verge",
-		'US-VA' => "United States: Virginia,Virginia",
-		'US-WA' => "United States: Washington,Washington",
-		'US-WV' => "United States: West Virginia,West Virginia",
-		'US-WI' => "United States: Wisconsin,Wisconsin",
-		'US-WY' => "United States: Wyoming,Wyoming",
-		'US-CO' => "United States: lorado",
-		'US-CT' => "United States: nnecticut,Connecticut",
-		'US-DC' => "United States: of Columbia,Disricte de Columbia",
+		'US-CO' => "United States: Colorado",
+		'US-CT' => "United States: Connecticut",
+		'US-DE' => "United States: Delaware",
+		'US-DC' => "United States: District of Columbia, Disricte de Columbia",
+		'US-FL' => "United States: Florida",
+		'US-GA' => "United States: Georgia, Geòrgia",
+		'US-GU' => "United States: Guam",
+		'US-HI' => "United States: Hawaii",
+		'US-ID' => "United States: Idaho",
+		'US-IL' => "United States: Illinois",
+		'US-IN' => "United States: Indiana",
+		'US-IA' => "United States: Iowa",
+		'US-KS' => "United States: Kansas",
+		'US-KY' => "United States: Kentucky",
+		'US-LA' => "United States: Louisiana",
+		'US-ME' => "United States: Maine",
+		'US-MD' => "United States: Maryland",
+		'US-MA' => "United States: Massachusetts",
+		'US-MI' => "United States: Michigan",
+		'US-MN' => "United States: Minnesota",
+		'US-MS' => "United States: Mississippi",
+		'US-MO' => "United States: Missouri",
+		'US-MT' => "United States: Montana",
+		'US-NE' => "United States: Nebraska",
+		'US-NV' => "United States: Nevada",
+		'US-NH' => "United States: New Hampshire",
+		'US-NJ' => "United States: New Jersey",
+		'US-NM' => "United States: New Mexico",
+		'US-NY' => "United States: New York",
+		'US-NC' => "United States: North Carolina",
+		'US-ND' => "United States: North Dakota",
+		'US-MP' => "United States: Northern Mariana Islands, Illes Marianes del Nord",
+		'US-OH' => "United States: Ohio",
+		'US-OK' => "United States: Oklahoma",
+		'US-OR' => "United States: Oregon",
+		'US-PA' => "United States: Pennsylvania",
+		'US-PR' => "United States: Puerto Rico",
+		'US-RI' => "United States: Rhode Island",
+		'US-SC' => "United States: South Carolina",
+		'US-SD' => "United States: South Dakota",
+		'US-TN' => "United States: Tennessee",
+		'US-TX' => "United States: Texas",
+		'US-UM' => "United States: United States Minor Outlying Islands, Illes Perifèriques Menors dels EUA",
+		'US-UT' => "United States: Utah",
+		'US-VT' => "United States: Vermont",
+		'US-VI' => "United States: Virgin Islands, Illes Verge",
+		'US-VA' => "United States: Virginia",
+		'US-WA' => "United States: Washington",
+		'US-WV' => "United States: West Virginia",
+		'US-WI' => "United States: Wisconsin",
+		'US-WY' => "United States: Wyoming",
 
 		'--VN'  => "", '-VN' => "Vietnam",
 		'VN-44' => "Vietnam: An Giang",
@@ -1735,6 +1744,7 @@ class JFormFieldRL_Geo extends RLFormField
 	function getRegionArray()
 	{
 		$regions = $this->getRegionArrayByFile();
+		$regions = $this->cleanRegions($regions);
 
 		$by_country = array();
 
@@ -1746,13 +1756,16 @@ class JFormFieldRL_Geo extends RLFormField
 			}
 			list($code_c, $code_r, $region) = explode(',', $full_region, 3);
 
+			$code_c = trim($code_c);
+			$code_r = trim($code_r);
+			$region = trim($region);
+
 			if (!isset($this->region_countries[$code_c]))
 			{
 				continue;
 			}
 
 			$country = $this->countries[$code_c];
-			$region  = $this->cleanRegion($region);
 
 			if (!isset($by_country[$code_c]))
 			{
@@ -1781,6 +1794,14 @@ class JFormFieldRL_Geo extends RLFormField
 
 			ksort($regions);
 
+			if (empty($output))
+			{
+				$output[] = '\'-' . $code_c . '\'  => "' . $country . '",';
+				$output[] = implode("\n", $regions);
+
+				continue;
+			}
+
 			$output[] = '';
 			$output[] = '\'--' . $code_c . '\'  => "", \'-' . $code_c . '\'  => "' . $country . '",';
 			$output[] = implode("\n", $regions);
@@ -1794,45 +1815,41 @@ class JFormFieldRL_Geo extends RLFormField
 	function getRegionArrayByFile()
 	{
 		// https://www.softcatala.org/wiki/ISO_3166_2
-		$regions = trim(file_get_contents(__DIR__ . '/geo.iso.regions.txt'));
-
-		return explode("\n", $regions);
+		return trim(file_get_contents(__DIR__ . '/geo.iso.regions.txt'));
 	}
 
-	function getRegionArrayByCSV()
+	public function cleanRegions($regions)
 	{
-		$regions = trim(file_get_contents('http://geolite.maxmind.com/download/geoip/misc/region_codes.csv'));
+		$regions = htmlspecialchars($regions);
+
+		// LR,MY, name for US-MD,Maryland,Maryland
+		// >>
+		// LR,MY,Maryland,Maryland
+		// US,MD,Maryland,Maryland
+		$regex = '#(\n[^,]*),([^\n]*), name for ([^-]*)-([^,]*),([^\n]*\n)#';
+		while (preg_match($regex, $regions))
+		{
+			$regions = preg_replace($regex, '\1,\2,\5\3,\4,\5', $regions);
+		}
+
+		// LR,MY,Maryland,Maryland
+		// >>
+		// LR,MY,Maryland
+		$regions = preg_replace('#(\n[^,]*,[^,]*),([^,]*),\2#', '\1,\2', $regions);
+
+		// LR,MY,District of Columbia,Disricte de Columbia
+		// >>
+		// LR, MY, District of Columbia, Disricte de Columbia
+		$regions = str_replace(',', ', ', $regions);
+
+		// GB, WRX, Wrexham;Wrecsam
+		// >>
+		// GB, WRX, Wrexham;Wrecsam
+		$regions = preg_replace('#(\n[^,]*,[^,]*,[^;]*);([^\n]*)#', '\1 (\2)', $regions);
+
+		$regions = trim(preg_replace('#  +#', ' ', $regions));
 
 		return explode("\n", $regions);
-	}
-
-	public function cleanRegion($region)
-	{
-		$region = trim($region, '"');
-
-		$region = htmlspecialchars($region);
-
-		$region = str_replace(
-			array(
-				'Province of ',
-				'Provincia di ',
-				'County',
-				'Prefecture',
-				'District',
-				'Province',
-				'Rrethi i ',
-				'Okres ',
-				'Nomos ',
-			),
-			' ',
-			$region
-		);
-		$region = preg_replace('#^Co#', '', $region);
-		$region = preg_replace('#name for .*?,\s*#', '', $region);
-
-		$region = preg_replace('#;(.*)#', ' (\1)', $region);
-
-		return trim(preg_replace('#  +#', ' ', $region));
 	}
 	/* <<< [NONE] <<< */
 }
