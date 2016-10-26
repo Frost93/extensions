@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -82,7 +82,7 @@ class PlgSystemModalsHelperFile
 			return $this->params->iframe;
 		}
 
-		return ($data['iframe'] !== 0 && $data['iframe'] != 'false');
+		return ($data['iframe'] !== 0 && $data['iframe'] !== 'false');
 	}
 
 	public function retinaImageExists($url)
@@ -124,8 +124,10 @@ class PlgSystemModalsHelperFile
 
 	public function getTitle($url, $case)
 	{
-		$title = basename($url);
-		$title = explode('.', $title);
+		$file_name = basename($url);
+
+
+		$title = explode('.', $file_name);
 		$title = $title['0'];
 		$title = preg_replace('#[_-]([0-9]+|[a-z])$#i', '', $title);
 		$title = str_replace(array('-', '_'), ' ', $title);

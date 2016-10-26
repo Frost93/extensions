@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -65,8 +65,8 @@ if (JFactory::getUser()->authorise('core.admin'))
 }
 
 JFactory::getDocument()->addScriptDeclaration($script);
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-RLFunctions::script('regularlabs/toggler.min.js', '16.5.10919');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::script('regularlabs/toggler.min.js');
 
 JFactory::getDocument()->addStyleSheetVersion(JUri::root(true) . '/media/regularlabs/css/frontend.min.css');
 ?>

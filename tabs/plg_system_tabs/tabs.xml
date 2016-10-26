@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_tabs</name>
 	<description>PLG_SYSTEM_TABS_DESC</description>
-	<version>6.0.3</version>
-	<creationDate>May 2016</creationDate>
+	<version>6.2.3</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -60,8 +60,8 @@
 					<option value="center">&lt;span class="icon-reglab-paragraph-center">&lt;/span></option>
 					<option value="justify">&lt;span class="icon-reglab-paragraph-justify">&lt;/span></option>
 				</field>
-				<field name="color_inactive_handles" type="radio" class="btn-group" default="0" label="TAB_COLOR_INACTIVE_HANDLES"
-					   description="TAB_COLOR_INACTIVE_HANDLES_DESC">
+				<field name="color_inactive_handles" type="radio" class="btn-group" default="0"
+					   label="TAB_COLOR_INACTIVE_HANDLES" description="TAB_COLOR_INACTIVE_HANDLES_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -104,8 +104,8 @@
 					<option value="space">TAB_SYNTAX_SPACE</option>
 					<option value="=">TAB_SYNTAX_IS</option>
 				</field>
-				<field name="tag_characters" type="list" default="{.}" class="input-small" label="RL_TAG_CHARACTERS"
-					   description="RL_TAG_CHARACTERS_DESC">
+				<field name="tag_characters" type="list" default="{.}" class="input-small"
+					   label="RL_TAG_CHARACTERS" description="RL_TAG_CHARACTERS_DESC">
 					<option value="{.}">{...}</option>
 					<option value="[.]">[...]</option>
 					<option value="{{.}}">{{...}}</option>
@@ -136,8 +136,8 @@
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
-				<field name="place_comments" type="radio" class="btn-group" default="1" label="RL_PLACE_HTML_COMMENTS"
-					   description="RL_PLACE_HTML_COMMENTS_DESC">
+				<field name="place_comments" type="radio" class="btn-group" default="1"
+					   label="RL_PLACE_HTML_COMMENTS" description="RL_PLACE_HTML_COMMENTS_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -146,8 +146,8 @@
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
-				<field name="load_bootstrap_framework" type="radio" class="btn-group" default="1" label="RL_LOAD_BOOTSTRAP_FRAMEWORK"
-					   description="RL_LOAD_BOOTSTRAP_FRAMEWORK_DESC">
+				<field name="load_bootstrap_framework" type="radio" class="btn-group" default="1"
+					   label="RL_LOAD_BOOTSTRAP_FRAMEWORK" description="RL_LOAD_BOOTSTRAP_FRAMEWORK_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -162,8 +162,8 @@
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
-				<field name="button_use_simple_button" type="radio" class="btn-group" default="0" label="RL_USE_SIMPLE_BUTTON"
-					   description="RL_USE_SIMPLE_BUTTON_DESC">
+				<field name="button_use_simple_button" type="radio" class="btn-group" default="0"
+					   label="RL_USE_SIMPLE_BUTTON" description="RL_USE_SIMPLE_BUTTON_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -176,15 +176,15 @@
 				</field>
 				<field name="@toggler_button_use_simple_button_no_b" type="rl_toggler" />
 				<field name="@toggler_button_use_simple_button_yes_a" type="rl_toggler" param="button_use_simple_button" value="1" />
-				<field name="button_use_custom_code" type="radio" class="btn-group" default="0" label="RL_USE_CUSTOM_CODE"
-					   description="RL_USE_CUSTOM_CODE_DESC">
+				<field name="button_use_custom_code" type="radio" class="btn-group" default="0"
+					   label="RL_USE_CUSTOM_CODE" description="RL_USE_CUSTOM_CODE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
 				<field name="@toggler_button_code_a" type="rl_toggler" param="button_use_custom_code" value="1" />
 				<field name="button_custom_code" type="rl_textareaplus" filter="RAW" texttype="html" width="400" height="300"
-					   default="{tab Tab Title 1}&lt;br />[:SELECTION:]&lt;br />{tab Tab Title 2}&lt;br />Tab text...&lt;br />{/tabs}" label="RL_CUSTOM_CODE"
-					   description="RL_CUSTOM_CODE_DESC" />
+					   default="{tab Tab Title 1}&lt;br />[:SELECTION:]&lt;br />{tab Tab Title 2}&lt;br />Tab text...&lt;br />{/tabs}"
+					   label="RL_CUSTOM_CODE" description="RL_CUSTOM_CODE_DESC" />
 				<field name="@toggler_button_code_b" type="rl_toggler" />
 				<field name="@toggler_button_use_simple_button_yes_b" type="rl_toggler" />
 			</fieldset>

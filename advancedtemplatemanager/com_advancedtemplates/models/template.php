@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.2
+ * @version         2.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -21,8 +21,20 @@ defined('_JEXEC') or die;
  */
 class AdvancedTemplatesModelTemplate extends JModelForm
 {
+	/**
+	 * The information in a template
+	 *
+	 * @var    stdClass
+	 * @since  1.6
+	 */
 	protected $template = null;
 
+	/**
+	 * The path to the template
+	 *
+	 * @var    stdClass
+	 * @since  3.2
+	 */
 	protected $element = null;
 
 	/**
@@ -32,6 +44,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $name The file name.
 	 *
 	 * @return  object
+	 *
+	 * @since   1.6
 	 */
 	protected function getFile($path, $name)
 	{
@@ -50,6 +64,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to get a list of all the files to edit in a template.
 	 *
 	 * @return  array  A nested array of relevant files.
+	 *
+	 * @since   1.6
 	 */
 	public function getFiles()
 	{
@@ -94,6 +110,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $dir The path of the directory to scan
 	 *
 	 * @return  array
+	 *
+	 * @since   3.2
 	 */
 	public function getDirectoryTree($dir)
 	{
@@ -112,16 +130,10 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 				}
 				else
 				{
-					$ext          = pathinfo($dir . $value, PATHINFO_EXTENSION);
-					$params       = JComponentHelper::getParams('com_advancedtemplates');
-					$imageTypes   = explode(',', $params->get('image_formats'));
-					$sourceTypes  = explode(',', $params->get('source_formats'));
-					$fontTypes    = explode(',', $params->get('font_formats'));
-					$archiveTypes = explode(',', $params->get('compressed_formats'));
+					$ext           = pathinfo($dir . $value, PATHINFO_EXTENSION);
+					$allowedFormat = $this->checkFormat($ext);
 
-					$types = array_merge($imageTypes, $sourceTypes, $fontTypes, $archiveTypes);
-
-					if (in_array($ext, $types))
+					if ($allowedFormat == true)
 					{
 						$relativePath = str_replace($this->element, '', $dir);
 						$info         = $this->getFile('/' . $relativePath, $value);
@@ -140,6 +152,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Note. Calling getState in this method will result in recursion.
 	 *
 	 * @return  void
+	 *
+	 * @since   1.6
 	 */
 	protected function populateState()
 	{
@@ -159,6 +173,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to get the template information.
 	 *
 	 * @return  mixed  Object if successful, false if not and internal error is set.
+	 *
+	 * @since   1.6
 	 */
 	public function &getTemplate()
 	{
@@ -170,7 +186,7 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 
 			// Get the template information.
 			$query = $db->getQuery(true)
-				->select('extension_id, client_id, element, name')
+				->select('extension_id, client_id, element, name, manifest_cache')
 				->from('#__extensions')
 				->where($db->quoteName('extension_id') . ' = ' . (int) $pk)
 				->where($db->quoteName('type') . ' = ' . $db->quote('template'));
@@ -206,6 +222,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to check if new template name already exists
 	 *
 	 * @return  boolean   true if name is not used, false otherwise
+	 *
+	 * @since    2.5
 	 */
 	public function checkNewName()
 	{
@@ -223,6 +241,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to check if new template name already exists
 	 *
 	 * @return  string     name of current template
+	 *
+	 * @since    2.5
 	 */
 	public function getFromName()
 	{
@@ -233,6 +253,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to check if new template name already exists
 	 *
 	 * @return  boolean   true if name is not used, false otherwise
+	 *
+	 * @since    2.5
 	 */
 	public function copy()
 	{
@@ -277,6 +299,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to delete tmp folder
 	 *
 	 * @return  boolean   true if delete successful, false otherwise
+	 *
+	 * @since    2.5
 	 */
 	public function cleanup()
 	{
@@ -293,15 +317,19 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to rename the template in the XML files and rename the language files
 	 *
 	 * @return  boolean  true if successful, false otherwise
+	 *
+	 * @since    2.5
 	 */
 	protected function fixTemplateName()
 	{
 		// Rename Language files
 		// Get list of language files
-		$result  = true;
-		$files   = JFolder::files($this->getState('to_path'), '.ini', true, true);
-		$newName = strtolower($this->getState('new_name'));
-		$oldName = $this->getTemplate()->element;
+		$result   = true;
+		$files    = JFolder::files($this->getState('to_path'), '.ini', true, true);
+		$newName  = strtolower($this->getState('new_name'));
+		$template = $this->getTemplate();
+		$oldName  = $template->element;
+		$manifest = json_decode($template->manifest_cache);
 
 		jimport('joomla.filesystem.file');
 
@@ -317,7 +345,7 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 		if (JFile::exists($xmlFile))
 		{
 			$contents  = file_get_contents($xmlFile);
-			$pattern[] = '#<name>\s*' . $oldName . '\s*</name>#i';
+			$pattern[] = '#<name>\s*' . $manifest->name . '\s*</name>#i';
 			$replace[] = '<name>' . $newName . '</name>';
 			$pattern[] = '#<language(.*)' . $oldName . '(.*)</language>#';
 			$replace[] = '<language${1}' . $newName . '${2}</language>';
@@ -335,6 +363,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   boolean $loadData True if the form is to load its own data (default case), false if not.
 	 *
 	 * @return  JForm    A JForm object on success, false on failure
+	 *
+	 * @since   1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
@@ -374,6 +404,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to get the data that should be injected in the form.
 	 *
 	 * @return  mixed  The data for the form.
+	 *
+	 * @since   1.6
 	 */
 	protected function loadFormData()
 	{
@@ -388,6 +420,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Method to get a single record.
 	 *
 	 * @return  mixed  Object on success, false on failure.
+	 *
+	 * @since   1.6
 	 */
 	public function &getSource()
 	{
@@ -404,7 +438,17 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 			$input    = JFactory::getApplication()->input;
 			$fileName = base64_decode($input->get('file'));
 			$client   = JApplicationHelper::getClientInfo($this->template->client_id);
-			$filePath = JPath::clean($client->path . '/templates/' . $this->template->element . '/' . $fileName);
+
+			try
+			{
+				$filePath = JPath::check($client->path . '/templates/' . $this->template->element . '/' . $fileName);
+			}
+			catch (Exception $e)
+			{
+				$app->enqueueMessage(JText::_('COM_TEMPLATES_ERROR_SOURCE_FILE_NOT_FOUND'), 'error');
+
+				return;
+			}
 
 			if (file_exists($filePath))
 			{
@@ -427,6 +471,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   array $data The source data to save.
 	 *
 	 * @return  boolean  True on success, false otherwise and internal error set.
+	 *
+	 * @since   1.6
 	 */
 	public function save($data)
 	{
@@ -456,7 +502,7 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 		if (!is_writable($filePath))
 		{
 			$app->enqueueMessage(JText::_('COM_TEMPLATES_ERROR_SOURCE_FILE_NOT_WRITABLE'), 'warning');
-			$app->enqueueMessage(JText::_('COM_TEMPLATES_FILE_PERMISSIONS' . JPath::getPermissions($filePath)), 'warning');
+			$app->enqueueMessage(JText::sprintf('COM_TEMPLATES_FILE_PERMISSIONS', JPath::getPermissions($filePath)), 'warning');
 
 			if (!JPath::isOwner($filePath))
 			{
@@ -466,22 +512,19 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 			return false;
 		}
 
+		// Make sure EOL is Unix
+		$data['source'] = str_replace(array("\r\n", "\r"), "\n", $data['source']);
+
 		$return = JFile::write($filePath, $data['source']);
 
-		// Try to make the template file unwritable.
-		if (JPath::isOwner($filePath) && !JPath::setPermissions($filePath, '0444'))
-		{
-			$app->enqueueMessage(JText::_('COM_TEMPLATES_ERROR_SOURCE_FILE_NOT_UNWRITABLE'), 'error');
-
-			return false;
-		}
-		elseif (!$return)
+		if (!$return)
 		{
 			$app->enqueueMessage(JText::sprintf('COM_TEMPLATES_ERROR_FAILED_TO_SAVE_FILENAME', $fileName), 'error');
 
 			return false;
 		}
 
+		// Get the extension of the changed file.
 		$explodeArray = explode('.', $fileName);
 		$ext          = end($explodeArray);
 
@@ -500,6 +543,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $path Location of override.
 	 *
 	 * @return  object  containing override name and path.
+	 *
+	 * @since   3.2
 	 */
 	public function getOverridesFolder($name, $path)
 	{
@@ -514,6 +559,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Get a list of overrides.
 	 *
 	 * @return  array containing overrides.
+	 *
+	 * @since   3.2
 	 */
 	public function getOverridesList()
 	{
@@ -527,15 +574,30 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 
 			foreach ($components as $component)
 			{
-				$viewPath = JPath::clean($componentPath . '/' . $component . '/views/');
+				if (file_exists($componentPath . '/' . $component . '/views/'))
+				{
+					$viewPath = JPath::clean($componentPath . '/' . $component . '/views/');
+				}
+				elseif (file_exists($componentPath . '/' . $component . '/view/'))
+				{
+					$viewPath = JPath::clean($componentPath . '/' . $component . '/view/');
+				}
+				else
+				{
+					$viewPath = '';
+				}
 
-				if (file_exists($viewPath))
+				if ($viewPath)
 				{
 					$views = JFolder::folders($viewPath);
 
 					foreach ($views as $view)
 					{
-						$result['components'][$component][] = $this->getOverridesFolder($view, $viewPath);
+						// Only show the view has layout inside it
+						if (file_exists($viewPath . $view . '/tmpl'))
+						{
+							$result['components'][$component][] = $this->getOverridesFolder($view, $viewPath);
+						}
 					}
 				}
 			}
@@ -567,6 +629,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $override The override location.
 	 *
 	 * @return   boolean  true if override creation is successful, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function createOverride($override)
 	{
@@ -597,31 +661,28 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 				$htmlPath = JPath::clean($client->path . '/templates/' . $template->element . '/html/layouts/joomla/' . $name);
 			}
 
-			if (JFolder::exists($htmlPath))
+			// Check Html folder, create if not exist
+			if (!JFolder::exists($htmlPath))
 			{
-				$app->enqueueMessage(JText::_('COM_TEMPLATES_OVERRIDE_EXISTS'), 'error');
+				if (!JFolder::create($htmlPath))
+				{
+					$app->enqueueMessage(JText::_('COM_TEMPLATES_FOLDER_ERROR'), 'error');
 
-				return false;
-			}
-
-			if (!JFolder::create($htmlPath))
-			{
-				$app->enqueueMessage(JText::_('COM_TEMPLATES_FOLDER_ERROR'), 'error');
-
-				return false;
+					return false;
+				}
 			}
 
 			if (stristr($name, 'mod_') != false)
 			{
-				$return = JFolder::copy($override . '/tmpl', $htmlPath, '', true);
+				$return = $this->createTemplateOverride(JPath::clean($override . '/tmpl'), $htmlPath);
 			}
 			elseif (stristr($override, 'com_') != false)
 			{
-				$return = JFolder::copy($override . '/tmpl', $htmlPath . '/', '', true);
+				$return = $this->createTemplateOverride(JPath::clean($override . '/tmpl'), $htmlPath);
 			}
 			else
 			{
-				$return = JFolder::copy($override, $htmlPath, '', true);
+				$return = $this->createTemplateOverride($override, $htmlPath);
 			}
 
 			if ($return)
@@ -640,11 +701,72 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	}
 
 	/**
+	 * Create override folder & file
+	 *
+	 * @param   string $overridePath The override location
+	 * @param   string $htmlPath     The html location
+	 *
+	 * @return  boolean                True on success. False otherwise.
+	 */
+	public function createTemplateOverride($overridePath, $htmlPath)
+	{
+		$return = false;
+
+		if (empty($overridePath) || empty($htmlPath))
+		{
+			return $return;
+		}
+
+		// Get list of template folders
+		$folders = JFolder::folders($overridePath, null, true, true);
+
+		if (!empty($folders))
+		{
+			foreach ($folders as $folder)
+			{
+				$htmlFolder = $htmlPath . str_replace($overridePath, '', $folder);
+
+				if (!JFolder::exists($htmlFolder))
+				{
+					JFolder::create($htmlFolder);
+				}
+			}
+		}
+
+		// Get list of template files (Only get *.php file for template file)
+		$files = JFolder::files($overridePath, '.php', true, true);
+
+		if (empty($files))
+		{
+			return true;
+		}
+
+		foreach ($files as $file)
+		{
+			$overrideFilePath = str_replace($overridePath, '', $file);
+			$htmlFilePath     = $htmlPath . $overrideFilePath;
+
+			if (JFile::exists($htmlFilePath))
+			{
+				// Generate new unique file name base on current time
+				$today        = JFactory::getDate();
+				$htmlFilePath = JFile::stripExt($htmlFilePath) . '-' . $today->format('Ymd-His') . '.' . JFile::getExt($htmlFilePath);
+			}
+
+			$return = JFile::copy($file, $htmlFilePath, '', true);
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Compile less using the less compiler under /build.
 	 *
 	 * @param   string $input The relative location of the less file.
 	 *
 	 * @return  boolean  true if compilation is successful, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function compileLess($input)
 	{
@@ -658,14 +780,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 			$fileName     = end($explodeArray);
 			$outFile      = reset(explode('.', $fileName));
 
-			// Load the RAD layer to use its LESS compiler
-			if (!defined('FOF_INCLUDED'))
-			{
-				require_once JPATH_LIBRARIES . '/fof/include.php';
-			}
-
-			$less = new FOFLess;
-			$less->setFormatter(new FOFLessFormatterJoomla);
+			$less = new JLess;
+			$less->setFormatter(new JLessFormatterJoomla);
 
 			try
 			{
@@ -686,6 +802,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $file The relative location of the file.
 	 *
 	 * @return   boolean  True if file deletion is successful, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function deleteFile($file)
 	{
@@ -717,6 +835,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $location Location for the new file.
 	 *
 	 * @return  boolean  true if file created successfully, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function createFile($name, $type, $location)
 	{
@@ -739,6 +859,14 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 
 				return false;
 			}
+			// Check if the format is allowed and will be showed in the backend
+			$check = $this->checkFormat($type);
+
+			// Add a message if we are not allowed to show this file in the backend.
+			if (!$check)
+			{
+				$app->enqueueMessage(JText::sprintf('COM_TEMPLATES_WARNING_FORMAT_WILL_NOT_BE_VISIBLE', $type), 'warning');
+			}
 
 			return true;
 		}
@@ -751,6 +879,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $location Location for the new file.
 	 *
 	 * @return   boolean  True if file uploaded successfully, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function uploadFile($file, $location)
 	{
@@ -764,7 +894,7 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 			$fileName = JFile::makeSafe($file['name']);
 
 			$err = null;
-			JLoader::register('TemplateHelper', JPATH_COMPONENT_ADMINISTRATOR . '/helpers/template.php');
+			JLoader::register('TemplateHelper', JPATH_ADMINISTRATOR . '/components/com_templates/helpers/template.php');
 
 			if (!TemplateHelper::canUpload($file, $err))
 			{
@@ -799,6 +929,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $location Location for the new folder.
 	 *
 	 * @return   boolean  True if override folder is created successfully, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function createFolder($name, $location)
 	{
@@ -834,6 +966,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $location The name and location of the folder.
 	 *
 	 * @return  boolean  True if override folder is deleted successfully, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function deleteFolder($location)
 	{
@@ -872,6 +1006,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $name The new name of the file.
 	 *
 	 * @return  string  Encoded string containing the new file location.
+	 *
+	 * @since   3.2
 	 */
 	public function renameFile($file, $name)
 	{
@@ -908,6 +1044,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Get an image address, height and width.
 	 *
 	 * @return  array an associative array containing image address, height and width.
+	 *
+	 * @since   3.2
 	 */
 	public function getImage()
 	{
@@ -959,6 +1097,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $y    y-coordinate.
 	 *
 	 * @return  boolean     true if image cropped successfully, false otherwise.
+	 *
+	 * @since   3.2
 	 */
 	public function cropImage($file, $w, $h, $x, $y)
 	{
@@ -992,6 +1132,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $height The new height of the image.
 	 *
 	 * @return   boolean  true if image resize successful, false otherwise.
+	 *
+	 * @since   3.2
 	 */
 	public function resizeImage($file, $width, $height)
 	{
@@ -1022,6 +1164,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Template preview.
 	 *
 	 * @return  object  object containing the id of the template.
+	 *
+	 * @since   3.2
 	 */
 	public function getPreview()
 	{
@@ -1031,7 +1175,7 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 
 		$query->select('id, client_id');
 		$query->from('#__template_styles');
-		$query->where($db->quoteName('template') . ' = ' . $db->quote($this->template->name));
+		$query->where($db->quoteName('template') . ' = ' . $db->quote($this->template->element));
 
 		$db->setQuery($query);
 
@@ -1058,6 +1202,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Rename a file.
 	 *
 	 * @return  mixed  array on success, false on failure
+	 *
+	 * @since   3.2
 	 */
 	public function getFont()
 	{
@@ -1102,34 +1248,6 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	}
 
 	/**
-	 * Check the admin template.
-	 *
-	 * @return  object  object containing the id of the template.
-	 */
-	public function getHathor()
-	{
-		$app   = JFactory::getApplication();
-		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-
-		$query->select('home');
-		$query->from('#__template_styles');
-		$query->where($db->quoteName('template') . ' = ' . $db->quote('hathor'));
-		$db->setQuery($query);
-
-		try
-		{
-			$result = $db->loadObject();
-		}
-		catch (RuntimeException $e)
-		{
-			$app->enqueueMessage($e->getMessage(), 'error');
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Copy a file.
 	 *
 	 * @param   string $newName  The name of the copied file
@@ -1137,6 +1255,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * @param   string $file     The name and location of the file
 	 *
 	 * @return   boolean  true if image resize successful, false otherwise.
+	 *
+	 * @since   3.2
 	 */
 	public function copyFile($newName, $location, $file)
 	{
@@ -1174,6 +1294,8 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	 * Get the compressed files.
 	 *
 	 * @return   array if file exists, false otherwise
+	 *
+	 * @since   3.2
 	 */
 	public function getArchive()
 	{
@@ -1216,11 +1338,13 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 	}
 
 	/**
-	 * Extract contents of a archive file.
+	 * Extract contents of an archive file.
 	 *
 	 * @param   string $file The name and location of the file
 	 *
 	 * @return  boolean  true if image extraction is successful, false otherwise.
+	 *
+	 * @since   3.2
 	 */
 	public function extractArchive($file)
 	{
@@ -1270,5 +1394,30 @@ class AdvancedTemplatesModelTemplate extends JModelForm
 				return false;
 			}
 		}
+	}
+
+	/**
+	 * Check if the extension is allowed and will be shown in the template manager
+	 *
+	 * @param   string $ext The extension to check if it is allowed
+	 *
+	 * @return  boolean  true if the extension is allowed false otherwise
+	 *
+	 * @since   3.6.0
+	 */
+	protected function checkFormat($ext)
+	{
+		if (!isset($this->allowedFormats))
+		{
+			$params       = JComponentHelper::getParams('com_templates');
+			$imageTypes   = explode(',', $params->get('image_formats'));
+			$sourceTypes  = explode(',', $params->get('source_formats'));
+			$fontTypes    = explode(',', $params->get('font_formats'));
+			$archiveTypes = explode(',', $params->get('compressed_formats'));
+
+			$this->allowedFormats = array_merge($imageTypes, $sourceTypes, $fontTypes, $archiveTypes);
+		}
+
+		return in_array($ext, $this->allowedFormats);
 	}
 }

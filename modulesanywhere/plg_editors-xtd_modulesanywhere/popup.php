@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modules Anywhere
- * @version         5.0.0
+ * @version         6.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -23,6 +23,7 @@ if ($user->get('guest')
 }
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/string.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
 $parameters = RLParameters::getInstance();
 $params     = $parameters->getPluginParams('modulesanywhere');
@@ -52,8 +53,8 @@ class PlgButtonModulesAnywherePopup
 		RLFunctions::loadLanguage('plg_system_modulesanywhere');
 		RLFunctions::loadLanguage('com_modules', JPATH_ADMINISTRATOR);
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		// Initialize some variables
 		$db     = JFactory::getDbo();
@@ -204,6 +205,9 @@ class PlgButtonModulesAnywherePopup
 		$postag = explode(',', $params->modulepos_tag);
 		$postag = trim($postag['0']);
 
+		// Tag character start and end
+		list($tag_start, $tag_end) = explode('.', $params->tag_characters);
+
 		JHtml::_('behavior.tooltip');
 		JHtml::_('formbehavior.chosen', 'select');
 
@@ -236,7 +240,7 @@ class PlgButtonModulesAnywherePopup
 		<div class="container-fluid container-main">
 			<form action="" method="post" name="adminForm" id="adminForm">
 				<div class="alert alert-info">
-					<?php echo html_entity_decode(JText::_('MA_CLICK_ON_ONE_OF_THE_MODULES_LINKS'), ENT_COMPAT, 'UTF-8'); ?>
+					<?php echo RLText::html_entity_decoder(JText::_('MA_CLICK_ON_ONE_OF_THE_MODULES_LINKS')); ?>
 				</div>
 
 				<div class="row-fluid form-vertical">
@@ -430,23 +434,25 @@ class PlgButtonModulesAnywherePopup
 							?>
 							<tr class="<?php echo "row$k"; ?>">
 								<td class="center">
-									<a rel="tooltip"
-									   title="<?php echo JText::_('MA_USE_ID_IN_TAG'); ?>:<br>{module <?php echo $row->id; ?>}"
-									   href="javascript:;"
-									   onclick="modulesanywhere_jInsertEditorText( '<?php echo $row->id; ?>' );return false;">
-										<?php echo $row->id; ?>
-									</a>
+									<?php
+									echo '<button class="btn" rel="tooltip" title="<strong>' . JText::_('MA_USE_ID_IN_TAG') . '</strong><br>'
+										. $tag_start . $tag . ' ' . $row->id . $tag_end
+										. '" onclick="modulesanywhere_jInsertEditorText( \'' . $row->id . '\' );return false;">'
+										. $row->id
+										. '</button>';
+									?>
 								</td>
 								<td class="center">
 									<?php echo JHtml::_('jgrid.published', $row->published, $row->id, 'modules.', 0, 'cb', $row->publish_up, $row->publish_down); ?>
 								</td>
 								<td>
-									<a rel="tooltip"
-									   title="<?php echo JText::_('MA_USE_TITLE_IN_TAG'); ?>:<br>{module <?php echo htmlspecialchars($row->title); ?>}"
-									   href="javascript:;"
-									   onclick="modulesanywhere_jInsertEditorText( '<?php echo addslashes(htmlspecialchars($row->title)); ?>' );return false;">
-										<?php echo htmlspecialchars($row->title); ?>
-									</a>
+									<?php
+									echo '<button class="btn" rel="tooltip" title="<strong>' . JText::_('MA_USE_TITLE_IN_TAG') . '</strong><br>'
+										. $tag_start . $tag . ' ' . htmlspecialchars($row->title) . $tag_end
+										. '" onclick="modulesanywhere_jInsertEditorText( \'' . addslashes(htmlspecialchars($row->title)) . '\' );return false;">'
+										. htmlspecialchars($row->title)
+										. '</button>';
+									?>
 									<?php if (!empty($row->note)) : ?>
 										<p class="smallsub">
 											<?php echo JText::sprintf('JGLOBAL_LIST_NOTE', htmlspecialchars($row->note)); ?></p>
@@ -454,12 +460,13 @@ class PlgButtonModulesAnywherePopup
 								</td>
 								<td>
 									<?php if ($row->position) : ?>
-										<a class="label label-info" rel="tooltip"
-										   title="<?php echo JText::_('MA_USE_MODULE_POSITION_TAG'); ?>:<br>{modulepos <?php echo $row->position; ?>}"
-										   href="javascript:;"
-										   onclick="modulesanywhere_jInsertEditorText( '<?php echo $row->position; ?>', 1 );return false;">
-											<?php echo $row->position; ?>
-										</a>
+										<?php
+										echo '<button class="btn" rel="tooltip" title="<strong>' . JText::_('MA_USE_MODULE_POSITION_TAG') . '</strong><br>'
+											. $tag_start . $postag . ' ' . $row->position . $tag_end
+											. '" onclick="modulesanywhere_jInsertEditorText( \'' . $row->position . '\', 1 );return false;">'
+											. $row->position
+											. '</button>';
+										?>
 									<?php else : ?>
 										<span class="label">
 											<?php echo JText::_('JNONE'); ?>

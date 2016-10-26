@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsLanguages extends RLAssignment
 {
-	function passLanguages()
+	public function passLanguages()
 	{
 		return $this->passSimple(JFactory::getLanguage()->getTag(), true);
 	}

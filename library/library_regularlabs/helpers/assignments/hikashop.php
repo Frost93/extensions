@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsHikaShop extends RLAssignment
 {
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		if ($this->request->option != 'com_hikashop')
 		{
@@ -34,7 +34,7 @@ class RLAssignmentsHikaShop extends RLAssignment
 		return $this->passSimple($type);
 	}
 
-	function passCategories()
+	public function passCategories()
 	{
 		if ($this->request->option != 'com_hikashop')
 		{
@@ -43,7 +43,7 @@ class RLAssignmentsHikaShop extends RLAssignment
 
 		$pass = (
 			($this->params->inc_categories
-				&& ($this->request->view == 'category')
+				&& ($this->request->view == 'category' || $this->request->layout == 'listing')
 			)
 			|| ($this->params->inc_items && $this->request->view == 'product')
 		);
@@ -72,7 +72,7 @@ class RLAssignmentsHikaShop extends RLAssignment
 		return $this->passSimple($cats);
 	}
 
-	function passProducts()
+	public function passProducts()
 	{
 		if (!$this->request->id || $this->request->option != 'com_hikashop' || $this->request->view != 'product')
 		{
@@ -82,14 +82,14 @@ class RLAssignmentsHikaShop extends RLAssignment
 		return $this->passSimple($this->request->id);
 	}
 
-	function getCategories()
+	private function getCategories()
 	{
 		switch (true)
 		{
-			case ($this->request->view == 'category' && $this->request->id):
+			case (($this->request->view == 'category' || $this->request->layout == 'listing') && $this->request->id):
 				return array($this->request->id);
 
-			case ($this->request->view == 'category'):
+			case ($this->request->view == 'category' || $this->request->layout == 'listing'):
 				include_once JPATH_ADMINISTRATOR . '/components/com_hikashop/helpers/helper.php';
 				$menuClass = hikashop_get('class.menus');
 				$menuData  = $menuClass->get($this->request->Itemid);
@@ -111,7 +111,7 @@ class RLAssignmentsHikaShop extends RLAssignment
 		}
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'hikashop_category', 'category_parent_id', 'category_id');
 	}

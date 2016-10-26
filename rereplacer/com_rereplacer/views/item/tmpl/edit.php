@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.1
+ * @version         7.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -21,23 +21,27 @@ $user    = JFactory::getUser();
 $contact = new stdClass;
 
 $db = JFactory::getDbo();
+$table_name = $db->getPrefix() . $this->config->contact_table;
 
-$query = 'SHOW TABLES LIKE ' . $db->quote($db->getPrefix() . $this->config->contact_table);
-$db->setQuery($query);
-
-$has_contact_table = $db->loadResult();
-if ($has_contact_table)
+if (in_array($table_name, $db->getTableList()))
 {
-	$query = $db->getQuery(true)
-		->select('c.misc')
-		->from('#__' . $this->config->contact_table . ' as c')
-		->where('c.user_id = ' . (int) $user->id);
+	$query = 'SHOW FIELDS FROM ' . $db->quoteName($table_name);
 	$db->setQuery($query);
-	$contact = $db->loadObject();
+	$columns = $db->loadColumn();
+
+	if (in_array('misc', $columns))
+	{
+		$query = $db->getQuery(true)
+			->select('c.misc')
+			->from('#__' . $this->config->contact_table . ' as c')
+			->where('c.user_id = ' . (int) $user->id);
+		$db->setQuery($query);
+		$contact = $db->loadObject();
+	}
 }
 
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_rereplacer&id=' . ( int ) $this->item->id); ?>" method="post"

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,7 +24,13 @@ class PlgSystemAdvancedModuleHelper
 
 	public function onRenderModule(&$module)
 	{
-		// do nothing if is not frontend
+		// Module already nulled
+		if (is_null($module))
+		{
+			return false;
+		}
+
+		// Do nothing if is not frontend
 		if (!JFactory::getApplication()->isSite())
 		{
 			return false;
@@ -42,7 +48,13 @@ class PlgSystemAdvancedModuleHelper
 
 	public function isEmpty(&$module)
 	{
-		$params = isset($module->adv_param) ? $module->adv_param : (isset($module->advancedparams) ? $module->advancedparams : null);
+		if (!isset($module->content))
+		{
+			return true;
+		}
+
+		$this->setAdvancedParams($module);
+		$params = $module->advancedparams;
 
 		// return false if hideempty is off in module params
 		if (empty($params) || !isset($params->hideempty) || !$params->hideempty)
@@ -59,10 +71,10 @@ class PlgSystemAdvancedModuleHelper
 		}
 
 		$content = trim($module->content);
+
 		// return true if module is empty
 		if ($content == '')
 		{
-			// return true will prevent the module from outputting html
 			return true;
 		}
 
@@ -75,53 +87,22 @@ class PlgSystemAdvancedModuleHelper
 		$content = preg_replace('#</[^>]+>#si', '', $content);
 		// remove tags to be ignored
 		$tags = 'p|div|span|strong|b|em|i|ul|font|br|h[0-9]|fieldset|label|ul|ol|li|table|thead|tbody|tfoot|tr|th|td|form';
-		$s    = '#<(' . $tags . ')([^a-z0-9>][^>]*)?>#si';
+		$s    = '#<(?:' . $tags . ')(?:\s*[^>]*)?>#si';
+
 		if (@preg_match($s . 'u', $content))
 		{
 			$s .= 'u';
 		}
+
 		if (preg_match($s, $content))
 		{
 			$content = preg_replace($s, '', $content);
 		}
 
-		// return false if module is not empty
-		if (trim($content) != '')
-		{
-			return false;
-		}
-
-		// return true will prevent the module from outputting html
-		return true;
+		// return whether content is empty
+		return (trim($content) == '');
 	}
 
-
-	public function onCreateModuleQuery(&$query)
-	{
-		// return if is not frontend
-		if (!JFactory::getApplication()->isSite())
-		{
-			return;
-		}
-
-		foreach ($query as $type => $strings)
-		{
-			foreach ($strings as $i => $string)
-			{
-				if ($type == 'select')
-				{
-					$query->{$type}[$i] = str_replace(', mm.menuid', '', $string);
-				}
-				else if (strpos($string, 'mm.') !== false || strpos($string, 'm.publish_') !== false)
-				{
-					unset($query->{$type}[$i]);
-				}
-			}
-		}
-		$query->select[] = 'am.params as advancedparams, 0 as menuid, m.publish_up, m.publish_down';
-		$query->join[]   = '#__advancedmodules as am ON am.moduleid = m.id';
-		$query->order    = array('m.ordering, m.id');
-	}
 
 	public function onPrepareModuleList(&$modules)
 	{
@@ -133,56 +114,36 @@ class PlgSystemAdvancedModuleHelper
 
 		jimport('joomla.filesystem.file');
 
-		require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
-		$parameters = RLParameters::getInstance();
-
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/assignments.php';
-		$assignments = new RLAssignmentsHelper;
-
-		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
+		$assignments_helper = new RLAssignmentsHelper;
 
 		// set params for all loaded modules first
 		// and make it an associated array (array id = module id)
 		$new_modules = array();
-		require_once JPATH_ADMINISTRATOR . '/components/com_advancedmodules/models/module.php';
-		$model = new AdvancedModulesModelModule;
+
 		foreach ($modules as $id => $module)
 		{
-			if (!isset($module->advancedparams))
-			{
-				$module->advancedparams = $this->getAdvancedParamsById($id);
-			}
-
-			$module->advancedparams = json_decode($module->advancedparams);
-			if (is_null($module->advancedparams))
-			{
-				$module->advancedparams = new stdClass;
-			}
-
-			if (
-				!isset($module->advancedparams->assignto_menuitems)
-				|| isset($module->advancedparams->assignto_urls_selection_sef)
-				|| (
-					!is_array($module->advancedparams->assignto_menuitems)
-					&& strpos($module->advancedparams->assignto_menuitems, '|') !== false
-				)
-			)
-			{
-				$module->advancedparams = (object) $model->initAssignments($module->id, $module);
-			}
-
-			$module->advancedparams   = $parameters->getParams($module->advancedparams, $xmlfile_assignments);
+			$this->setAdvancedParams($module);
 			$new_modules[$module->id] = $module;
 		}
+
 		$modules = $new_modules;
 		unset($new_modules);
 
 		foreach ($modules as $id => $module)
 		{
+			if (empty($module->id))
+			{
+				continue;
+			}
+
+			$this->setAdvancedParams($module);
+
 			if ($module->advancedparams === 0)
 			{
 				continue;
 			}
+
 
 			$module->reverse = 0;
 
@@ -193,11 +154,11 @@ class PlgSystemAdvancedModuleHelper
 
 			if ($module->published)
 			{
-				$this->setMirrorParams($module, $xmlfile_assignments);
+				$this->setMirrorParams($module);
 				$this->removeDisabledAssignments($module->advancedparams);
 
-				$ass  = $assignments->getAssignmentsFromParams($module->advancedparams);
-				$pass = $assignments->passAll($ass, $module->advancedparams->match_method);
+				$ass  = $assignments_helper->getAssignmentsFromParams($module->advancedparams);
+				$pass = $assignments_helper->passAll($ass, $module->advancedparams->match_method);
 
 				if (!$pass)
 				{
@@ -212,6 +173,128 @@ class PlgSystemAdvancedModuleHelper
 
 			$modules[$id] = $module;
 		}
+	}
+
+	private function setAdvancedParams(&$module)
+	{
+		if (empty($module->id))
+		{
+			return;
+		}
+
+		if (isset($module->advancedparams) && is_object($module->advancedparams))
+		{
+			return;
+		}
+
+		if (!isset($module->advancedparams))
+		{
+			$module->advancedparams = $this->getAdvancedParams($module);
+		}
+
+		$module->advancedparams = json_decode($module->advancedparams);
+
+		if (is_null($module->advancedparams))
+		{
+			$module->advancedparams = new stdClass;
+		}
+
+		if (
+			!isset($module->advancedparams->assignto_menuitems)
+			|| isset($module->advancedparams->assignto_urls_selection_sef)
+			|| (
+				!is_array($module->advancedparams->assignto_menuitems)
+				&& strpos($module->advancedparams->assignto_menuitems, '|') !== false
+			)
+		)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_advancedmodules/models/module.php';
+			$model = new AdvancedModulesModelModule;
+
+			$module->advancedparams = (object) $model->initAssignments($module->id, $module);
+		}
+
+		require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
+		$parameters = RLParameters::getInstance();
+
+		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
+
+		$module->advancedparams = $parameters->getParams($module->advancedparams, $xmlfile_assignments);
+	}
+
+	private function setMirrorParams(&$module)
+	{
+		$module->mirror_id = $this->getMirrorModuleId($module);
+
+		if (empty($module->mirror_id))
+		{
+			return;
+		}
+
+		$parameters = RLParameters::getInstance();
+
+		$mirror_id = $module->mirror_id < 0 ? $module->mirror_id * -1 : $module->mirror_id;
+
+		$count = 0;
+		while ($count++ < 10)
+		{
+			if (!$test_mirrorid = $this->getMirrorModuleIdById($mirror_id))
+			{
+				break;
+			}
+
+			$mirror_id = $test_mirrorid;
+		}
+
+		if (empty($mirror_id))
+		{
+			return;
+		}
+
+		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
+
+		$module->reverse = $mirror_id < 0;
+
+		if ($mirror_id == $module->id)
+		{
+			$empty         = new stdClass;
+			$mirror_params = $parameters->getParams($empty, $xmlfile_assignments);
+		}
+		else
+		{
+			if (isset($modules[$mirror_id]))
+			{
+				if (!isset($modules[$mirror_id]->advancedparams))
+				{
+					$modules[$mirror_id]->advancedparams = $this->getAdvancedParamsById($mirror_id);
+					$modules[$mirror_id]->advancedparams = $parameters->getParams($modules[$mirror_id]->advancedparams, $xmlfile_assignments);
+				}
+
+				$mirror_params = $modules[$mirror_id]->advancedparams;
+			}
+			else
+			{
+				$mirror_params = $this->getAdvancedParamsById($mirror_id);
+				$mirror_params = $parameters->getParams($mirror_params, $xmlfile_assignments);
+			}
+		}
+
+		// Keep the advanced settings that shouldn't be mirrored
+		$settings_to_keep = array(
+			'hideempty', 'color',
+		);
+
+		foreach ($settings_to_keep as $key)
+		{
+			if (!isset($module->advancedparams->{$key}))
+			{
+				continue;
+			}
+
+			$mirror_params->{$key} = $module->advancedparams->{$key};
+		}
+
+		$module->advancedparams = $mirror_params;
 	}
 
 	private function removeDisabledAssignments(&$params)
@@ -242,6 +325,10 @@ class PlgSystemAdvancedModuleHelper
 		{
 			$params->assignto_urls = 0;
 		}
+		if (!$config->show_assignto_devices)
+		{
+			$params->assignto_devices = 0;
+		}
 		if (!$config->show_assignto_os)
 		{
 			$params->assignto_os = 0;
@@ -266,83 +353,34 @@ class PlgSystemAdvancedModuleHelper
 		}
 	}
 
-	private function setMirrorParams(&$module, $xmlfile_assignments)
+
+
+	public function onCreateModuleQuery(&$query)
 	{
-		$module->mirror_id = $this->getMirrorModuleId($module);
-
-		if (empty($module->mirror_id))
+		// return if is not frontend
+		if (!JFactory::getApplication()->isSite())
 		{
 			return;
 		}
 
-		$parameters = RLParameters::getInstance();
-
-		$mirror_id = $module->mirror_id < 0 ? $module->mirror_id * -1 : $module->mirror_id;
-
-		$count = 0;
-		while ($count++ < 10)
+		foreach ($query as $type => $strings)
 		{
-			if (!$test_mirrorid = $this->getMirrorModuleIdById($mirror_id))
+			foreach ($strings as $i => $string)
 			{
-				break;
-			}
-
-			$mirror_id = $test_mirrorid;
-		}
-
-		if (empty($mirror_id))
-		{
-			return;
-		}
-
-		$module->reverse = $mirror_id < 0;
-
-		if ($mirror_id == $module->id)
-		{
-			$empty         = new stdClass;
-			$mirror_params = $parameters->getParams($empty, $xmlfile_assignments);
-		}
-		else
-		{
-			if (isset($modules[$mirror_id]))
-			{
-				if (!isset($modules[$mirror_id]->advancedparams))
+				if ($type == 'select')
 				{
-					$modules[$mirror_id]->advancedparams = $this->getAdvancedParamsById($mirror_id);
-					$modules[$mirror_id]->advancedparams = $parameters->getParams($modules[$mirror_id]->adv_param, $xmlfile_assignments);
+					$query->{$type}[$i] = str_replace(', mm.menuid', '', $string);
 				}
-				$mirror_params = $modules[$mirror_id]->advancedparams;
-			}
-			else
-			{
-				$mirror_params = $this->getAdvancedParamsById($mirror_id);
-				$mirror_params = $parameters->getParams($mirror_params, $xmlfile_assignments);
+				else if (strpos($string, 'mm.') !== false || strpos($string, 'm.publish_') !== false)
+				{
+					unset($query->{$type}[$i]);
+				}
 			}
 		}
-
-		// Keep the advanced settings that shouldn't be mirrored
-		$settings_to_keep = array(
-			'hideempty', 'color',
-		);
-
-		foreach ($settings_to_keep as $key)
-		{
-			if (!isset($module->advancedparams->{$key}))
-			{
-				continue;
-			}
-
-			$mirror_params->{$key} = $module->advancedparams->{$key};
-		}
-
-		$module->advancedparams = $mirror_params;
+		$query->select[] = 'am.params as advancedparams, 0 as menuid, m.publish_up, m.publish_down';
+		$query->join[]   = '#__advancedmodules as am ON am.moduleid = m.id';
+		$query->order    = array('m.ordering, m.id');
 	}
-
-	/**
-	 * Function that gets the config settings
-	 *
-	 * @return    Object
-	 */
 	private function getConfig()
 	{
 		static $instance;
@@ -366,17 +404,11 @@ class PlgSystemAdvancedModuleHelper
 			return $module->mirror_id;
 		}
 
-		if (empty($module->advancedparams->mirror_module) || empty($module->advancedparams->mirror_id))
-		{
-			return 0;
-		}
-
 		return $this->getMirrorModuleIdById($module->id);
 	}
 
 	private function getMirrorModuleIdById($id)
 	{
-
 		if (isset($this->mirror_ids[$id]))
 		{
 			return $this->mirror_ids[$id];
@@ -394,8 +426,36 @@ class PlgSystemAdvancedModuleHelper
 		return $this->mirror_ids[$id];
 	}
 
+	private function getAdvancedParams($module)
+	{
+		if (empty($module->id))
+		{
+			return '{}';
+		}
+
+		if (isset($this->advanced_params[$module->id]))
+		{
+			return $this->advanced_params[$module->id];
+		}
+
+		if (isset($module->adv_params))
+		{
+
+			$this->advanced_params[$module->id] = $module->adv_params;
+
+			return $this->advanced_params[$module->id];
+		}
+
+		return $this->getAdvancedParamsById($module->id);
+	}
+
 	private function getAdvancedParamsById($id = 0)
 	{
+		if (!$id)
+		{
+			return '{}';
+		}
+
 		if (isset($this->advanced_params[$id]))
 		{
 			return $this->advanced_params[$id];

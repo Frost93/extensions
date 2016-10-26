@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsVirtueMart extends RLAssignment
 {
-	function init()
+	public function init()
 	{
 		$virtuemart_product_id  = JFactory::getApplication()->input->get('virtuemart_product_id', array(), 'array');
 		$virtuemart_category_id = JFactory::getApplication()->input->get('virtuemart_category_id', array(), 'array');
@@ -25,7 +25,7 @@ class RLAssignmentsVirtueMart extends RLAssignment
 		$this->request->id          = ($this->request->item_id) ? $this->request->item_id : $this->request->category_id;
 	}
 
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		// Because VM sucks, we have to get the view again
 		$this->request->view = JFactory::getApplication()->input->getString('view');
@@ -33,7 +33,7 @@ class RLAssignmentsVirtueMart extends RLAssignment
 		return $this->passByPageTypes('com_virtuemart', $this->selection, $this->assignment, true);
 	}
 
-	function passCategories()
+	public function passCategories()
 	{
 		if ($this->request->option != 'com_virtuemart')
 		{
@@ -113,7 +113,7 @@ class RLAssignmentsVirtueMart extends RLAssignment
 		return $this->passSimple($cats);
 	}
 
-	function passProducts()
+	public function passProducts()
 	{
 		// Because VM sucks, we have to get the view again
 		$this->request->view = JFactory::getApplication()->input->getString('view');
@@ -126,7 +126,7 @@ class RLAssignmentsVirtueMart extends RLAssignment
 		return $this->passSimple($this->request->id);
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'virtuemart_category_categories', 'category_parent_id', 'category_child_id');
 	}

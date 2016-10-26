@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sourcerer
- * @version         6.0.2
+ * @version         6.3.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -66,8 +66,9 @@ class PlgSystemSourcererHelper
 			$this->src_params->tag_character_start . $this->src_params->syntax_word,
 		);
 
-		$this->src_params->trim         = (bool) $params->trim;
-		$this->src_params->include_path = str_replace('//', '/', ('/' . trim($params->include_path, ' /\\') . '/'));
+		$this->src_params->trim           = (bool) $params->trim;
+		$this->src_params->enable_in_head = (bool) $params->enable_in_head;
+		$this->src_params->include_path   = str_replace('//', '/', ('/' . trim($params->include_path, ' /\\') . '/'));
 
 		$user                            = JFactory::getUser();
 		$this->src_params->user_is_admin = $user->authorise('core.admin', 1);
@@ -82,7 +83,8 @@ class PlgSystemSourcererHelper
 		$this->src_params->areas['default']['forbidden_tags'] = $params->forbidden_tags;
 
 
-		$this->src_params->currentarea = 'default';
+		$this->src_params->currentarea        = 'default';
+		$this->src_params->remove_from_search = $params->remove_from_search;
 	}
 
 	/**
@@ -90,7 +92,9 @@ class PlgSystemSourcererHelper
 	 */
 	public function onContentPrepare(&$article, &$context)
 	{
-		$area = isset($article->created_by) ? 'articles' : 'other';
+		$area   = isset($article->created_by) ? 'articles' : 'other';
+		$remove = $this->src_params->remove_from_search
+			&& in_array($context, array('com_search.search', 'com_search.search.article', 'com_finder.indexer'));
 
 
 		if (!RLHelper::isCategoryList($context))
@@ -98,26 +102,26 @@ class PlgSystemSourcererHelper
 			switch (true)
 			{
 				case (isset($article->text)):
-					$this->replace($article->text, $area, $article);
+					$this->replace($article->text, $area, $article, $remove);
 					break;
 
 				case (isset($article->introtext)):
-					$this->replace($article->introtext, $area, $article);
+					$this->replace($article->introtext, $area, $article, $remove);
 
 				case (isset($article->fulltext)) :
-					$this->replace($article->fulltext, $area, $article);
+					$this->replace($article->fulltext, $area, $article, $remove);
 					break;
 			}
 		}
 
 		if (isset($article->description))
 		{
-			$this->replace($article->description, $area, $article);
+			$this->replace($article->description, $area, $article, $remove);
 		}
 
 		if (isset($article->title))
 		{
-			$this->replace($article->title, $area, $article);
+			$this->replace($article->title, $area, $article, $remove);
 		}
 	}
 
@@ -126,8 +130,8 @@ class PlgSystemSourcererHelper
 	 */
 	public function onAfterDispatch()
 	{
-		// only in html
-		if (JFactory::getDocument()->getType() !== 'html' && !RLFunctions::isFeed())
+		// only in html, pdfs, ajax/raw and feeds
+		if (!in_array(JFactory::getDocument()->getType(), array('html', 'pdf', 'ajax', 'raw')) || RLFunctions::isFeed())
 		{
 			return;
 		}
@@ -147,8 +151,8 @@ class PlgSystemSourcererHelper
 	 */
 	public function onAfterRender()
 	{
-		// only in html and feeds
-		if (JFactory::getDocument()->getType() !== 'html' && !RLFunctions::isFeed())
+		// only in html, pdfs, ajax/raw and feeds
+		if (!in_array(JFactory::getDocument()->getType(), array('html', 'pdf', 'ajax', 'raw')) || RLFunctions::isFeed())
 		{
 			return;
 		}
@@ -167,7 +171,9 @@ class PlgSystemSourcererHelper
 		$this->replaceInTheRest($body);
 		RLProtect::unprotect($body);
 
-		$this->cleanTagsFromHead($pre);
+		$this->src_params->enable_in_head
+			? $this->replace($pre, 'head')
+			: $this->cleanTagsFromHead($pre);
 
 		$html = $pre . $body . $post;
 
@@ -261,7 +267,7 @@ class PlgSystemSourcererHelper
 		return $matches;
 	}
 
-	function replace(&$string, $area = 'articles', $article = '')
+	function replace(&$string, $area = 'articles', $article = '', $remove = false)
 	{
 		if (!is_string($string) || $string == '')
 		{
@@ -283,69 +289,83 @@ class PlgSystemSourcererHelper
 				continue;
 			}
 
-			$data    = RLTags::getTagValues(trim($match['data']), array());
-			$content = trim($match['content']);
+			$content = $this->handleMatch($match, $area, $article, $remove);
 
-			$remove_html = !in_array('0', $data->params);
-
-			// Remove html tags if code is placed via the WYSIWYG editor
-			if ($remove_html)
-			{
-				$this->cleanText($content);
-			}
-
-			// Add the include file if file=... or include=... is used in the {source} tag
-			$file = !empty($data->file) ? $data->file : (!empty($data->include) ? $data->include : '');
-			if (!empty($file) && JFile::exists(JPATH_SITE . $this->src_params->include_path . $file))
-			{
-				$content = '<?php include JPATH_SITE . \'' . $this->src_params->include_path . $file . '\'; ?>' . $content;
-			}
-
-			$this->replaceTags($content, $area, $article);
-
-			if (!$remove_html)
-			{
-				$array[$i] = $match['start_pre'] . $match['start_post'] . $content . $match['end_pre'] . $match['end_post'];
-				continue;
-			}
-
-			$trim = isset($data->trim) ? $data->trim : $this->src_params->trim;
-
-			if ($trim)
-			{
-				$tags = RLTags::cleanSurroundingTags(array(
-					'start_pre'  => $match['start_pre'],
-					'start_post' => $match['start_post'],
-				));
-
-				$match = array_merge($match, $tags);
-
-				$tags = RLTags::cleanSurroundingTags(array(
-					'end_pre'  => $match['end_pre'],
-					'end_post' => $match['end_post'],
-				));
-
-				$match = array_merge($match, $tags);
-
-				$tags = RLTags::cleanSurroundingTags(array(
-					'start_pre' => $match['start_pre'],
-					'end_post'  => $match['end_post'],
-				));
-
-				$match = array_merge($match, $tags);
-			}
-
-			$tags = RLTags::cleanSurroundingTags(array(
-				'start_pre'  => $match['start_pre'],
-				'start_post' => $match['start_post'],
-				'end_pre'    => $match['end_pre'],
-				'end_post'   => $match['end_post'],
-			));
-
-			$array[$i] = $tags['start_pre'] . $tags['start_post'] . $content . $tags['end_pre'] . $tags['end_post'];
+			$array[$i] = $match['start_pre'] . $match['start_post'] . $content . $match['end_pre'] . $match['end_post'];
 		}
 
 		$string = implode('', $array);
+	}
+
+	function handleMatch(&$match, $area = 'articles', $article = '', $remove = false)
+	{
+		if ($remove)
+		{
+			return '';
+		}
+
+		$data    = RLTags::getTagValues(trim($match['data']), array());
+		$content = trim($match['content']);
+
+		$remove_html = !in_array('0', $data->params);
+
+		// Remove html tags if code is placed via the WYSIWYG editor
+		if ($remove_html)
+		{
+			$this->cleanText($content);
+		}
+
+		$this->replacePhpShortCodes($content);
+
+		// Add the include file if file=... or include=... is used in the {source} tag
+		$file = !empty($data->file) ? $data->file : (!empty($data->include) ? $data->include : '');
+		if (!empty($file) && JFile::exists(JPATH_SITE . $this->src_params->include_path . $file))
+		{
+			$content = '<?php include JPATH_SITE . \'' . $this->src_params->include_path . $file . '\'; ?>' . $content;
+		}
+
+		$this->replaceTags($content, $area, $article);
+
+		if (!$remove_html)
+		{
+			return $content;
+		}
+
+		$trim = isset($data->trim) ? $data->trim : $this->src_params->trim;
+
+		if ($trim)
+		{
+			$tags = RLTags::cleanSurroundingTags(array(
+				'start_pre'  => $match['start_pre'],
+				'start_post' => $match['start_post'],
+			));
+
+			$match = array_merge($match, $tags);
+
+			$tags = RLTags::cleanSurroundingTags(array(
+				'end_pre'  => $match['end_pre'],
+				'end_post' => $match['end_post'],
+			));
+
+			$match = array_merge($match, $tags);
+
+			$tags = RLTags::cleanSurroundingTags(array(
+				'start_pre' => $match['start_pre'],
+				'end_post'  => $match['end_post'],
+			));
+
+			$match = array_merge($match, $tags);
+		}
+
+		return $content;
+	}
+
+	function replacePhpShortCodes(&$string)
+	{
+		// Replace <? with <?php
+		$string = preg_replace('#<\?(\s.*?)\?>#', '<?php\1?>', $string);
+		// Replace <?= with <?php echo
+		$string = preg_replace('#<\?=\s*(.*?)\?>#', '<?php echo \1?>', $string);
 	}
 
 	function replaceTags(&$string, $area = 'articles', $article = '')
@@ -804,29 +824,9 @@ class PlgSystemSourcererHelper
 
 	function cleanText(&$string)
 	{
-		// Load common functions
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
-		// replace chr style enters with normal enters
-		$string = str_replace(array(chr(194) . chr(160), '&#160;', '&nbsp;'), ' ', $string);
-
-		// replace linbreak tags with normal linebreaks (paragraphs, enters, etc).
-		$enter_tags = array('p', 'br');
-		$regex      = '#</?((' . implode(')|(', $enter_tags) . '))+[^>]*?>\n?#si';
-		$string     = preg_replace($regex, " \n", $string);
-
-		// replace indent characters with spaces
-		$string = preg_replace('#<' . 'img [^>]*/sourcerer/images/tab\.png[^>]*>#si', '    ', $string);
-
-		// strip all other tags
-		$regex  = '#<(/?\w+((\s+\w+(\s*=\s*(?:".*?"|\'.*?\'|[^\'">\s]+))?)+\s*|\s*)/?)>#si';
-		$string = preg_replace($regex, "", $string);
-
-		// reset htmlentities
-		$string = RLText::html_entity_decoder($string);
-
-		// convert protected html entities &_...; -> &...;
-		$string = preg_replace('#&_([a-z0-9\#]+?);#i', '&\1;', $string);
+		$string = RLText::convertWysiwygToPlainText($string);
 	}
 
 	/**

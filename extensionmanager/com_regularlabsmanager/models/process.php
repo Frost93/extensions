@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.3
+ * @version         6.1.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -89,6 +89,15 @@ class RegularLabsManagerModelProcess extends JModelItem
 
 		// Install the package
 		$installer->install($package['dir']);
+		
+		// Cleanup the install files.
+		if (!is_file($package['packagefile']))
+		{
+			$config = JFactory::getConfig();
+			$package['packagefile'] = $config->get('tmp_path') . '/' . $package['packagefile'];
+		}
+
+		JInstallerHelper::cleanupInstall($package['packagefile'], $package['extractdir']);
 	}
 
 	/**

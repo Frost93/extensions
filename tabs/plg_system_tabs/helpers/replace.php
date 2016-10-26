@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.3
+ * @version         6.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -16,6 +16,7 @@ class PlgSystemTabsHelperReplace
 	var $helpers = array();
 	var $params  = null;
 	var $context = '';
+	var $sets    = array();
 
 	public function __construct()
 	{
@@ -191,7 +192,9 @@ class PlgSystemTabsHelperReplace
 		{
 			foreach ($matches as $match)
 			{
-				$tag = RLText::cleanTitle($match['data'], false, false);
+				$item = new stdClass;
+				$tag  = RLText::cleanTitle($match['data'], false, false);
+
 				$this->setTagValues($item, $tag);
 
 				$title = isset($item->title) ? trim($item->title) : 'Tab';
@@ -249,89 +252,177 @@ class PlgSystemTabsHelperReplace
 			return array();
 		}
 
-		$sets   = array();
-		$setids = array();
+		$this->sets = array();
+		$setids     = array();
 
 
 		foreach ($matches as $match)
 		{
 			if (substr($match['tag'], 0, 1) == '/')
 			{
+				if (empty($setids))
+				{
+					continue;
+				}
+
+				$set_id = key($setids);
 
 				array_pop($setids);
+
+				if (empty($set_id))
+				{
+					continue;
+				}
+
+				$this->sets[$set_id]['0']->ending = $match['0'];
+
 				continue;
 			}
 
 			end($setids);
 
-			$item = new stdClass;
-
-			// Set the values from the tag
-			$tag = RLText::cleanTitle($match['data'], false, false);
-			$this->setTagValues($item, $tag);
+			$item = $this->getSetItem($match, $setids, $only_basic_details);
 
 			if ($only_basic_details)
 			{
-				if (!isset($sets['basic']))
+				if (!isset($this->sets['basic']))
 				{
-					$sets['basic'] = array();
+					$this->sets['basic'] = array();
 				}
 
-				$sets['basic'][] = $item;
+				$this->sets['basic'][] = $item;
 				continue;
 			}
 
-			$item->orig  = $match['0'];
-			$item->setid = trim(str_replace('-', '_', $match['setid']));
 
-			if (empty($setids) || current($setids) != $item->setid)
+			if (!isset($this->sets[$item->set]))
 			{
-				$this->setcount++;
-				$setids[$this->setcount . '.'] = $item->setid;
+				$this->sets[$item->set] = array();
 			}
 
-			$item->set = str_replace('__', '_', array_search($item->setid, array_reverse($setids)) . $item->setid);
-			if (!isset($sets[$item->set]))
-			{
-				$sets[$item->set] = array();
-			}
-
-			list($item->pre, $item->post) = RLTags::cleanSurroundingTags(
-				array($match['pre'], $match['post']),
-				array('div', 'p', 'span', 'h[0-6]')
-			);
-
-
-			$sets[$item->set][] = $item;
+			$this->sets[$item->set][] = $item;
 		}
 
 
-		return $sets;
+		return $this->sets;
 	}
 
-	private function getParent(&$sets, $item, $prev_item, $setid, $prev_setid)
+	private function getSetItem($match, &$setids, $only_basic_details = false)
 	{
-		if (!$prev_item)
+		$item = new stdClass;
+
+		// Set the values from the tag
+		$tag = RLText::cleanTitle($match['data'], false, false);
+		$this->setTagValues($item, $tag);
+
+		if ($only_basic_details)
 		{
-			return '';
+			return $item;
 		}
 
-		if (count($sets[$item->set]))
-		{
-			$last_item = end($sets[$item->set]);
-			reset($sets[$item->set]);
+		$item->orig  = $match['0'];
+		$item->setid = trim(str_replace('-', '_', $match['setid']));
 
-			return $last_item->parent;
+		// New set
+		if (empty($setids) || current($setids) != $item->setid)
+		{
+			$this->setcount++;
+			$setids[$this->setcount . '.' . $item->setid] = $item->setid;
 		}
 
-		if ($prev_setid != $setid)
-		{
-			$sets[$prev_item->set][$prev_item->id]->children[] = $item->set;
+		$item->set = array_search($item->setid, array_reverse($setids));
 
-			return $prev_item->set . $prev_item->id;
+		$item->level = $this->getSetLevel($item->set, $setids);
+
+
+		list($item->pre, $item->post) = RLTags::cleanSurroundingTags(
+			array($match['pre'], $match['post']),
+			array('div', 'p', 'span', 'h[0-6]')
+		);
+
+		return $item;
+	}
+
+	private function getSetLevel($setid, $setids)
+	{
+		// Sets are still empty, so this is the first set
+		if (empty($this->sets))
+		{
+			return 1;
 		}
 
-		return '';
+		// Grab the level from the previous entry of this set
+		if (isset($this->sets[$setid]))
+		{
+			return $this->sets[$setid]['0']->level;
+		}
+
+		// Look up the level of the previous set
+		$previous_setid = array_search(prev($setids), array_reverse($setids));
+
+		// Grab the level from the previous entry of this set
+		if (isset($this->sets[$previous_setid]))
+		{
+			return $this->sets[$previous_setid]['0']->level + 1;
+		}
+
+		return 1;
+	}
+
+	private function getParent($setid, $level)
+	{
+		if (empty($this->sets))
+		{
+			return false;
+		}
+
+		if (isset($this->sets[$setid]))
+		{
+			return $this->sets[$setid]['0']->parent;
+		}
+
+		reset($this->sets);
+
+		$previous_set = current($this->sets);
+		$prev_level   = $prev_level = $previous_set['0']->level;
+
+		while ($prev_level >= $level)
+		{
+			$previous_set = prev($this->sets);
+
+			if (empty($previous_set))
+			{
+				end($this->sets);
+
+				return false;
+			}
+
+			$prev_level = $previous_set['0']->level;
+		}
+
+		end($this->sets);
+		end($previous_set);
+
+		$parent_item = key($previous_set);
+
+		return array($previous_set[$parent_item]->set, $parent_item);
+	}
+
+	private function addChildToParent($item)
+	{
+		if (empty($item->parent))
+		{
+			return;
+		}
+
+		list($parent_set, $parent_item) = $item->parent;
+
+		if (empty($this->sets[$parent_set]) || empty($this->sets[$parent_set][$parent_item]))
+		{
+			return;
+		}
+
+		$this->sets[$parent_set][$parent_item]->children[] = $item->set;
 	}
 
 
@@ -468,12 +559,11 @@ class PlgSystemTabsHelperReplace
 
 	private function getTagValues($string)
 	{
-
 		RLTags::protectSpecialChars($string);
 
-		$is_old = (strpos($string, '|') !== false);
+		$is_old_syntax = (strpos($string, '|') !== false);
 
-		if ($is_old)
+		if ($is_old_syntax)
 		{
 			// Fix some different old syntaxes
 			$string = str_replace(
@@ -489,7 +579,7 @@ class PlgSystemTabsHelperReplace
 			);
 		}
 
-		RLTags::unprotectSpecialChars($string);
+		RLTags::unprotectSpecialChars($string, true);
 
 		$known_boolean_keys = array(
 			'open', 'active', 'opened', 'default',
@@ -501,19 +591,22 @@ class PlgSystemTabsHelperReplace
 		$values = RLTags::getValuesFromString($string, 'title', $known_boolean_keys);
 
 		$key_aliases = array(
-			'title'        => array('name'),
-			'title-opened' => array('title-open', 'title-active'),
-			'title-closed' => array('title-close', 'title-inactive'),
-			'open'         => array('active', 'opened', 'default'),
-			'access'       => array('accesslevels', 'accesslevel'),
-			'usergroup'    => array('usergroups'),
-			'position'     => array('positioning'),
-			'align'        => array('alignment'),
+			'title'              => array('name'),
+			'title-opened'       => array('title-open', 'title-active'),
+			'title-closed'       => array('title-close', 'title-inactive'),
+			'open'               => array('active', 'opened', 'default'),
+			'access'             => array('accesslevels', 'accesslevel'),
+			'usergroup'          => array('usergroups', 'group', 'groups'),
+			'position'           => array('positioning'),
+			'align'              => array('alignment'),
+			'heading_attributes' => array('li_attributes'),
+			'link_attributes'    => array('a_attributes'),
+			'body_attributes'    => array('content_attributes'),
 		);
 
 		RLTags::replaceKeyAliases($values, $key_aliases);
 
-		if ($is_old)
+		if ($is_old_syntax)
 		{
 			$this->setPositionFromOldClasses($values);
 		}
@@ -571,13 +664,7 @@ class PlgSystemTabsHelperReplace
 
 	private function replaceSyntaxItem(&$string, $item, $items, $first = 0)
 	{
-		$s = '#' . preg_quote($item->orig, '#') . '#';
-		if (@preg_match($s . 'u', $string))
-		{
-			$s .= 'u';
-		}
-
-		if (!preg_match($s, $string, $match))
+		if (strpos($string, $item->orig) === false)
 		{
 			return;
 		}
@@ -586,15 +673,20 @@ class PlgSystemTabsHelperReplace
 		$html[] = $item->post;
 		$html[] = $item->pre;
 
-		if (!in_array($this->context, array('com_search.search', 'com_finder.indexer')))
+		if (!in_array($this->context, array('com_search.search', 'com_search.search.article', 'com_finder.indexer')))
 		{
 			$html[] = $this->getPreHtml($item, $items, $first);
 		}
 
 		$class = $this->getItemClass($item, 'tab-pane rl_tabs-pane nn_tabs-pane');
 
-		$html[] = '<div class="' . trim($class) . '" id="' . $item->id . '"'
-			. ' role="tabpanel" aria-labelledby="tab-' . $item->id . '" aria-hidden="' . ($item->open ? 'false' : 'true') . '">';
+		$body_attributes = 'role="tabpanel" aria-labelledby="tab-' . $item->id . '" aria-hidden="' . ($item->open ? 'false' : 'true') . '"';
+		if (!empty($item->body_attributes))
+		{
+			$body_attributes .= ' ' . $item->body_attributes;
+		}
+
+		$html[] = '<div class="' . trim($class) . '" id="' . $item->id . '" ' . $body_attributes . '>';
 
 		if (!$item->haslink)
 		{
@@ -604,8 +696,9 @@ class PlgSystemTabsHelperReplace
 				. $item->title . '</' . $item->title_tag . '>';
 		}
 
-		$html   = implode("\n", $html);
-		$string = RLText::strReplaceOnce($match['0'], $html, $string);
+		$html = implode("\n", $html);
+
+		$string = RLText::strReplaceOnce($item->orig, $html, $string);
 	}
 
 	private function getPreHtml($item, $items, $first = 0)
@@ -818,12 +911,12 @@ class PlgSystemTabsHelperReplace
 				continue;
 			}
 
-			$attribs = $this->getLinkAttributes($id);
+			$attributes = $this->getLinkAttributes($id);
 
 			// Combine attributes with original
-			$attribs = RLText::combineAttributes($link, $attribs);
+			$attributes = RLText::combineAttributes($link, $attributes);
 
-			$html = '<a ' . $attribs . '><span class="rl_tabs-link-inner nn_tabs-link-inner">' . $match['text'] . '</span></a>';
+			$html = '<a ' . $attributes . '><span class="rl_tabs-link-inner nn_tabs-link-inner">' . $match['text'] . '</span></a>';
 
 			$string = str_replace($match['0'], $html, $string);
 		}
@@ -912,30 +1005,63 @@ class PlgSystemTabsHelperReplace
 		$html[] = '<ul class="nav nav-tabs" id="set-rl_tabs-' . $items['0']->set . '" role="tablist"' . $ul_extra . '>';
 		foreach ($items as $item)
 		{
-			$html[] = '<li class="' . $this->getItemClass($item) . '"'
-				. ' role="presentation">';
-
-			if ($item->haslink)
-			{
-				$html[] = $item->title_full;
-				$html[] = '</li>';
-				continue;
-			}
+			$href               = '#' . $item->id;
+			$title              = $item->title_full;
+			$link_attributes    = ' id="tab-' . $item->id . '"'
+				. ' data-toggle="tab" data-id="' . $item->id . '"'
+				. ' role="tab" aria-controls="' . $item->id . '"'
+				. ' aria-selected="' . ($item->open ? 'true' : 'false') . '"';
+			$heading_attributes = array();
 
 			$class = 'rl_tabs-toggle nn_tabs-toggle';
 
 			$onclick = '';
 
-			$html[] = '<a href="#' . $item->id . '" class="' . $class . '"' . $onclick
-				. ' id="tab-' . $item->id . '"'
-				. ' data-toggle="tab" data-id="' . $item->id . '"'
-				. ' role="tab" aria-controls="' . $item->id . '" aria-selected="' . ($item->open ? 'true' : 'false') . '"'
-				. '>'
+			$heading_attributes = 'role="presentation"';
+			if (!empty($item->heading_attributes))
+			{
+				$heading_attributes .= ' ' . $item->heading_attributes;
+			}
+
+			if ($item->haslink)
+			{
+				if (preg_match('#<a [^>]*href="(.*?)"#s', $title, $match))
+				{
+					$href = $match['1'];
+				}
+
+				$class = 'rl_tabs-link';
+
+				if (preg_match('#<a [^>]*class="(.*?)"#s', $title, $match))
+				{
+					$class = trim($class . ' ' . $match['1']);
+				}
+
+				$link_attributes = '';
+
+				if (preg_match('#<a ([^>]*)#s', $title, $match))
+				{
+					$link_attributes = $match['1'];
+					$link_attributes = trim(preg_replace('#(href|class)=".*?"#', '', $link_attributes));
+				}
+
+				if (!empty($item->link_attributes))
+				{
+					$link_attributes .= ' ' . $item->link_attributes;
+				}
+
+				$title = preg_replace('#<a .*?>(.*?)</a>#s', '\1', $title);
+			}
+
+			$html[] = '<li class="' . $this->getItemClass($item) . '" ' . $heading_attributes . '>'
+				. '<a href="' . $href . '" class="' . $class . '"' . $onclick . $link_attributes . '>'
 				. '<span class="rl_tabs-toggle-inner nn_tabs-toggle-inner">'
-				. $item->title_full
-				. '</span></a>';
-			$html[] = '</li>';
+				. $title
+				. '</span>'
+				. '</a>'
+				. '</li>';
 		}
+
 		$html[] = '</ul>';
 
 		return implode("\n", $html);

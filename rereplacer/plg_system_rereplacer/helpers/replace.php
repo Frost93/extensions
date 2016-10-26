@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.1
+ * @version         7.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -102,8 +102,6 @@ class PlgSystemReReplacerHelperReplace
 			return;
 		}
 
-		$this->helpers->get('variables')->protectVariables($string);
-
 		switch ($this->item->regex)
 		{
 			case true:
@@ -114,8 +112,6 @@ class PlgSystemReReplacerHelperReplace
 				$this->replaceString($string);
 				break;
 		}
-
-		$this->helpers->get('variables')->replaceVariables($string);
 
 	}
 
@@ -229,6 +225,8 @@ class PlgSystemReReplacerHelperReplace
 			return;
 		}
 
+		$this->helpers->get('variables')->replaceVariablesPre($this->item->replace);
+
 
 		$this->helpers->get('clean')->cleanStringReplace($this->item->replace, $this->item->regex);
 
@@ -236,6 +234,8 @@ class PlgSystemReReplacerHelperReplace
 		if (!$this->item->thorough && strpos($this->item->replace, '[[counter]]') === false && strpos($this->item->replace, '\#') === false)
 		{
 			$string = preg_replace($this->item->search, $this->item->replace, $string);
+
+			$this->helpers->get('variables')->replaceVariablesPost($string);
 
 			return;
 		}
@@ -253,6 +253,8 @@ class PlgSystemReReplacerHelperReplace
 				break;
 			}
 		}
+
+		$this->helpers->get('variables')->replaceVariablesPost($string);
 	}
 
 	private function getCounterName($search, $replace)

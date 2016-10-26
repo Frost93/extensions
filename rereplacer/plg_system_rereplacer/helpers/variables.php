@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.1
+ * @version         7.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -26,26 +26,18 @@ class PlgSystemReReplacerHelperVariables
 		$this->helpers = PlgSystemReReplacerHelpers::getInstance();
 	}
 
-	public function protectVariables(&$string)
-	{
-		$string = preg_replace('#(\[\(/?)(user:|date:|random:|escape|lowercase|uppercase)#', '\1x\2', $string);
-	}
-
-	public function unprotectVariables(&$string)
-	{
-		$string = preg_replace('#(\[\(/?)x(user:|date:|random:|escape|lowercase|uppercase)#', '\1\2', $string);
-	}
-
-	public function replaceVariables(&$string)
+	public function replaceVariablesPre(&$string)
 	{
 		$this->replaceVariableTagByType($string, 'user');
 		$this->replaceVariableTagByType($string, 'date');
 		$this->replaceVariableTagByType($string, 'random');
+	}
+
+	public function replaceVariablesPost(&$string)
+	{
 		$this->replaceVariableDoubleTagByType($string, 'escape');
 		$this->replaceVariableDoubleTagByType($string, 'lowercase');
 		$this->replaceVariableDoubleTagByType($string, 'uppercase');
-
-		$this->unprotectVariables($string);
 	}
 
 	// single [[tag:...]] style tag on single line

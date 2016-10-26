@@ -2,8 +2,8 @@
 <extension version="3.4" type="module" client="administrator" method="upgrade">
 	<name>mod_addtomenu</name>
 	<description>MOD_ADDTOMENU_DESC</description>
-	<version>5.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>5.0.5</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -67,17 +67,17 @@
 				<field name="@notice_display_field_language" type="rl_plaintext" label="ATM_DISPLAY_FIELD_LANGUAGE" description="ATM_DISPLAY_FIELD_DESC"
 					   default="RL_ONLY_AVAILABLE_IN_PRO" />
 				<!-- >>> [PRO] >>> -->
-				<field name="display_field_language" type="radio" class="btn-group" default="1" label="ATM_DISPLAY_FIELD_LANGUAGE"
-					   description="ATM_DISPLAY_FIELD_DESC">
+				<field name="display_field_language" type="radio" class="btn-group" default="1"
+					   label="ATM_DISPLAY_FIELD_LANGUAGE" description="ATM_DISPLAY_FIELD_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
 				<!-- >>> [PRO] >>> -->
-				<field name="@notice_display_field_template_style" type="rl_plaintext" label="ATM_DISPLAY_FIELD_TEMPLATE_STYLE"
-					   description="ATM_DISPLAY_FIELD_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
+				<field name="@notice_display_field_template_style" type="rl_plaintext"
+					   label="ATM_DISPLAY_FIELD_TEMPLATE_STYLE" description="ATM_DISPLAY_FIELD_DESC" default="RL_ONLY_AVAILABLE_IN_PRO" />
 				<!-- >>> [PRO] >>> -->
-				<field name="display_field_template_style" type="radio" class="btn-group" default="1" label="ATM_DISPLAY_FIELD_TEMPLATE_STYLE"
-					   description="ATM_DISPLAY_FIELD_DESC">
+				<field name="display_field_template_style" type="radio" class="btn-group" default="1"
+					   label="ATM_DISPLAY_FIELD_TEMPLATE_STYLE" description="ATM_DISPLAY_FIELD_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>

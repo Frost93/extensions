@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,6 +24,8 @@
 
 defined('JPATH_PLATFORM') or defined('JPATH_BASE') or die;
 
+use Joomla\Registry\Registry;
+
 /**
  * Module helper class
  *
@@ -39,7 +41,7 @@ abstract class JModuleHelper
 	 * @param   string $name  The name of the module
 	 * @param   string $title The title of the module, optional
 	 *
-	 * @return  object  The Module object
+	 * @return  stdClass  The Module object
 	 *
 	 * @since   1.5
 	 */
@@ -159,7 +161,7 @@ abstract class JModuleHelper
 		// Check that $module is a valid module object
 		if (!is_object($module) || !isset($module->module) || !isset($module->params))
 		{
-			if (defined('JDEBUG') && JDEBUG)
+			if (JDEBUG)
 			{
 				JLog::addLogger(array('text_file' => 'jmodulehelper.log.php'), JLog::ALL, array('modulehelper'));
 				JLog::add('JModuleHelper::renderModule($module) expects a module object', JLog::DEBUG, 'modulehelper');
@@ -168,7 +170,7 @@ abstract class JModuleHelper
 			return;
 		}
 
-		if (defined('JDEBUG'))
+		if (JDEBUG)
 		{
 			JProfiler::getInstance('Application')->mark('beforeRenderModule ' . $module->module . ' (' . $module->title . ')');
 		}
@@ -182,7 +184,7 @@ abstract class JModuleHelper
 		$app->scope = $module->module;
 
 		// Get module parameters
-		$params = new JRegistry;
+		$params = new Registry;
 		$params->loadString($module->params);
 
 		// Get the template
@@ -265,7 +267,7 @@ abstract class JModuleHelper
 
 		foreach (explode(' ', $attribs['style']) as $style)
 		{
-			$chromeMethod = 'ModChrome_' . $style;
+			$chromeMethod = 'modChrome_' . $style;
 
 			// Apply chrome and render module
 			if (function_exists($chromeMethod))
@@ -282,7 +284,7 @@ abstract class JModuleHelper
 		// Revert the scope
 		$app->scope = $scope;
 
-		if (defined('JDEBUG'))
+		if (JDEBUG)
 		{
 			JProfiler::getInstance('Application')->mark('afterRenderModule ' . $module->module . ' (' . $module->title . ')');
 		}
@@ -341,14 +343,13 @@ abstract class JModuleHelper
 		{
 			return $tPath;
 		}
-		elseif (file_exists($bPath))
+
+		if (file_exists($bPath))
 		{
 			return $bPath;
 		}
-		else
-		{
-			return $dPath;
-		}
+
+		return $dPath;
 	}
 
 	/**
@@ -377,6 +378,8 @@ abstract class JModuleHelper
 
 		if (isset($clean))
 		{
+			$clean = array_values($clean);
+
 			return $clean;
 		}
 
@@ -446,7 +449,6 @@ abstract class JModuleHelper
 
 		// Set the query
 		$db->setQuery($q);
-		$clean = array();
 
 		try
 		{
@@ -456,24 +458,24 @@ abstract class JModuleHelper
 		{
 			JLog::add(JText::sprintf('JLIB_APPLICATION_ERROR_MODULE_LOAD', $e->getMessage()), JLog::WARNING, 'jerror');
 
-			return $clean;
+			return array();
 		}
 
 		// Apply negative selections and eliminate duplicates
-		$negId = $Itemid ? -(int) $Itemid : false;
-		$dupes = array();
+		$Itemid = JFactory::getApplication()->input->getInt('Itemid');
+		$negId  = $Itemid ? -(int) $Itemid : false;
+		$clean  = array();
+		$dupes  = array();
 
-		for ($i = 0, $n = count($modules); $i < $n; $i++)
+		foreach ($modules as $i => $module)
 		{
-			$module = &$modules[$i];
-
 			// The module is excluded if there is an explicit prohibition
 			$negHit = ($negId === (int) $module->menuid);
 
 			if (isset($dupes[$module->id]))
 			{
 				// If this item has been excluded, keep the duplicate flag set,
-				// but remove any item from the cleaned array.
+				// but remove any item from the modules array.
 				if ($negHit)
 				{
 					unset($clean[$module->id]);
@@ -485,13 +487,16 @@ abstract class JModuleHelper
 			$dupes[$module->id] = true;
 
 			// Only accept modules without explicit exclusions.
-			if (!$negHit)
+			if ($negHit)
 			{
-				$module->name       = substr($module->module, 4);
-				$module->style      = null;
-				$module->position   = strtolower($module->position);
-				$clean[$module->id] = $module;
+				continue;
 			}
+
+			$module->name     = substr($module->module, 4);
+			$module->style    = null;
+			$module->position = strtolower($module->position);
+
+			$clean[$module->id] = $module;
 		}
 
 		unset($dupes);
@@ -596,16 +601,17 @@ abstract class JModuleHelper
 
 				if (is_array($cacheparams->modeparams))
 				{
-					$uri     = JRequest::get();
-					$safeuri = new stdClass;
+					$input        = JFactory::getApplication()->input;
+					$uri          = $input->getArray();
+					$safeuri      = new stdClass;
+					$noHtmlFilter = JFilterInput::getInstance();
 
 					foreach ($cacheparams->modeparams as $key => $value)
 					{
 						// Use int filter for id/catid to clean out spamy slugs
 						if (isset($uri[$key]))
 						{
-							$noHtmlFilter    = JFilterInput::getInstance();
-							$safeuri->{$key} = $noHtmlFilter->clean($uri[$key], $value);
+							$safeuri->$key = $noHtmlFilter->clean($uri[$key], $value);
 						}
 					}
 				}

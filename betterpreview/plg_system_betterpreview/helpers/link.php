@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -237,22 +237,26 @@ class HelperBetterPreviewLink extends PlgSystemBetterPreviewHelper
 
 	public function prepareNonSefLink(&$link)
 	{
-		$lang              = isset($link->language) ? $link->language : '';
-		$default_menu_item = JFactory::getApplication()->getMenu('site')->getDefault($lang);
+		parent::setItemId($link);
+
+		$default_menu_item = parent::getDefaultMenuItem($link);
+
 		if (empty($default_menu_item))
 		{
-			$default_menu_item = JFactory::getApplication()->getMenu('site')->getDefault();
-		}
-		$default_menu_url = $default_menu_item->link . '&Itemid=' . $default_menu_item->id;
-
-		if (!$this->params->use_home_menu_id && $link->url != $default_menu_url)
-		{
-			// Remove the home Itemid
-			$link->url = preg_replace('#&(amp;)?Itemid=' . $default_menu_item->id . '$#', '', $link->url);
+			return;
 		}
 
 		// Check if current item is the home menu item
-		if ($link->published && in_array($link->url, array($default_menu_url, '')))
+		if ($link->published
+			&& in_array(
+				$link->url,
+				array(
+					'',
+					$default_menu_item->link,
+					$default_menu_item->link . '&Itemid=' . $default_menu_item->id,
+				)
+			)
+		)
 		{
 			$this->_has_home = true;
 			$link->home      = true;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.3
+ * @version         6.1.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -18,8 +18,8 @@ $task = JFactory::getApplication()->input->get('task');
 
 $config = JComponentHelper::getParams('com_regularlabsmanager');
 
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 
 $script = "
 	/* Regular Labs Extension Manager variable */
@@ -29,8 +29,8 @@ $script = "
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
 
-RLFunctions::script('regularlabsmanager/process.min.js', '16.5.10919');
-RLFunctions::stylesheet('regularlabs/process.min.css', '16.5.10919');
+RLFunctions::script('regularlabsmanager/process.min.js', '6.1.1');
+RLFunctions::stylesheet('regularlabsmanager/process.min.css', '6.1.1');
 ?>
 
 <div id="rlem">

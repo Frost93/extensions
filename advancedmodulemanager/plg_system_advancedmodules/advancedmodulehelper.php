@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -53,7 +53,15 @@ class PlgSystemAdvancedModuleHelper
 			return true;
 		}
 
-		$params = isset($module->adv_param) ? $module->adv_param : (isset($module->advancedparams) ? $module->advancedparams : null);
+		$this->setAdvancedParams($module);
+
+		// return false if module params are not found
+		if (empty($module->advancedparams))
+		{
+			return false;
+		}
+
+		$params = $module->advancedparams;
 
 		// return false if hideempty is off in module params
 		if (empty($params) || !isset($params->hideempty) || !$params->hideempty)
@@ -86,7 +94,7 @@ class PlgSystemAdvancedModuleHelper
 		$content = preg_replace('#</[^>]+>#si', '', $content);
 		// remove tags to be ignored
 		$tags = 'p|div|span|strong|b|em|i|ul|font|br|h[0-9]|fieldset|label|ul|ol|li|table|thead|tbody|tfoot|tr|th|td|form';
-		$s    = '#<(?:' . $tags . ')(?:\s*[^>]*)?>#si';
+		$s    = '#<(?:' . $tags . ')(?:\s[^>]*)?>#si';
 
 		if (@preg_match($s . 'u', $content))
 		{
@@ -113,16 +121,8 @@ class PlgSystemAdvancedModuleHelper
 
 		jimport('joomla.filesystem.file');
 
-		require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
-		$parameters = RLParameters::getInstance();
-
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/assignments.php';
 		$assignments_helper = new RLAssignmentsHelper;
-
-		require_once JPATH_ADMINISTRATOR . '/components/com_advancedmodules/models/module.php';
-		$model = new AdvancedModulesModelModule;
-
-		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
 
 		$modules = is_null($modules) ? $this->getModuleList() : $modules;
 
@@ -135,6 +135,11 @@ class PlgSystemAdvancedModuleHelper
 
 		foreach ($modules as $module)
 		{
+			if (empty($module->id))
+			{
+				continue;
+			}
+
 			$module->name = substr($module->module, 4);
 
 			if (JFactory::getApplication()->input->get('option') == 'com_ajax')
@@ -143,30 +148,7 @@ class PlgSystemAdvancedModuleHelper
 				continue;
 			}
 
-			if (!isset($module->advancedparams))
-			{
-				$module->advancedparams = $this->getAdvancedParamsById($module->id);
-			}
-
-			$module->advancedparams = json_decode($module->advancedparams);
-			if (is_null($module->advancedparams))
-			{
-				$module->advancedparams = new stdClass;
-			}
-
-			if (
-				!isset($module->advancedparams->assignto_menuitems)
-				|| isset($module->advancedparams->assignto_urls_selection_sef)
-				|| (
-					!is_array($module->advancedparams->assignto_menuitems)
-					&& strpos($module->advancedparams->assignto_menuitems, '|') !== false
-				)
-			)
-			{
-				$module->advancedparams = (object) $model->initAssignments($module->id, $module);
-			}
-
-			$module->advancedparams = $parameters->getParams($module->advancedparams, $xmlfile_assignments);
+			$this->setAdvancedParams($module);
 
 			if ($module->advancedparams === 0)
 			{
@@ -183,7 +165,7 @@ class PlgSystemAdvancedModuleHelper
 
 			$module->reverse = 0;
 
-			$this->setMirrorParams($module, $xmlfile_assignments);
+			$this->setMirrorParams($module);
 
 			$this->removeDisabledAssignments($module->advancedparams);
 
@@ -212,7 +194,54 @@ class PlgSystemAdvancedModuleHelper
 		unset($filtered_modules);
 	}
 
-	private function setMirrorParams(&$module, $xmlfile_assignments)
+	private function setAdvancedParams(&$module)
+	{
+		if (empty($module->id))
+		{
+			return;
+		}
+
+		if (isset($module->advancedparams) && is_object($module->advancedparams))
+		{
+			return;
+		}
+
+		if (!isset($module->advancedparams))
+		{
+			$module->advancedparams = $this->getAdvancedParams($module);
+		}
+
+		$module->advancedparams = json_decode($module->advancedparams);
+
+		if (is_null($module->advancedparams))
+		{
+			$module->advancedparams = new stdClass;
+		}
+
+		if (
+			!isset($module->advancedparams->assignto_menuitems)
+			|| isset($module->advancedparams->assignto_urls_selection_sef)
+			|| (
+				!is_array($module->advancedparams->assignto_menuitems)
+				&& strpos($module->advancedparams->assignto_menuitems, '|') !== false
+			)
+		)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_advancedmodules/models/module.php';
+			$model = new AdvancedModulesModelModule;
+
+			$module->advancedparams = (object) $model->initAssignments($module->id, $module);
+		}
+
+		require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
+		$parameters = RLParameters::getInstance();
+
+		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
+
+		$module->advancedparams = $parameters->getParams($module->advancedparams, $xmlfile_assignments);
+	}
+
+	private function setMirrorParams(&$module)
 	{
 		$module->mirror_id = $this->getMirrorModuleId($module);
 
@@ -241,6 +270,8 @@ class PlgSystemAdvancedModuleHelper
 			return;
 		}
 
+		$xmlfile_assignments = JPATH_ADMINISTRATOR . '/components/com_advancedmodules/assignments.xml';
+
 		$module->reverse = $module->mirror_id < 0;
 
 		if ($mirror_id == $module->id)
@@ -255,8 +286,9 @@ class PlgSystemAdvancedModuleHelper
 				if (!isset($modules[$mirror_id]->advancedparams))
 				{
 					$modules[$mirror_id]->advancedparams = $this->getAdvancedParamsById($mirror_id);
-					$modules[$mirror_id]->advancedparams = $parameters->getParams($modules[$mirror_id]->adv_param, $xmlfile_assignments);
+					$modules[$mirror_id]->advancedparams = $parameters->getParams($modules[$mirror_id]->advancedparams, $xmlfile_assignments);
 				}
+
 				$mirror_params = $modules[$mirror_id]->advancedparams;
 			}
 			else
@@ -311,6 +343,10 @@ class PlgSystemAdvancedModuleHelper
 		if (!$config->show_assignto_urls)
 		{
 			$params->assignto_urls = 0;
+		}
+		if (!$config->show_assignto_devices)
+		{
+			$params->assignto_devices = 0;
 		}
 		if (!$config->show_assignto_os)
 		{
@@ -405,17 +441,11 @@ class PlgSystemAdvancedModuleHelper
 			return $module->mirror_id;
 		}
 
-		if (empty($module->advancedparams->mirror_module) || empty($module->advancedparams->mirror_id))
-		{
-			return 0;
-		}
-
 		return $this->getMirrorModuleIdById($module->id);
 	}
 
 	private function getMirrorModuleIdById($id)
 	{
-
 		if (isset($this->mirror_ids[$id]))
 		{
 			return $this->mirror_ids[$id];
@@ -433,8 +463,36 @@ class PlgSystemAdvancedModuleHelper
 		return $this->mirror_ids[$id];
 	}
 
+	private function getAdvancedParams($module)
+	{
+		if (empty($module->id))
+		{
+			return '{}';
+		}
+
+		if (isset($this->advanced_params[$module->id]))
+		{
+			return $this->advanced_params[$module->id];
+		}
+
+		if (isset($module->adv_params))
+		{
+
+			$this->advanced_params[$module->id] = $module->adv_params;
+
+			return $this->advanced_params[$module->id];
+		}
+
+		return $this->getAdvancedParamsById($module->id);
+	}
+
 	private function getAdvancedParamsById($id = 0)
 	{
+		if (!$id)
+		{
+			return '{}';
+		}
+
 		if (isset($this->advanced_params[$id]))
 		{
 			return $this->advanced_params[$id];

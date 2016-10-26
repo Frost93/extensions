@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tooltips
- * @version         5.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,9 +48,9 @@ class PlgButtonTooltipsPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_tooltips');
 		RLFunctions::loadLanguage('plg_system_tooltips');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		// Tag character start and end
 		list($tag_start, $tag_end) = explode('.', $this->params->tag_characters);
@@ -65,8 +65,7 @@ class PlgButtonTooltipsPopup
 		";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('tooltips/popup.min.js', '5.0.0');
-		RLFunctions::stylesheet('tooltips/popup.min.css', '5.0.0');
+		RLFunctions::script('tooltips/popup.min.js', '6.0.2');
 
 		echo $this->getHTML();
 	}

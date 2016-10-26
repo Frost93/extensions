@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         GeoIp
- * @version         1.2.0
+ * @version         1.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

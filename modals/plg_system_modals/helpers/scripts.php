@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -52,7 +52,7 @@ class PlgSystemModalsHelperScripts
 
 		JHtml::script('modals/jquery.touchSwipe.min.js', false, true);
 		JHtml::script('modals/jquery.colorbox-min.js', false, true);
-		RLFunctions::script('modals/script.min.js', ($this->params->media_versioning ? '7.0.0' : false));
+		RLFunctions::script('modals/script.min.js', ($this->params->media_versioning ? '8.1.4' : false));
 
 		if ($this->params->load_stylesheet)
 		{

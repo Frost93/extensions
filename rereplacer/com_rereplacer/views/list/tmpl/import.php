@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.1
+ * @version         7.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 ?>
 <form onsubmit="return submitform();"
       action="<?php echo JRoute::_('index.php?option=com_rereplacer&view=list'); ?>" method="post"

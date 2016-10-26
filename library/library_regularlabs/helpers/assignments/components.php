@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsComponents extends RLAssignment
 {
-	function passComponents()
+	public function passComponents()
 	{
 		return $this->passSimple(strtolower($this->request->option));
 	}

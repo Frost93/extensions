@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modules Anywhere
- * @version         5.0.0
+ * @version         6.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -96,7 +96,7 @@ class PlgSystemModulesAnywhere extends JPlugin
 			return false;
 		}
 
-		if (RLProtect::isProtectedPage($this->_alias, 1))
+		if (RLProtect::isProtectedPage($this->_alias, true, array()))
 		{
 			return false;
 		}

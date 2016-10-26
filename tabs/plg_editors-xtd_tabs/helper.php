@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.3
+ * @version         6.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -52,7 +52,7 @@ class PlgButtonTabsHelper
 	{
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$button = new JObject;
 
@@ -67,7 +67,7 @@ class PlgButtonTabsHelper
 		$button->link    = $link;
 		$button->text    = $this->getButtonText();
 		$button->name    = $icon;
-		$button->options = "{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}";
+		$button->options = "{handler: 'iframe', size: {x: window.getSize().x-100, y: window.getSize().y-100}}";
 
 		return $button;
 	}
@@ -78,8 +78,8 @@ class PlgButtonTabsHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_tabs');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$this->params->tag_open      = preg_replace('#[^a-z0-9-_]#s', '', $this->params->tag_open);
 		$this->params->tag_close     = preg_replace('#[^a-z0-9-_]#s', '', $this->params->tag_close);

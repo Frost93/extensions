@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,12 +15,12 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsFlexiContent extends RLAssignment
 {
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		return $this->passByPageTypes('com_flexicontent', $this->selection, $this->assignment);
 	}
 
-	function passTags()
+	public function passTags()
 	{
 		if ($this->request->option != 'com_flexicontent')
 		{
@@ -63,7 +63,7 @@ class RLAssignmentsFlexiContent extends RLAssignment
 		return $this->passSimple($tags, true);
 	}
 
-	function passTypes()
+	public function passTypes()
 	{
 		if ($this->request->option != 'com_flexicontent')
 		{
@@ -84,12 +84,12 @@ class RLAssignmentsFlexiContent extends RLAssignment
 		$this->db->setQuery($query);
 		$type = $this->db->loadResult();
 
-		$types = $this->makeArray($type, 1);
+		$types = $this->makeArray($type);
 
 		return $this->passSimple($types);
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'categories', 'parent_id');
 	}

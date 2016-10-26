@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Cache Cleaner
- * @version         5.0.0
+ * @version         5.2.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,23 +29,23 @@ class ModCacheCleaner
 		}
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
+		require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
 		// load the admin language file
-		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 		RLFunctions::loadLanguage('mod_cachecleaner');
 
 		$script = "
 			var cachecleaner_base = '" . JUri::base(true) . "';
 			var cachecleaner_root = '" . JUri::root() . "';
-			var cachecleaner_msg_clean = '" . addslashes(html_entity_decode(JText::_('CC_CLEANING_CACHE'))) . "';
-			var cachecleaner_msg_inactive = '" . addslashes(html_entity_decode(JText::sprintf('CC_SYSTEM_PLUGIN_NOT_ENABLED', '<a href=&quot;index.php?option=com_plugins&filter_type=system&filter_folder=system&search=cache cleaner&filter_search=cache cleaner&quot;>', '</a>'))) . "';
-			var cachecleaner_msg_failure = '" . addslashes(html_entity_decode(JText::_('CC_CACHE_COULD_NOT_BE_CLEANED'))) . "';";
+			var cachecleaner_msg_clean = '" . addslashes(RLText::html_entity_decoder(JText::_('CC_CLEANING_CACHE'))) . "';
+			var cachecleaner_msg_inactive = '" . addslashes(RLText::html_entity_decoder(JText::sprintf('CC_SYSTEM_PLUGIN_NOT_ENABLED', '<a href=&quot;index.php?option=com_plugins&filter_type=system&filter_folder=system&search=cache cleaner&filter_search=cache cleaner&quot;>', '</a>'))) . "';
+			var cachecleaner_msg_failure = '" . addslashes(RLText::html_entity_decoder(JText::_('CC_CACHE_COULD_NOT_BE_CLEANED'))) . "';";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::script('cachecleaner/script.min.js', '5.0.0');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
-		RLFunctions::stylesheet('cachecleaner/style.min.css', '5.0.0');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('cachecleaner/script.min.js', '5.2.1');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
+		RLFunctions::stylesheet('cachecleaner/style.min.css', '5.2.1');
 
 		$text_ini = strtoupper(str_replace(' ', '_', $this->params->icon_text));
 		$text     = JText::_($text_ini);
@@ -69,6 +69,7 @@ class ModCacheCleaner
 		// Generate html for status link
 		$html   = array();
 		$html[] = '<div class="btn-group cachecleaner">';
+		$html[] = '<span class="btn-group separator"></span>';
 		$html[] = '<a href="javascript:;" onclick="return false;" class="cachecleaner_link">';
 
 		if ($this->params->display_link != 'text')

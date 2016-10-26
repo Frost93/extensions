@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -71,8 +71,8 @@ class SnippetsViewList extends JViewLegacy
 
 		$viewLayout = JFactory::getApplication()->input->get('layout', 'default');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
-		RLFunctions::stylesheet('snippets/style.min.css', '5.0.0');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
+		RLFunctions::stylesheet('snippets/style.min.css', '5.0.4');
 
 		if ($viewLayout == 'import')
 		{

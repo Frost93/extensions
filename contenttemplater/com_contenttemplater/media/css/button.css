@@ -1,6 +1,6 @@
 /**
  * @package         Content Templater
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,4 +12,7 @@
 }
 .contenttemplater-list ul.dropdown-menu {
   display: block;
+}
+.contenttemplater-list ul.dropdown-menu span strong {
+  padding-left: 15px;
 }

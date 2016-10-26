@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,7 +11,11 @@
 
 defined('_JEXEC') or die;
 
-if (!JFactory::getUser()->authorise('core.manage', 'com_modules'))
+$app = JFactory::getApplication();
+
+if (!JFactory::getUser()->authorise('module.edit.frontend', 'com_modules.module.' . $app->input->get('id'))
+	&& !JFactory::getUser()->authorise('module.edit.frontend', 'com_modules')
+)
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
@@ -28,7 +32,7 @@ if (!JFile::exists(JPATH_PLUGINS . '/system/regularlabs/regularlabs.php'))
 {
 	$msg = JText::_('AMM_REGULAR_LABS_LIBRARY_NOT_INSTALLED')
 		. ' ' . JText::sprintf('AMM_EXTENSION_CAN_NOT_FUNCTION', JText::_('COM_ADVANCEDMODULES'));
-	JFactory::getApplication()->enqueueMessage($msg, 'error');
+	$app->enqueueMessage($msg, 'error');
 
 	return;
 }
@@ -39,7 +43,7 @@ if (!isset($regularlabs->name))
 {
 	$msg = JText::_('AMM_REGULAR_LABS_LIBRARY_NOT_ENABLED')
 		. ' ' . JText::sprintf('AMM_EXTENSION_CAN_NOT_FUNCTION', JText::_('COM_ADVANCEDMODULES'));
-	JFactory::getApplication()->enqueueMessage($msg, 'notice');
+	$app->enqueueMessage($msg, 'notice');
 }
 
 // load the Regular Labs Library language file
@@ -48,8 +52,14 @@ RLFunctions::loadLanguage('plg_system_regularlabs');
 RLFunctions::loadLanguage('', JPATH_ADMINISTRATOR);
 
 // Tell the browser not to cache this page.
-JFactory::getApplication()->setHeader('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT', true);
+$app->setHeader('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT', true);
 
-$controller = JControllerLegacy::getInstance('AdvancedModules');
-$controller->execute(JFactory::getApplication()->input->get('task'));
+$config = array();
+if ($app->input->get('task') === 'module.orderPosition')
+{
+	$config['base_path'] = JPATH_COMPONENT_ADMINISTRATOR;
+}
+
+$controller = JControllerLegacy::getInstance('AdvancedModules', $config);
+$controller->execute($app->input->get('task'));
 $controller->redirect();

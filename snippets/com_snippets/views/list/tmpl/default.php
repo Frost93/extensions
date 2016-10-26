@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -20,8 +20,8 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
-RLFunctions::stylesheet('snippets/style.min.css', '5.0.0');
+RLFunctions::stylesheet('regularlabs/style.min.css');
+RLFunctions::stylesheet('snippets/style.min.css', '5.0.4');
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));

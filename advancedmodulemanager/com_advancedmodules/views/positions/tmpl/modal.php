@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -23,8 +23,8 @@ $function  = JFactory::getApplication()->input->getCmd('function', 'jSelectPosit
 $lang      = JFactory::getLanguage();
 $ordering  = $this->escape($this->state->get('list.ordering'));
 $direction = $this->escape($this->state->get('list.direction'));
-$clientId  = $this->state->get('filter.client_id');
-$published = $this->state->get('filter.published');
+$clientId  = $this->state->get('client_id');
+$state     = $this->state->get('filter.state');
 $template  = $this->state->get('filter.template');
 $type      = $this->state->get('filter.type');
 ?>
@@ -34,7 +34,7 @@ $type      = $this->state->get('filter.type');
 	<fieldset class="filter clear">
 		<div class="left">
 			<label for="filter_search">
-				<?php echo JText::_('JSearch_Filter_Label'); ?>
+				<?php echo JText::_('JSEARCH_FILTER_LABEL'); ?>
 			</label>
 			<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->escape($this->state->get('filter.search')); ?>" size="30"
 			       title="<?php echo JText::_('COM_MODULES_FILTER_SEARCH_DESC'); ?>">
@@ -106,10 +106,10 @@ $type      = $this->state->get('filter.type');
 	</table>
 
 	<div>
-		<input type="hidden" name="task" value="">
-		<input type="hidden" name="boxchecked" value="0">
-		<input type="hidden" name="filter_order" value="<?php echo $ordering; ?>">
-		<input type="hidden" name="filter_order_Dir" value="<?php echo $direction; ?>">
+		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="boxchecked" value="0" />
+		<input type="hidden" name="filter_order" value="<?php echo $ordering; ?>" />
+		<input type="hidden" name="filter_order_Dir" value="<?php echo $direction; ?>" />
 		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>

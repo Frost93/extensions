@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsMijoShop extends RLAssignment
 {
-	function init()
+	public function init()
 	{
 		$input = JFactory::getApplication()->input;
 
@@ -47,12 +47,12 @@ class RLAssignmentsMijoShop extends RLAssignment
 		$this->request->view = $view;
 	}
 
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		return $this->passByPageTypes('com_mijoshop', $this->selection, $this->assignment, true);
 	}
 
-	function passCategories()
+	public function passCategories()
 	{
 		if ($this->request->option != 'com_mijoshop')
 		{
@@ -105,7 +105,7 @@ class RLAssignmentsMijoShop extends RLAssignment
 		return $this->passSimple($cats);
 	}
 
-	function passProducts()
+	public function passProducts()
 	{
 		if (!$this->request->id || $this->request->option != 'com_mijoshop' || $this->request->view != 'product')
 		{
@@ -115,7 +115,7 @@ class RLAssignmentsMijoShop extends RLAssignment
 		return $this->passSimple($this->request->id);
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'mijoshop_category', 'parent_id', 'category_id');
 	}

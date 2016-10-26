@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -16,6 +16,7 @@ class PlgSystemSlidersHelperReplace
 	var $helpers = array();
 	var $params  = null;
 	var $context = '';
+	var $sets    = array();
 
 	public function __construct()
 	{
@@ -236,90 +237,177 @@ class PlgSystemSlidersHelperReplace
 			return array();
 		}
 
-		$sets   = array();
-		$setids = array();
+		$this->sets = array();
+		$setids     = array();
 
 
 		foreach ($matches as $match)
 		{
 			if (substr($match['tag'], 0, 1) == '/')
 			{
+				if (empty($setids))
+				{
+					continue;
+				}
+
+				$set_id = key($setids);
 
 				array_pop($setids);
+
+				if (empty($set_id))
+				{
+					continue;
+				}
+
+				$this->sets[$set_id]['0']->ending = $match['0'];
+
 				continue;
 			}
 
 			end($setids);
 
-			$item = new stdClass;
-
-			// Set the values from the tag
-			$tag = RLText::cleanTitle($match['data'], false, false);
-			$this->setTagValues($item, $tag);
+			$item = $this->getSetItem($match, $setids, $only_basic_details);
 
 			if ($only_basic_details)
 			{
-				if (!isset($sets['basic']))
+				if (!isset($this->sets['basic']))
 				{
-					$sets['basic'] = array();
+					$this->sets['basic'] = array();
 				}
 
-				$sets['basic'][] = $item;
+				$this->sets['basic'][] = $item;
 				continue;
 			}
 
-			$item->orig  = $match['0'];
-			$item->setid = trim(str_replace('-', '_', $match['setid']));
 
-			if (empty($setids) || current($setids) != $item->setid)
+			if (!isset($this->sets[$item->set]))
 			{
-				$this->setcount++;
-				$setids[$this->setcount . '.'] = $item->setid;
+				$this->sets[$item->set] = array();
 			}
 
-			$item->set = str_replace('__', '_', array_search($item->setid, array_reverse($setids)) . $item->setid);
-
-			if (!isset($sets[$item->set]))
-			{
-				$sets[$item->set] = array();
-			}
-
-			list($item->pre, $item->post) = RLTags::cleanSurroundingTags(
-				array($match['pre'], $match['post']),
-				array('div', 'p', 'span', 'h[0-6]')
-			);
-
-
-			$sets[$item->set][] = $item;
+			$this->sets[$item->set][] = $item;
 		}
 
 
-		return $sets;
+		return $this->sets;
 	}
 
-	private function getParent(&$sets, $item, $prev_item, $setid, $prev_setid)
+	private function getSetItem($match, &$setids, $only_basic_details = false)
 	{
-		if (!$prev_item)
+		$item = new stdClass;
+
+		// Set the values from the tag
+		$tag = RLText::cleanTitle($match['data'], false, false);
+		$this->setTagValues($item, $tag);
+
+		if ($only_basic_details)
 		{
-			return '';
+			return $item;
 		}
 
-		if (count($sets[$item->set]))
-		{
-			$last_item = end($sets[$item->set]);
-			reset($sets[$item->set]);
+		$item->orig  = $match['0'];
+		$item->setid = trim(str_replace('-', '_', $match['setid']));
 
-			return $last_item->parent;
+		// New set
+		if (empty($setids) || current($setids) != $item->setid)
+		{
+			$this->setcount++;
+			$setids[$this->setcount . '.' . $item->setid] = $item->setid;
 		}
 
-		if ($prev_setid != $setid)
-		{
-			$sets[$prev_item->set][$prev_item->id]->children[] = $item->set;
+		$item->set = array_search($item->setid, array_reverse($setids));
 
-			return $prev_item->set . $prev_item->id;
+		$item->level = $this->getSetLevel($item->set, $setids);
+
+
+		list($item->pre, $item->post) = RLTags::cleanSurroundingTags(
+			array($match['pre'], $match['post']),
+			array('div', 'p', 'span', 'h[0-6]')
+		);
+
+		return $item;
+	}
+
+	private function getSetLevel($setid, $setids)
+	{
+		// Sets are still empty, so this is the first set
+		if (empty($this->sets))
+		{
+			return 1;
 		}
 
-		return '';
+		// Grab the level from the previous entry of this set
+		if (isset($this->sets[$setid]))
+		{
+			return $this->sets[$setid]['0']->level;
+		}
+
+		// Look up the level of the previous set
+		$previous_setid = array_search(prev($setids), array_reverse($setids));
+
+		// Grab the level from the previous entry of this set
+		if (isset($this->sets[$previous_setid]))
+		{
+			return $this->sets[$previous_setid]['0']->level + 1;
+		}
+
+		return 1;
+	}
+
+	private function getParent($setid, $level)
+	{
+		if (empty($this->sets))
+		{
+			return false;
+		}
+
+		if (isset($this->sets[$setid]))
+		{
+			return $this->sets[$setid]['0']->parent;
+		}
+
+		reset($this->sets);
+
+		$previous_set = current($this->sets);
+		$prev_level   = $prev_level = $previous_set['0']->level;
+
+		while ($prev_level >= $level)
+		{
+			$previous_set = prev($this->sets);
+
+			if (empty($previous_set))
+			{
+				end($this->sets);
+
+				return false;
+			}
+
+			$prev_level = $previous_set['0']->level;
+		}
+
+		end($this->sets);
+		end($previous_set);
+
+		$parent_item = key($previous_set);
+
+		return array($previous_set[$parent_item]->set, $parent_item);
+	}
+
+	private function addChildToParent($item)
+	{
+		if (empty($item->parent))
+		{
+			return;
+		}
+
+		list($parent_set, $parent_item) = $item->parent;
+
+		if (empty($this->sets[$parent_set]) || empty($this->sets[$parent_set][$parent_item]))
+		{
+			return;
+		}
+
+		$this->sets[$parent_set][$parent_item]->children[] = $item->set;
 	}
 
 
@@ -461,16 +549,25 @@ class PlgSystemSlidersHelperReplace
 
 	private function getTagValues($string)
 	{
-		// Fix some different old syntaxes
-		$string = str_replace(
-			array(
-				'|alias:',
-			),
-			array(
-				'|alias=',
-			),
-			$string
-		);
+		RLTags::protectSpecialChars($string);
+
+		$is_old_syntax = (strpos($string, '|') !== false);
+
+		if ($is_old_syntax)
+		{
+			// Fix some different old syntaxes
+			$string = str_replace(
+				array(
+					'|alias:',
+				),
+				array(
+					'|alias=',
+				),
+				$string
+			);
+		}
+
+		RLTags::unprotectSpecialChars($string);
 
 		$known_boolean_keys = array(
 			'open', 'active', 'opened', 'default',
@@ -483,13 +580,16 @@ class PlgSystemSlidersHelperReplace
 		$values = RLTags::getValuesFromString($string, 'title', $known_boolean_keys);
 
 		$key_aliases = array(
-			'title'        => array('name'),
-			'title-opened' => array('title-open', 'title-active'),
-			'title-closed' => array('title-close', 'title-inactive'),
-			'open'         => array('active', 'opened', 'default'),
-			'close'        => array('inactive', 'closed'),
-			'access'       => array('accesslevels', 'accesslevel'),
-			'usergroup'    => array('usergroups'),
+			'title'              => array('name'),
+			'title-opened'       => array('title-open', 'title-active'),
+			'title-closed'       => array('title-close', 'title-inactive'),
+			'open'               => array('active', 'opened', 'default'),
+			'close'              => array('inactive', 'closed'),
+			'access'             => array('accesslevels', 'accesslevel'),
+			'usergroup'          => array('usergroups', 'group', 'groups'),
+			'heading_attributes' => array('li_attributes'),
+			'link_attributes'    => array('a_attributes'),
+			'body_attributes'    => array('content_attributes'),
 		);
 
 		RLTags::replaceKeyAliases($values, $key_aliases);
@@ -529,13 +629,7 @@ class PlgSystemSlidersHelperReplace
 
 	private function replaceSyntaxItem(&$string, $item, $items, $first = 0)
 	{
-		$s = '#' . preg_quote($item->orig, '#') . '#';
-		if (@preg_match($s . 'u', $string))
-		{
-			$s .= 'u';
-		}
-
-		if (!preg_match($s, $string, $match))
+		if (strpos($string, $item->orig) === false)
 		{
 			return;
 		}
@@ -548,9 +642,15 @@ class PlgSystemSlidersHelperReplace
 
 		if (!in_array($this->context, array('com_search.search', 'com_finder.indexer')))
 		{
+			$heading_attributes = '';
+			if (!empty($item->heading_attributes))
+			{
+				$heading_attributes .= ' ' . $item->heading_attributes;
+			}
+
 			$html[] = '<div class="' . $this->getItemClass($item) . '">';
 			$html[] = '<a id="rl_sliders-scrollto_' . $item->id . '" class="anchor rl_sliders-scroll nn_sliders-scroll"></a>';
-			$html[] = '<div class="accordion-heading panel-heading">';
+			$html[] = '<div class="accordion-heading panel-heading"' . $heading_attributes . '>';
 			$html[] = $this->getSliderTitle($item, $items);
 			$html[] = '</div>';
 
@@ -560,7 +660,13 @@ class PlgSystemSlidersHelperReplace
 				$body_class .= ' in';
 			}
 
-			$html[] = '<div class="' . $body_class . '" id="' . $item->id . '">';
+			$body_attributes = ' id="' . $item->id . '"';
+			if (!empty($item->body_attributes))
+			{
+				$body_attributes .= ' ' . $item->lbody_attributes;
+			}
+
+			$html[] = '<div class="' . $body_class . '" ' . $body_attributes . '>';
 			$html[] = '<div class="accordion-inner panel-body">';
 		}
 
@@ -570,7 +676,7 @@ class PlgSystemSlidersHelperReplace
 
 		$html = implode("\n", $html);
 
-		$string = RLText::strReplaceOnce($match['0'], $html, $string);
+		$string = RLText::strReplaceOnce($item->orig, $html, $string);
 	}
 
 	private function getItemClass($item)
@@ -612,23 +718,57 @@ class PlgSystemSlidersHelperReplace
 
 	private function getSliderTitle($item, $items)
 	{
-		if ($item->haslink)
+		$href            = RLText::getURI($item->id);
+		$title           = $item->title_full;
+		$link_attributes = ' data-toggle="collapse"'
+			. ' data-id="' . $item->id . '"'
+			. ' data-parent="#set-rl_sliders-' . $items['0']->set . '"';
+
+		if (!empty($item->link_attributes))
 		{
-			return $item->title_full;
+			$link_attributes .= ' ' . $item->link_attributes;
 		}
 
 		$class = 'accordion-toggle rl_sliders-toggle nn_sliders-toggle';
 
 		$onclick = '';
 
-		$html   = array();
-		$html[] = '<a href="' . RLText::getURI($item->id) . '" class="' . $class . '"' . $onclick
-			. ' data-toggle="collapse" data-id="' . $item->id . '" data-parent="#set-rl_sliders-' . $items['0']->set . '"'
-			. '><span class="rl_sliders-toggle-inner nn_sliders-toggle-inner">';
-		$html[] = $item->title_full;
-		$html[] = '</span></a>';
+		if (!$item->open)
+		{
+			$class .= ' collapsed';
+		}
 
-		return implode("\n", $html);
+		if ($item->haslink)
+		{
+			if (preg_match('#<a [^>]*href="(.*?)"#s', $title, $match))
+			{
+				$href = $match['1'];
+			}
+
+			$class = 'accordion-toggle rl_sliders-link';
+
+			if (preg_match('#<a [^>]*class="(.*?)"#s', $title, $match))
+			{
+				$class = trim($class . ' ' . $match['1']);
+			}
+
+			$link_attributes = '';
+
+			if (preg_match('#<a ([^>]*)#s', $title, $match))
+			{
+				$link_attributes = $match['1'];
+				$link_attributes = trim(preg_replace('#(href|class)=".*?"#', '', $link_attributes));
+			}
+
+			$title = preg_replace('#<a .*?>(.*?)</a>#s', '\1', $title);
+		}
+
+		return
+			'<a href="' . $href . '" class="' . $class . '"' . $onclick . $link_attributes . '>'
+			. '<span class="rl_sliders-toggle-inner nn_sliders-toggle-inner">'
+			. ' ' . $title
+			. '</span>'
+			. '</a>';
 	}
 
 	private function replaceClosingTag(&$string)
@@ -743,12 +883,12 @@ class PlgSystemSlidersHelperReplace
 				continue;
 			}
 
-			$attribs = $this->getLinkAttributes($id);
+			$attributes = $this->getLinkAttributes($id);
 
 			// Combine attributes with original
-			$attribs = RLText::combineAttributes($link, $attribs);
+			$attributes = RLText::combineAttributes($link, $attributes);
 
-			$html = '<a ' . $attribs . '><span class="rl_sliders-link-inner nn_sliders-link-inner">' . $match['text'] . '</span></a>';
+			$html = '<a ' . $attributes . '><span class="rl_sliders-link-inner nn_sliders-link-inner">' . $match['text'] . '</span></a>';
 
 			$string = str_replace($match['0'], $html, $string);
 		}

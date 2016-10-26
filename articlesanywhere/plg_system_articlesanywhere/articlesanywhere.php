@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -96,7 +96,7 @@ class PlgSystemArticlesAnywhere extends JPlugin
 			return false;
 		}
 
-		if (RLProtect::isProtectedPage($this->_alias, 1))
+		if (RLProtect::isProtectedPage($this->_alias, true, array()))
 		{
 			return false;
 		}

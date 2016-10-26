@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+		<fieldset name="contact"
+				  label="SUN_NOTES"
+				  description="SUN_NOTES_DESC"
+		>
+			<field name="notes" type="rl_textareaplus" height="200" default=""
+				   label="SUN_NOTES" description="SUN_NOTES_DESC" />
+		</fieldset>
+	</fields>
+</form>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -102,6 +102,9 @@ class PlgButtonContentTemplaterData
 		}
 
 
+		list($key, $val) = $this->getStr($model, 'override_settings', $item->override_settings, 0);
+		$output[$key] = $val;
+
 		$str = implode("\n", $output);
 
 		if ($unprotected)
@@ -134,7 +137,9 @@ class PlgButtonContentTemplaterData
 		}
 		if ($key != 'content')
 		{
-			$val = html_entity_decode($val, ENT_QUOTES, 'UTF-8');
+			require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
+			$val = RLText::html_entity_decoder($val);
+
 			if (strpos($key, 'jform_') !== false)
 			{
 

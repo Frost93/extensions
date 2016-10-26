@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.1.0
+ * @version         5.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -43,7 +43,7 @@ class DBReplacerController extends JControllerLegacy
 		$params          = new stdClass;
 		$params->table   = JFactory::getApplication()->input->get('table');
 		$params->columns = JFactory::getApplication()->input->get('columns', array(0), 'array');
-		$params->search  = JRequest::getVar('search', '', 'default', 'none', 2);
+		$params->search  = JFactory::getApplication()->input->get('search', '', 'RAW');
 
 		if (!$params->table || $params->search == '' || !is_array($params->columns) || empty($params->columns))
 		{
@@ -56,7 +56,7 @@ class DBReplacerController extends JControllerLegacy
 			return;
 		}
 
-		$params->replace = JRequest::getVar('replace', '', 'default', 'none', 2);
+		$params->replace = JFactory::getApplication()->input->get('replace', '', 'RAW');
 		$params->case    = JFactory::getApplication()->input->getInt('case', 0);
 		$params->max = 50;
 

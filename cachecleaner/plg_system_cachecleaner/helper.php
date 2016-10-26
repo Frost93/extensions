@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Cache Cleaner
- * @version         5.0.0
+ * @version         5.2.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -107,6 +107,11 @@ class PlgSystemCacheCleanerHelper
 			}
 
 			$this->show_message = true;
+
+			if (JFactory::getApplication()->isSite() && $cleancache == $this->params->frontend_secret)
+			{
+				$this->show_message = $this->params->frontend_secret_msg;
+			}
 
 			return 'clean';
 		}

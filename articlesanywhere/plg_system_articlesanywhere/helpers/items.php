@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -60,16 +60,8 @@ class PlgSystemArticlesAnywhereHelperItems
 	{
 		foreach ($items as $item)
 		{
-			$this->data = $item;
-
-			$output = array();
-
-			foreach ($item->sets as &$set)
-			{
-				$output = array_merge($output, $this->getHtmlOutput($set));
-			}
-
-			$item->output = $output;
+			$this->data   = $item;
+			$item->output = $this->getHtmlOutput();
 		}
 
 		return $items;
@@ -169,41 +161,24 @@ class PlgSystemArticlesAnywhereHelperItems
 		return $output;
 	}
 
-	private function getOutput($item, $content_item, $firstpass = false)
+	private function getOutput($item, $content_item)
 	{
-		list($tag_start, $tag_end) = $this->getDataTagCharacters(true);
-
-		if ($firstpass)
-		{
-			// first pass: search for normal tags and tags around tags
-			$regex  = '#' . $tag_start . '(/?[a-z0-9][^' . $tag_end . ']*?|/?[a-z0-9](?:[^' . $tag_start . ']*?' . $tag_start . '[^' . $tag_end . ']*?' . $tag_end . ')*[^' . $tag_end . ']*?)' . $tag_end . '#si';
-			$output = $this->data->content;
-		}
-		else
-		{
-			// do second pass
-			$output = $this->getOutput($item, $content_item, true);
-
-			$regex_close = '#' . $tag_start . '/' . $this->helpers->_('replace')->params->tags . $tag_end . '#si';
-			if (preg_match($regex_close, $output))
-			{
-				return $output;
-			}
-
-			// second pass: only search for normal tags
-			$regex = '#' . $tag_start . '(/?[a-z0-9][^' . $tag_end . ']*?)' . $tag_end . '#si';
-		}
-
-		preg_match_all($regex, $this->data->content, $matches, PREG_SET_ORDER);
-
-		if (empty($matches))
-		{
-			return $this->data->content;
-		}
-
 		if (empty($content_item))
 		{
 			return '<!-- ' . JText::_('AA_ACCESS_TO_ARTICLE_DENIED') . ' -->';
+		}
+
+		$output = $this->data->content;
+
+		list($tag_start, $tag_end) = $this->getTagCharacters(true);
+		list($data_tag_start, $data_tag_end) = $this->getDataTagCharacters(true);
+
+		// Check if there are any tags found in the content
+		$regex = '#(' . $tag_start . '[a-z].*?' . $tag_end . '|' . $data_tag_start . '[a-z].*?' . $data_tag_end . ')#si';
+
+		if (!preg_match($regex, $output))
+		{
+			return $output;
 		}
 
 		$this->prepareContentItem($item, $content_item, $output);
@@ -212,6 +187,7 @@ class PlgSystemArticlesAnywhereHelperItems
 
 		$this->helpers->_($helper)->handleIfStatements($output, $content_item);
 
+		$regex = '#' . $data_tag_start . '(/?[a-z][a-z0-9-_]*(?:[\s\:].*?)?)' . $data_tag_end . '#si';
 		preg_match_all($regex, $output, $matches, PREG_SET_ORDER);
 
 		if (empty($matches))
@@ -288,6 +264,26 @@ class PlgSystemArticlesAnywhereHelperItems
 	}
 
 	private function getContentItemsBySet($data)
+	{
+		$items = $this->getContentItemsBySetType($data);
+
+		if (empty($items))
+		{
+			return array();
+		}
+
+		foreach ($items as $i => $item)
+		{
+			if (!$this->passParentState($item, $data))
+			{
+				unset($items[$i]);
+			}
+		}
+
+		return $items;
+	}
+
+	private function getContentItemsBySetType($data)
 	{
 		if (!empty($data->current))
 		{
@@ -422,111 +418,6 @@ class PlgSystemArticlesAnywhereHelperItems
 		return array($numeric, $not_nummeric, $likes);
 	}
 
-	private function getCategoryIds($item)
-	{
-		list($ids, $titles, $likes) = $this->getQueryIdLists($item->categories);
-
-		if (empty($titles) && empty($likes))
-		{
-			return $ids;
-		}
-
-		$table = 'content';
-		$title = 'title';
-
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true)
-			->clear()
-			->select($db->quoteName('a.id'))
-			->from($db->quoteName('#__' . $table, 'a'));
-
-		if ($table == 'content')
-		{
-			$query->where($db->quoteName('extension') . ' = ' . $db->quote('com_content'));
-		}
-
-		if (!empty($titles))
-		{
-			$wheres[] = $db->quoteName('a.' . $title) . ' IN (' . implode(',', $titles) . ')';
-			$wheres[] = $db->quoteName('a.alias') . ' IN (' . implode(',', $titles) . ')';
-
-			$query->where('(' . implode(' OR ', $wheres) . ')');
-		}
-
-		if (!empty($likes))
-		{
-			$wheres = array();
-			foreach ($likes as $like)
-			{
-				$wheres[] = $db->quoteName('a.' . $title) . ' LIKE ' . $like;
-				$wheres[] = $db->quoteName('a.alias') . ' LIKE ' . $like;
-			}
-			$query->where('(' . implode(' OR ', $wheres) . ')');
-		}
-
-		$ignore_language = isset($item->ignore_language) ? $item->ignore_language : $this->params->ignore_language;
-		$ignore_state    = isset($item->ignore_state) ? $item->ignore_state : $this->params->ignore_state;
-		$ignore_access   = isset($item->ignore_access) ? $item->ignore_access : $this->params->ignore_access;
-
-		if (!$ignore_language)
-		{
-			$query->where($db->quoteName('a.language') . ' IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
-		}
-
-		if (!$ignore_state)
-		{
-			$where = $db->quoteName('a.published') . ' = 1';
-
-			$query->where($where);
-		}
-
-		if (!$ignore_access)
-		{
-			$query->where($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ')');
-		}
-
-		$db->setQuery($query);
-
-		return array_merge($ids, $db->loadColumn());
-	}
-
-	private function getCategoryItems($item)
-	{
-		if (empty($item->categories))
-		{
-			return false;
-		}
-
-		$cat_ids = $this->getCategoryIds($item);
-
-		if (empty($cat_ids))
-		{
-			return false;
-		}
-
-		$limit  = isset($item->limit) ? $item->limit : ((int) $this->params->limit ? $this->params->limit : 1000);
-		$offset = isset($item->offset) ? $item->offset : 0;
-
-		$table = 'content';
-
-		$db = JFactory::getDbo();
-
-		$query = $this->getContentItemQuery($item);
-
-		$query->where($db->quoteName('a.catid') . ' IN (' . implode(',', $cat_ids) . ')');
-
-		if (!empty($item->is_tag))
-		{
-			$item_ids   = $this->getTagItemIds($item);
-			$item_ids[] = 0;
-
-			$query->where($db->quoteName('a.id') . ' IN (' . implode(',', $item_ids) . ')');
-		}
-
-		$db->setQuery($query, (int) $offset, (int) $limit);
-
-		return $db->loadObjectList();
-	}
 
 	private function getTagIds($item)
 	{
@@ -629,8 +520,6 @@ class PlgSystemArticlesAnywhereHelperItems
 		$limit  = isset($item->limit) ? $item->limit : ((int) $this->params->limit ? $this->params->limit : 1000);
 		$offset = isset($item->offset) ? $item->offset : 0;
 
-		$table = 'content';
-
 		$db = JFactory::getDbo();
 
 		$query = $this->getContentItemQuery($item);
@@ -644,11 +533,14 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getFeaturedItems($item)
 	{
+		$limit  = isset($item->limit) ? $item->limit : ((int) $this->params->limit ? $this->params->limit : 1000);
+		$offset = isset($item->offset) ? $item->offset : 0;
+
 		$db = JFactory::getDbo();
 
 		$query = $this->getContentItemQuery($item);
 
-		$db->setQuery($query);
+		$db->setQuery($query, (int) $offset, (int) $limit);
 
 		return $db->loadObjectList();
 	}
@@ -675,6 +567,17 @@ class PlgSystemArticlesAnywhereHelperItems
 		$db = JFactory::getDbo();
 
 		$query = $this->getContentItemQuery($item);
+
+		$this->setWhereConditionsForContentIds($id, $query);
+
+		$db->setQuery($query, 0, 1);
+
+		return $db->loadObject();
+	}
+
+	private function setWhereConditionsForContentIds($id, &$query)
+	{
+		$db = JFactory::getDbo();
 
 		list($ids, $titles, $likes) = $this->getQueryIdLists($id);
 
@@ -707,10 +610,6 @@ class PlgSystemArticlesAnywhereHelperItems
 			}
 			$query->where('(' . implode(' OR ', $wheres) . ')');
 		}
-
-		$db->setQuery($query, 0, 1);
-
-		return $db->loadObject();
 	}
 
 	private function getSingleContentItemStored($item, $id)
@@ -791,13 +690,21 @@ class PlgSystemArticlesAnywhereHelperItems
 		$query = $db->getQuery(true)
 			->select(array(
 				'a.*',
+
+				$db->quoteName('c.' . $cat_title, 'cat'),
 				$db->quoteName('c.' . $cat_title, 'cat_title'),
 				$db->quoteName('c.' . $cat_title, 'cat_name'),
 				$db->quoteName('c.alias', 'cat_alias'),
+				$db->quoteName('c.id', 'cat_id'),
+
+				$db->quoteName('u.name', 'author'),
+				$db->quoteName('u.name', 'author_name'),
+				$db->quoteName('u.id', 'author_id'),
 			))
 			->select($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
 			->from($db->quoteName('#__' . $table, 'a'))
-			->join('LEFT', $db->quoteName('#__' . $cat_table, 'c') . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName('a.catid'));
+			->join('LEFT', $db->quoteName('#__' . $cat_table, 'c') . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName('a.catid'))
+			->join('LEFT', $db->quoteName('#__users', 'u') . ' ON ' . $db->quoteName('u.id') . ' = ' . $db->quoteName('a.created_by'));
 
 		$this->setQueryConditions($query, $item);
 
@@ -837,7 +744,66 @@ class PlgSystemArticlesAnywhereHelperItems
 		{
 			$query->where($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ')');
 		}
+
 		$query->order($db->quoteName('a.ordering') . ' ASC');
+	}
+
+	private function passParentState(&$item, $data)
+	{
+		if (empty($item->has_access))
+		{
+			return false;
+		}
+
+		$ignore_state = isset($data->ignore_state) ? $data->ignore_state : $this->params->ignore_state;
+
+		if ($ignore_state)
+		{
+			return true;
+		}
+
+		$table     = 'categories';
+		$parent_id = 'parent_id';
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->select($db->quoteName('a.' . $parent_id, 'parent'))
+			->select($db->quoteName('a.access') . ' IN (' . implode(', ', $this->aid) . ') as has_access')
+			->from($db->quoteName('#__' . $table, 'a'));
+
+		$where_state = $db->quoteName('a.published') . ' = 1';
+
+		$parent = $item->catid;
+
+		while ($parent)
+		{
+			$query->clear('where')
+				->where($where_state)
+				->where($db->quoteName('a.id') . ' = ' . (int) $parent);
+
+			$db->setQuery($query);
+
+			$cat = $db->loadObject();
+
+			if (empty($cat))
+			{
+				return false;
+			}
+
+			if (empty($cat->has_access))
+			{
+				$item->has_access = $cat->has_access;
+			}
+
+			if (empty($cat->parent))
+			{
+				return true;
+			}
+
+			$parent = $cat->parent;
+		}
+
+		return true;
 	}
 
 	private function getItem($data)
@@ -877,7 +843,7 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getTagValues($data)
 	{
-		$string = html_entity_decode($data['id']);
+		$string = RLText::html_entity_decoder($data['id']);
 
 		if (strpos($string, '="') == false)
 		{
@@ -949,11 +915,6 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getCurrentArticle($item)
 	{
-		if (!is_null($this->current_article))
-		{
-			return $this->current_article;
-		}
-
 		$id = $this->getCurrentArticleId($item->type);
 
 		if (empty($id))
@@ -970,11 +931,6 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function getCurrentArticleId($type = 'joomla')
 	{
-		if (!is_null($this->current_article_id))
-		{
-			return $this->current_article_id;
-		}
-
 		$this->current_article_id = $this->findCurrentArticleId($type);
 
 		return $this->current_article_id;
@@ -982,11 +938,6 @@ class PlgSystemArticlesAnywhereHelperItems
 
 	private function findCurrentArticleId($type = 'joomla')
 	{
-		if (!is_null($this->current_article_id))
-		{
-			return $this->current_article_id;
-		}
-
 		if (!is_null($this->helpers->_('replace')->current_article_id))
 		{
 			return $this->helpers->_('replace')->current_article_id;
@@ -1037,6 +988,7 @@ class PlgSystemArticlesAnywhereHelperItems
 
 			$id         = array_pop($parts);
 			$attributes = array();
+			$id_name    = 'id';
 
 			foreach ($parts as $part)
 			{
@@ -1047,10 +999,12 @@ class PlgSystemArticlesAnywhereHelperItems
 						break;
 
 					case ($part == 'cat'):
+						$id_name      = 'category';
 						$attributes[] = 'is_category="1"';
 						break;
 
 					case ($part == 'tag'):
+						$id_name      = 'tag';
 						$attributes[] = 'is_tag="1"';
 						break;
 
@@ -1069,7 +1023,7 @@ class PlgSystemArticlesAnywhereHelperItems
 				}
 			}
 
-			array_unshift($attributes, 'id="' . $id . '"');
+			array_unshift($attributes, $id_name . '="' . $id . '"');
 
 			$set = implode(' ', $attributes);
 		}

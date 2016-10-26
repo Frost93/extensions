@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.2
+ * @version         2.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -221,6 +221,10 @@ class PlgSystemAdvancedTemplatesHelper
 		if (!$this->params->show_assignto_urls)
 		{
 			$params->assignto_urls = 0;
+		}
+		if (!$this->params->show_assignto_devices)
+		{
+			$params->assignto_devices = 0;
 		}
 		if (!$this->params->show_assignto_os)
 		{

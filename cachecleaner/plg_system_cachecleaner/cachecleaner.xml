@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_cachecleaner</name>
 	<description>PLG_SYSTEM_CACHECLEANER_DESC</description>
-	<version>5.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>5.2.1</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -56,20 +56,20 @@
 				<field name="@clean_cache" type="radio" class="btn-group btn-group-yesno" default="1" label="CC_PURGE_CACHE" description="CC_PURGE_CACHE_DESC">
 					<option value="1">JYES</option>
 				</field>
-				<field name="purge" type="radio" class="btn-group btn-group-yesno" default="1" label="MOD_MENU_PURGE_EXPIRED_CACHE"
-					   description="CC_PURGE_EXPIRED_CACHE_DESC">
+				<field name="purge" type="radio" class="btn-group btn-group-yesno" default="1"
+					   label="MOD_MENU_PURGE_EXPIRED_CACHE" description="CC_PURGE_EXPIRED_CACHE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 					<option value="2">CC_ONLY_VIA_BUTTON</option>
 				</field>
-				<field name="purge_updates" type="radio" class="btn-group btn-group-yesno" default="1" label="CC_PURGE_UPDATE_CACHE"
-					   description="CC_PURGE_UPDATE_CACHE_DESC">
+				<field name="purge_updates" type="radio" class="btn-group btn-group-yesno" default="1"
+					   label="CC_PURGE_UPDATE_CACHE" description="CC_PURGE_UPDATE_CACHE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 					<option value="2">CC_ONLY_VIA_BUTTON</option>
 				</field>
-				<field name="purge_opcache" type="radio" class="btn-group btn-group-yesno" default="1" label="CC_PURGE_OPCACHE"
-					   description="CC_PURGE_OPCACHE_DESC">
+				<field name="purge_opcache" type="radio" class="btn-group btn-group-yesno" default="1"
+					   label="CC_PURGE_OPCACHE" description="CC_PURGE_OPCACHE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 					<option value="2">CC_ONLY_VIA_BUTTON</option>
@@ -80,18 +80,23 @@
 
 				<field name="@block_secret_a" type="rl_block" start="1" label="CC_FRONTEND_SECRET_URL" description="CC_FRONTEND_SECRET_URL_DESC" />
 				<field name="frontend_secret" type="text" default="" label="CC_FRONTEND_SECRET" description="CC_FRONTEND_SECRET_DESC" />
+				<field name="frontend_secret_msg" type="radio" class="btn-group btn-group-yesno" default="1"
+					   label="CC_SHOW_MESSAGE" description="CC_SHOW_MESSAGE_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
 				<field name="@block_secret_b" type="rl_block" end="1" />
 
 				<field name="@block_save_a" type="rl_block" start="1" label="CC_AUTOMATIC_CLEANING_ON_SAVE" description="CC_AUTOMATIC_CLEANING_ON_SAVE_DESC" />
 				<field name="@block_save_admin_a" type="rl_block" start="1" label="JADMINISTRATOR" />
-				<field name="auto_save_admin" type="radio" class="btn-group btn-group-yesno" default="0" label="RL_ENABLE"
-					   description="CC_AUTOMATIC_CLEANING_ON_SAVE_DESC">
+				<field name="auto_save_admin" type="radio" class="btn-group btn-group-yesno" default="0"
+					   label="RL_ENABLE" description="CC_AUTOMATIC_CLEANING_ON_SAVE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
 				<field name="@toggler_save_admin_a" type="rl_toggler" param="auto_save_admin" value="1" />
-				<field name="auto_save_admin_msg" type="radio" class="btn-group btn-group-yesno" default="1" label="CC_SHOW_MESSAGE"
-					   description="CC_SHOW_MESSAGE_DESC">
+				<field name="auto_save_admin_msg" type="radio" class="btn-group btn-group-yesno" default="1"
+					   label="CC_SHOW_MESSAGE" description="CC_SHOW_MESSAGE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -99,14 +104,14 @@
 				<field name="@block_save_admin_b" type="rl_block" end="1" />
 
 				<field name="@block_save_front_a" type="rl_block" start="1" label="RL_FRONTEND" />
-				<field name="auto_save_front" type="radio" class="btn-group btn-group-yesno" default="0" label="RL_ENABLE"
-					   description="CC_AUTOMATIC_CLEANING_ON_SAVE_DESC">
+				<field name="auto_save_front" type="radio" class="btn-group btn-group-yesno" default="0"
+					   label="RL_ENABLE" description="CC_AUTOMATIC_CLEANING_ON_SAVE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
 				<field name="@toggler_save_front_a" type="rl_toggler" param="auto_save_front" value="1" />
-				<field name="auto_save_front_msg" type="radio" class="btn-group btn-group-yesno" default="0" label="CC_SHOW_MESSAGE"
-					   description="CC_SHOW_MESSAGE_DESC">
+				<field name="auto_save_front_msg" type="radio" class="btn-group btn-group-yesno" default="0"
+					   label="CC_SHOW_MESSAGE" description="CC_SHOW_MESSAGE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -114,21 +119,21 @@
 				<field name="@block_save_front_b" type="rl_block" end="1" />
 
 				<field name="@toggler_save_a" type="rl_toggler" param="auto_save_admin|auto_save_front" value="1|1" />
-				<field name="auto_save_tasks" type="text" default="save,apply,publish,unpublish,archive,trash,delete" label="CC_SAVE_TASKS"
-					   description="CC_SAVE_TASKS_DESC" />
+				<field name="auto_save_tasks" type="text" default="save,apply,publish,unpublish,archive,trash,delete"
+					   label="CC_SAVE_TASKS" description="CC_SAVE_TASKS_DESC" />
 				<field name="@toggler_save_b" type="rl_toggler" />
 				<field name="@block_save_b" type="rl_block" end="1" />
 
-				<field name="@block_interval_a" type="rl_block" start="1" label="CC_AUTOMATIC_CLEANING_BY_INTERVAL"
-					   description="CC_AUTOMATIC_CLEANING_BY_INTERVAL_DESC" />
+				<field name="@block_interval_a" type="rl_block" start="1"
+					   label="CC_AUTOMATIC_CLEANING_BY_INTERVAL" description="CC_AUTOMATIC_CLEANING_BY_INTERVAL_DESC" />
 				<field name="@notice_interval" type="note" description="RL_ONLY_AVAILABLE_IN_PRO" />
 				<field name="@block_interval_b" type="rl_block" end="1" />
 			</fieldset>
 
 			<fieldset name="advanced">
 				<field name="@block_folders_a" type="rl_block" start="1" label="CC_CLEAN_OTHER_FOLDERS" />
-				<field name="clean_tmp" type="radio" class="btn-group btn-group-yesno" default="2" label="CC_EMPTY_TMP_FOLDER"
-					   description="CC_EMPTY_TMP_FOLDER_DESC">
+				<field name="clean_tmp" type="radio" class="btn-group btn-group-yesno" default="2"
+					   label="CC_EMPTY_TMP_FOLDER" description="CC_EMPTY_TMP_FOLDER_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 					<option value="2">CC_ONLY_VIA_BUTTON</option>
@@ -176,8 +181,8 @@
 				<field name="@toggler_link_a" type="rl_toggler" param="display_link" value="text,both" />
 				<field name="icon_text" type="text" default="Clean Cache" label="RL_LINK_TEXT" description="RL_LINK_TEXT_DESC" />
 				<field name="@toggler_link_b" type="rl_toggler" />
-				<field name="display_toolbar_button" type="radio" class="btn-group btn-group-yesno" default="0" label="RL_DISPLAY_TOOLBAR_BUTTON"
-					   description="RL_DISPLAY_TOOLBAR_BUTTON_DESC">
+				<field name="display_toolbar_button" type="radio" class="btn-group btn-group-yesno" default="0"
+					   label="RL_DISPLAY_TOOLBAR_BUTTON" description="RL_DISPLAY_TOOLBAR_BUTTON_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>

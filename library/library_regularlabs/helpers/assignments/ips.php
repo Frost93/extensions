@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsIPs extends RLAssignment
 {
-	function passIPs()
+	public function passIPs()
 	{
 		if (is_array($this->selection))
 		{
@@ -29,7 +29,7 @@ class RLAssignmentsIPs extends RLAssignment
 		return $this->pass($pass);
 	}
 
-	function checkIPList()
+	private function checkIPList()
 	{
 		foreach ($this->selection as $range)
 		{
@@ -47,7 +47,7 @@ class RLAssignmentsIPs extends RLAssignment
 		return false;
 	}
 
-	function checkIP($range)
+	private function checkIP($range)
 	{
 		if (empty($range))
 		{
@@ -64,7 +64,7 @@ class RLAssignmentsIPs extends RLAssignment
 		return $this->checkIPPart($range);
 	}
 
-	function checkIPRange($range)
+	private function checkIPRange($range)
 	{
 		$ip = $_SERVER['REMOTE_ADDR'];
 
@@ -114,7 +114,7 @@ class RLAssignmentsIPs extends RLAssignment
 		return implode('.', $prefix) . '.' . implode('.', $max_parts);
 	}
 
-	function checkIPPart($range)
+	private function checkIPPart($range)
 	{
 		$ip = $_SERVER['REMOTE_ADDR'];
 

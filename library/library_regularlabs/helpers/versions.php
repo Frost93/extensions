@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,6 +12,7 @@
 defined('_JEXEC') or die;
 
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/text.php';
 
 class RLVersions
 {
@@ -21,8 +22,6 @@ class RLVersions
 		{
 			return '';
 		}
-
-		require_once __DIR__ . '/functions.php';
 
 		$name  = RLFunctions::getNameByAlias($alias);
 		$alias = RLFunctions::getAliasByName($alias);
@@ -68,7 +67,7 @@ class RLVersions
 			. '<br>'
 			. '<a ' . $href . $onclick . ' class="btn btn-large btn-success">'
 			. '<span class="icon-upload"></span> '
-			. html_entity_decode(JText::sprintf('RL_UPDATE_TO', '<span id="regularlabs_newversionnumber_' . $alias . '"></span>'), ENT_COMPAT, 'UTF-8')
+			. RLText::html_entity_decoder(JText::sprintf('RL_UPDATE_TO', '<span id="regularlabs_newversionnumber_' . $alias . '"></span>'))
 			. '</a>';
 
 		if (!$is_pro)
@@ -89,7 +88,7 @@ class RLVersions
 			. '</span>'
 			. '</div>';
 
-		return html_entity_decode($msg, ENT_COMPAT, 'UTF-8');
+		return RLText::html_entity_decoder($msg);
 	}
 
 	public static function getUpdateLink($alias, $version)
@@ -125,7 +124,7 @@ class RLVersions
 			var NNEM_TOKEN = '" . JSession::getFormToken() . "';
 		"
 		);
-		RLFunctions::script('regularlabsmanager/script.min.js', '5.4.0');
+		RLFunctions::script('regularlabsmanager/script.min.js', '6.2.3');
 
 		$url = 'http://download.regularlabs.com?ext=' . $alias . '&j=3';
 
@@ -184,7 +183,7 @@ class RLVersions
 		$jed_url = 'http://regl.io/jed-' . $alias . '#reviews';
 
 		return
-			html_entity_decode(
+			RLText::html_entity_decoder(
 				JText::sprintf(
 					'RL_JED_REVIEW',
 					'<a href="' . $jed_url . '" target="_blank">',

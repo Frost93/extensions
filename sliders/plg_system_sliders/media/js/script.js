@@ -1,6 +1,6 @@
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,6 +27,11 @@ var RegularLabsSliders = null;
 	});
 
 	RegularLabsSliders = {
+		timers       : [],
+		scroll_to    : null,
+		scroll_offset: 0,
+		scrolling    : false,
+
 		init: function() {
 			var self = this;
 
@@ -49,37 +54,38 @@ var RegularLabsSliders = null;
 				self.initActiveClasses();
 
 
+				self.initScrollTracking();
+
 				self.showByURL();
 
 				self.showByHash();
+
+				setTimeout((function() {
+					self.initClickMode();
+
+
+					if (rl_sliders_use_hash) {
+						self.initHashHandling();
+					}
+
+					self.initHashLinkList();
+
+					if (rl_sliders_reload_iframes) {
+						self.initIframeReloading();
+					}
+
+					// Add the transition durations
+					// But not for Bootstrap 3!
+					if (typeof $().emulateTransitionEnd != 'function') {
+						$('.rl_sliders').addClass('has_effects');
+					}
+				}), 1000);
 			}), timeout);
-
-			setTimeout((function() {
-				self.initClickMode();
-
-
-				if (rl_sliders_use_hash) {
-					self.initHashHandling();
-				}
-
-				self.initHashLinkList();
-
-				if (rl_sliders_reload_iframes) {
-					self.initIframeReloading();
-				}
-
-				// Add the transition durations
-				// But not for Bootstrap 3!
-				if (typeof $().emulateTransitionEnd != 'function') {
-					$('.rl_sliders').addClass('has_effects');
-				}
-			}), 1000);
-
 		},
 
 		show: function(id, scroll, openparents) {
 			if (openparents) {
-				this.openParents(id, scroll);
+				this.openParents(id);
 				return;
 			}
 
@@ -91,24 +97,59 @@ var RegularLabsSliders = null;
 			}
 
 
-			if (!$el.hasClass('in')) {
-
-				$el.collapse({
-					toggle: true,
-					parent: $el.parent().parent()
-				});
-				$el.collapse('show');
+			if (this.scroll_to) {
+				this.setScrollOnLoad($el);
 			}
 
-			if (scroll) {
-				self.scroll(id, previous_id);
-			}
+			$el.collapse({
+				toggle: true,
+				parent: $el.parent().parent()
+			});
+
+			$el.collapse('show');
 
 			this.updateActiveClassesOnSliderLinks($el);
 
 			$el.focus();
 		},
 
+		setScrollOnLoad: function($el) {
+			var self = this;
+
+			// If slider is already open, do scroll immediately
+			if ($el.hasClass('in')) {
+				self.scrollOnLoad();
+				return;
+			}
+
+			// If slider is not open yet, do scroll when opened
+			$el.one('shown.bs.collapse', function() {
+				self.scrollOnLoad();
+			});
+		},
+
+		scrollOnLoad: function() {
+			var self = this;
+
+			if (this.scrolling) {
+				setTimeout(function() {
+					self.scrollOnLoad();
+				}, 100);
+
+				return;
+			}
+
+			clearTimeout(self.timers['scroll']);
+
+			self.timers['scroll'] = setTimeout(function() {
+				if (!self.scroll_to) {
+					return;
+				}
+
+				$('html,body').animate({scrollTop: self.scroll_to.offset().top});
+				self.scroll_to = null;
+			}, 100);
+		},
 
 		getElement: function(id) {
 			return this.getSliderElement(id);
@@ -122,6 +163,32 @@ var RegularLabsSliders = null;
 			return $('#' + id + '.rl_sliders-body');
 		},
 
+
+		initScrollTracking: function() {
+			var self = this;
+
+			self.scrolling = true;
+
+			self.timers['scrolling'] = setTimeout((function() {
+				self.scrolling = false;
+			}), 250);
+
+			var scroll_function_orig = window.onscroll;
+
+			window.onscroll = (function() {
+				self.scrolling = true;
+
+				clearTimeout(self.timers['scrolling']);
+
+				self.timers['scrolling'] = setTimeout((function() {
+					self.scrolling = false;
+				}), 1250);
+
+				if (scroll_function_orig) {
+					scroll_function_orig();
+				}
+			});
+		},
 
 		showByURL: function() {
 			var id = this.getUrlVar();
@@ -144,10 +211,14 @@ var RegularLabsSliders = null;
 				return;
 			}
 
-			// hash is a text anchor
-			if ($('a#rl_sliders-scrollto_' + id).length == 0) {
-				this.showByHashAnchor(id);
+			// check if element is a tab -> leave to Tabs
+			if ($('a.rl_tabs-toggle[data-id="' + id + '"]').length) {
+				return;
+			}
 
+			// check if element is not a slider
+			if (!$('a#rl_sliders-scrollto_' + id).length) {
+				this.showByHashAnchor(id);
 				return;
 			}
 
@@ -169,42 +240,48 @@ var RegularLabsSliders = null;
 				return;
 			}
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
+			var $anchor = $('#' + id + ',a[name="' + id + '"],a#anchor-' + id + '');
 
-			if ($anchor.length == 0) {
+			if (!$anchor.length) {
 				return;
 			}
 
+			$anchor = $anchor.first();
+
 			// Check if anchor has a parent slider
-			if ($anchor.closest('.rl_sliders').length == 0) {
+			if (!$anchor.closest('.rl_sliders').length) {
 				return;
 			}
 
 			var $slider = $anchor.closest('.rl_sliders-body').first();
 
-			// Check if slider has tabs. If so, let Tabs handle it.
-			if ($slider.find('.rl_tabs').length > 0) {
-				return;
-			}
+			this.setScrollToElement($anchor);
 
-			this.openParents($slider.attr('id'), false);
-
-			setTimeout(function() {
-				$('html,body').animate({scrollTop: $anchor.offset().top});
-			}, 250);
+			this.openParents($slider.attr('id'));
 		},
 
-		showByID: function(id) {
+		showByID: function(id, scroll) {
 			var $el = $('a#rl_sliders-scrollto_' + id);
 
-			if ($el.length == 0) {
+			if (!$el.length) {
 				return;
 			}
 
-			this.openParents(id, rl_sliders_urlscroll);
+
+			this.openParents(id);
+
 		},
 
-		openParents: function(id, scroll) {
+
+		setScrollToElement: function($el) {
+			if (!$el.length) {
+				return;
+			}
+
+			this.scroll_to = $el;
+		},
+
+		openParents: function(id) {
 			var $el = this.getElement(id);
 
 			if (!$el.length) {
@@ -224,50 +301,44 @@ var RegularLabsSliders = null;
 				return false;
 			}
 
-			this.stepThroughParents(parents, null, scroll);
+			this.stepThroughParents(parents, null);
 		},
 
-		stepThroughParents: function(parents, parent, scroll) {
+		stepThroughParents: function(parents, parent) {
 			var self = this;
 
 			if (!parents.length && parent) {
-
-				parent.el.focus();
+				self.show(parent.id);
 				return;
 			}
 
 			parent = parents.pop();
 
 			if (parent.el.hasClass('in') || parent.el.parent().hasClass('active')) {
-				self.stepThroughParents(parents, parent, scroll);
+				self.stepThroughParents(parents, parent);
 				return;
 			}
 
 			switch (parent.type) {
 				case 'tab':
 					if (typeof( window['RegularLabsTabs'] ) == "undefined") {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 						break;
 					}
 
 					parent.el.one('shown.bs.tab', function() {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 					});
 
 					RegularLabsTabs.show(parent.id);
 					break;
 
 				case 'slider':
-					if (typeof( window['RegularLabsSliders'] ) == "undefined") {
-						self.stepThroughParents(parents, parent, scroll);
-						break;
-					}
-
 					parent.el.one('shown.bs.collapse', function() {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 					});
 
-					RegularLabsSliders.show(parent.id);
+					self.show(parent.id);
 					break;
 			}
 		},
@@ -300,10 +371,12 @@ var RegularLabsSliders = null;
 		initActiveClasses: function() {
 			$('.rl_sliders-body').on('show.bs.collapse', function(e) {
 				$(this).parent().addClass('active');
+				$('a[data-toggle="collapse"][data-id="' + this.id + '"]').removeClass('collapsed');
 				e.stopPropagation();
 			});
 			$('.rl_sliders-body').on('hidden hidden.bs.collapse', function(e) {
 				$(this).parent().removeClass('active');
+				$('a[data-toggle="collapse"][data-id="' + this.id + '"]').addClass('collapsed');
 				e.stopPropagation();
 			});
 		},
@@ -354,11 +427,11 @@ var RegularLabsSliders = null;
 
 			var $anchor = $('a[data-toggle="collapse"][data-id="' + id + '"]');
 
-			if ($anchor.length == 0) {
-				$anchor = $('a#' + id + ',a[name="' + id + '"]');
+			if (!$anchor.length) {
+				$anchor = $('#' + id + ',a[name="' + id + '"]');
 
 				// No accompanying link found
-				if ($anchor.length == 0) {
+				if (!$anchor.length) {
 					return;
 				}
 
@@ -368,7 +441,7 @@ var RegularLabsSliders = null;
 			$anchor = $anchor.first();
 
 			// Check if anchor has a parent slider
-			if ($anchor.closest('.rl_sliders').length == 0) {
+			if (!$anchor.closest('.rl_sliders').length) {
 				return;
 			}
 
@@ -376,7 +449,7 @@ var RegularLabsSliders = null;
 			var slider_id = $slider.attr('id');
 
 			// Check if link is inside the same slider
-			if ($link.closest('.rl_sliders').length > 0) {
+			if ($link.closest('.rl_sliders').length) {
 				if ($link.closest('.rl_sliders-body').first().attr('id') == slider_id) {
 					return;
 				}
@@ -385,7 +458,7 @@ var RegularLabsSliders = null;
 			$link.click(function(e) {
 				// Open parent slider and parents
 				e.preventDefault();
-				self.openParents(slider_id, scroll);
+				self.showByID(slider_id);
 				e.stopPropagation();
 			});
 		},
@@ -412,7 +485,7 @@ var RegularLabsSliders = null;
 				var $el = self.getElement(id);
 
 				if (!$el.hasClass('in')) {
-					RegularLabsSliders.show(id, $(this).hasClass('rl_sliders-item-scroll'));
+					self.show(id, $(this).hasClass('rl_sliders-item-scroll'));
 				} else {
 					$el.collapse('hide');
 				}
@@ -487,15 +560,25 @@ var RegularLabsSliders = null;
 
 /* For custom use */
 function openAllSliders(id) {
-	var parent = findSliderSetBy(id);
+	var parent   = findSliderSetBy(id);
+	var elements = parent.find('.rl_sliders-body:not(.in)');
 
-	parent.find('.rl_sliders-body:not(.in)').collapse('show');
+	if (!elements.length) {
+		return;
+	}
+
+	elements.collapse('show');
 }
 
 function closeAllSliders(id) {
-	var parent = findSliderSetBy(id);
+	var parent   = findSliderSetBy(id);
+	var elements = parent.find('.rl_sliders-body.in');
 
-	parent.find('.rl_sliders-body.in').collapse('hide');
+	if (!elements.length) {
+		return;
+	}
+
+	elements.collapse('hide');
 }
 
 function findSliderSetBy(id) {

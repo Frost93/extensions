@@ -1,6 +1,6 @@
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -45,8 +45,6 @@ var RegularLabsSlidersPopup = null;
 
 			this.setRadioOption('slider_1[open]', 1);
 
-			this.fillFromSelection();
-
 			$('.reglab-overlay').css('cursor', '').fadeOut();
 		},
 
@@ -71,115 +69,6 @@ var RegularLabsSlidersPopup = null;
 				$('.' + $(input).parent().attr('id') + '_icon').hide();
 				self.setRadioOption($(input).attr('name'), 0);
 			});
-		},
-
-		fillFromSelection: function() {
-			var selection = this.getSelection();
-
-			if (!selection) {
-				return;
-			}
-
-			var url = 'index.php?rl_qp=1&folder=plugins.editors-xtd.sliders&file=data.php&format=json&selection=' + encodeURIComponent(selection);
-
-			RegularLabsScripts.loadajax(
-				url,
-				'RegularLabsSlidersPopup.fillFromData(data)', 'RegularLabsSlidersPopup.fillFromData(null)',
-				'', 5, 'json'
-			);
-		},
-
-		fillFromData: function(data) {
-			var self = this;
-			var form = document.getElementById('slidersForm');
-
-			$.each(data, function(i, item) {
-				var id    = 'slider_' + (i + 1);
-				var extra = [];
-
-				console.log(item);
-				$.each(self.classes, function(s, clss) {
-					if (item['class'] === undefined) {
-						return;
-					}
-
-					var regex     = new RegExp('(^| )' + clss + '( |$)');
-					item['class'] = item['class'].replace(regex, '$2');
-
-					item[clss] = true;
-				});
-
-				$.each(item, function(key, value) {
-					if (key == 'content') {
-						$('#' + id + '_content').html(value).show();
-						return;
-					}
-
-					var input = $('input[name="' + id + '[' + key + ']"],select[name="' + id + '[' + key + ']"]');
-
-					if (input.length < 1) {
-						extra.push(key + '="' + (value + '').replace(/"/g, '\\"') + '"');
-						return;
-					}
-
-					if (typeof(value) === "boolean") {
-						value = value ? '1' : '0';
-					}
-
-					switch (true) {
-						case (input.attr('type') == 'radio'):
-							self.setRadioOption(input.attr('name'), value);
-							break;
-
-						case (input.prop('tagName') == 'SELECT'):
-							self.setSelectOption(input.attr('name'), value);
-							break;
-
-						default:
-							form[$(input).attr('id')].value = value;
-							break;
-					}
-
-				});
-
-				if (extra.length) {
-					form[id + '_extra'].value = extra.join(' ');
-				}
-			});
-		},
-
-		getSelection: function() {
-			var editor_textarea = window.parent.document.getElementById(sliders_editorname);
-			if (!editor_textarea) {
-				return false;
-			}
-
-			var iframes = editor_textarea.parentNode.getElementsByTagName('iframe');
-			if (!iframes.length) {
-				return false;
-			}
-
-			var editor_frame  = iframes[0];
-			var contentWindow = editor_frame.contentWindow;
-			var selection     = '';
-
-			if (typeof contentWindow.getSelection != "undefined") {
-				var sel = contentWindow.getSelection();
-				if (sel.rangeCount) {
-					var container = contentWindow.document.createElement("div");
-					var len       = sel.rangeCount;
-					for (var i = 0; i < len; ++i) {
-						container.appendChild(sel.getRangeAt(i).cloneContents());
-					}
-					selection = container.innerHTML;
-				}
-			} else if (typeof contentWindow.document.selection != "undefined") {
-				if (contentWindow.document.selection.type == "Text") {
-					selection = contentWindow.document.selection.createRange().htmlText;
-				}
-			}
-
-			return selection;
 		},
 
 		insertText: function() {

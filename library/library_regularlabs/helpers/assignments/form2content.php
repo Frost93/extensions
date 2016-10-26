@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsForm2Content extends RLAssignment
 {
-	function passProjects()
+	public function passProjects()
 	{
 		if ($this->request->option != 'com_content' && $this->request->view == 'article')
 		{
@@ -29,7 +29,7 @@ class RLAssignmentsForm2Content extends RLAssignment
 		$this->db->setQuery($query);
 		$type = $this->db->loadResult();
 
-		$types = $this->makeArray($type, 1);
+		$types = $this->makeArray($type);
 
 		return $this->passSimple($types);
 	}

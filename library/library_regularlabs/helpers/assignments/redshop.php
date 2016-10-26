@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,19 +15,19 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsRedShop extends RLAssignment
 {
-	function init()
+	public function init()
 	{
 		$this->request->item_id     = JFactory::getApplication()->input->getInt('pid', 0);
 		$this->request->category_id = JFactory::getApplication()->input->getInt('cid', 0);
 		$this->request->id          = ($this->request->item_id) ? $this->request->item_id : $this->request->category_id;
 	}
 
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		return $this->passByPageTypes('com_redshop', $this->selection, $this->assignment, true);
 	}
 
-	function passCategories()
+	public function passCategories()
 	{
 		if ($this->request->option != 'com_redshop')
 		{
@@ -80,7 +80,7 @@ class RLAssignmentsRedShop extends RLAssignment
 		return $this->passSimple($cats);
 	}
 
-	function passProducts()
+	public function passProducts()
 	{
 		if (!$this->request->id || $this->request->option != 'com_redshop' || $this->request->view != 'product')
 		{
@@ -90,7 +90,7 @@ class RLAssignmentsRedShop extends RLAssignment
 		return $this->passSimple($this->request->id);
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'redshop_category_xref', 'category_parent_id', 'category_child_id');
 	}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -49,10 +49,12 @@ class PlgButtonContentTemplaterHelper
 		JHtml::_('bootstrap.popover');
 
 		RLFunctions::script('regularlabs/script.min.js');
-		RLFunctions::script('contenttemplater/script.min.js', '6.0.1');
+		RLFunctions::script('contenttemplater/script.min.js', '6.2.6');
 
 		RLFunctions::stylesheet('regularlabs/style.min.css');
-		RLFunctions::stylesheet('contenttemplater/button.min.css', '6.0.1');
+		RLFunctions::stylesheet('contenttemplater/button.min.css', '6.2.6');
+
+		$name = 'rl_ct_button-' . $this->getEditorId($editor);
 
 		$buttons = array();
 
@@ -63,7 +65,7 @@ class PlgButtonContentTemplaterHelper
 			$btn->modal   = $button->modal;
 			$btn->class   = $button->class;
 			$btn->text    = $button->text;
-			$btn->name    = $button->name . ' rl_ct_button-' . $editor;
+			$btn->name    = $button->name . ' ' . $name;
 			$btn->link    = $button->link;
 			$btn->onclick = $button->onclick ? $button->onclick . 'return false;' : '';
 			$btn->options = $button->options;
@@ -81,6 +83,15 @@ class PlgButtonContentTemplaterHelper
 		$button->options = $this->getHTML($buttons);
 
 		return $button;
+	}
+
+	private function getEditorId($editor)
+	{
+		$editor = JFilterOutput::stringURLSafe($editor);
+		$editor = str_replace('-', '_', $editor);
+
+
+		return $editor;
 	}
 
 	private function getHTML($buttons)

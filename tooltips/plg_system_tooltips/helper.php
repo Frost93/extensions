@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tooltips
- * @version         5.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -78,11 +78,11 @@ class PlgSystemTooltipsHelper
 			}
 
 
-			RLFunctions::script('tooltips/script.min.js', ($this->params->media_versioning ? '5.0.0' : false));
+			RLFunctions::script('tooltips/script.min.js', ($this->params->media_versioning ? '6.0.2' : false));
 
 			if ($this->params->load_stylesheet)
 			{
-				RLFunctions::stylesheet('tooltips/style.min.css', ($this->params->media_versioning ? '5.0.0' : false));
+				RLFunctions::stylesheet('tooltips/style.min.css', ($this->params->media_versioning ? '6.0.2' : false));
 			}
 
 			$styles = array();
@@ -258,104 +258,254 @@ class PlgSystemTooltipsHelper
 
 		preg_match_all($this->params->regex, $string, $matches, PREG_SET_ORDER);
 
-		if (!empty($matches))
+		foreach ($matches as $match)
 		{
-			foreach ($matches as $match)
-			{
-				$tip  = $match['tip'];
-				$text = $match['text'];
-
-				$classes = str_replace('\|', '[:TT_BAR:]', $tip);
-				$classes = explode('|', $classes);
-				foreach ($classes as $i => $class)
-				{
-					$classes[$i] = trim(str_replace('[:TT_BAR:]', '|', $class));
-				}
-				$tip = array_shift($classes);
-
-				$classes_popover = $classes;
-
-				$classes   = array_diff($classes, array('hover', 'sticky', 'click'));
-				$classes[] = 'hover';
-
-				$position = 'top';
-
-				preg_match_all('#href="([^"]*)"#si', $tip, $url_matches, PREG_SET_ORDER);
-
-				if (!empty($url_matches))
-				{
-					foreach ($url_matches as $url_match)
-					{
-						$url = 'href="' . JRoute::_($url_match['1']) . '"';
-						$tip = str_replace($url_match['0'], $url, $tip);
-					}
-				}
-
-				preg_match_all('#src="([^"]*)"#si', $tip, $url_matches, PREG_SET_ORDER);
-
-				if (!empty($url_matches))
-				{
-					foreach ($url_matches as $url_match)
-					{
-						$url = $url_match['1'];
-						if (strpos($url, 'http') !== 0)
-						{
-							$url = JUri::root() . $url;
-						}
-						$url = 'src="' . $url . '"';
-						$tip = str_replace($url_match['0'], $url, $tip);
-					}
-				}
-
-				$tip = explode('::', $this->makeSave($tip), 2);
-				if (!isset($tip['1']))
-				{
-					$classes_popover[] = 'notitle';
-					$title             = '';
-					$content           = $tip['0'];
-					if (preg_match('#^\s*(&lt;|<)img [^>]*(&gt;|>)\s*$#', $content))
-					{
-						$classes_popover[] = 'isimg';
-					}
-				}
-				else
-				{
-					if (!$tip['1'])
-					{
-						$classes_popover[] = 'nocontent';
-					}
-					$title   = $tip['0'];
-					$content = $tip['1'];
-				}
-
-				if (preg_match('#^\s*<img [^>]*>\s*$#', $text))
-				{
-					$classes[] = 'isimg';
-				}
-
-				$template = '<div class="popover rl_tooltips nn_tooltips ' . implode(' ', $classes_popover) . '"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>';
-
-				$r = '<span'
-					. ' class="rl_tooltips-link nn_tooltips-link ' . implode(' ', $classes) . '"'
-					. ' data-toggle="popover"'
-					. ' data-html="true"'
-					. ' data-template="' . $this->makeSave($template) . '"'
-					. ' data-placement="' . $position . '"'
-					. ' data-content="' . $content . '"'
-					. ' title="' . $title . '">' . $text . '</span>';
-
-				if (in_array('isimg', $classes_popover))
-				{
-					// place the full image in a hidden span to make it pre-load it
-					$r .= '<span style="display:none;">' . html_entity_decode($content) . '</span>';
-				}
-				$string = str_replace($match['0'], $r, $string);
-			}
+			$this->replaceTag($string, $match);
 		}
 
 		$string = $pre_string . $string . $post_string;
 
 		RLProtect::unprotect($string);
+	}
+
+	private function replaceTag(&$string, $match)
+	{
+		$tip  = $this->getTip($match['tip']);
+		$text = $match['text'];
+
+		// Check if the text is an image
+		if (preg_match('#^\s*<img [^>]*>\s*$#', $text))
+		{
+			$tip->classes[] = 'isimg';
+		}
+
+		$template = '<div class="popover rl_tooltips nn_tooltips ' . implode(' ', $tip->classes_popover) . '"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>';
+
+		$html = '<span'
+			. ' class="rl_tooltips-link nn_tooltips-link ' . implode(' ', $tip->classes) . '"'
+			. ' data-toggle="popover"'
+			. ' data-html="true"'
+			. ' data-template="' . $this->makeSave($template) . '"'
+			. ' data-placement="' . $tip->position . '"'
+			. ' data-content="' . $tip->content . '"'
+			. ' title="' . $tip->title . '">' . $text . '</span>';
+
+		if (in_array('isimg', $tip->classes_popover))
+		{
+			// place the full image in a hidden span to make it pre-load it
+			$html .= '<span style="display:none;">' . RLText::html_entity_decoder($tip->content) . '</span>';
+		}
+
+		$string = str_replace($match['0'], $html, $string);
+	}
+
+	private function getTip($string)
+	{
+		$tip = $this->getTipFromSyntax($string);
+
+		$this->setDefaults($tip);
+
+		$this->setClasses($tip);
+
+		$this->prepareTextString($tip->title);
+		$this->prepareTextString($tip->content);
+
+		return $tip;
+	}
+
+	private function setDefaults(&$tip)
+	{
+		$defaults = array(
+			'title'           => '',
+			'content'         => '',
+			'classes_popover' => array(),
+			'classes'         => array(),
+			'position'        => 'top',
+			'mode'            => 'hover',
+		);
+
+		foreach ($defaults as $key => $default)
+		{
+			if (!isset($tip->{$key}))
+			{
+				$tip->{$key} = $default;
+				continue;
+			}
+
+			// Explode class strings
+			if (is_array($default) && !is_array($tip->{$key}))
+			{
+				$tip->{$key} = explode(' ', $tip->{$key});
+			}
+		}
+	}
+
+	private function setClasses(&$tip)
+	{
+		if (!empty($tip->content) && preg_match('#^\s*(&lt;|<)img [^>]*(&gt;|>)\s*$#', $tip->content))
+		{
+			$tip->classes_popover[] = 'isimg';
+		}
+
+		if (!empty($tip->image))
+		{
+			$attributes = $this->getImageAttributes($tip);
+
+			$tip->content           = '<img src="' . JRoute::_($tip->image) . '"' . $attributes . ' />';
+			$tip->classes_popover[] = 'isimg';
+
+			unset($tip->image);
+		}
+
+		if (empty($tip->title))
+		{
+			$tip->classes_popover[] = 'notitle';
+		}
+
+		if (empty($tip->content))
+		{
+			$tip->classes_popover[] = 'nocontent';
+		}
+
+		$tip->classes = array_diff($tip->classes, array('hover', 'sticky', 'click'));
+		$tip->classes = array_diff($tip->classes, array('left', 'right', 'top', 'bottom'));
+
+		$tip->classes[] = 'hover';
+		$tip->classes[] = 'top';
+
+		return;
+	}
+
+	private function getImageAttributes(&$tip)
+	{
+		$attributes = array();
+
+		if (!empty($tip->image_attributes))
+		{
+			$attributes[] = $tip->image_attributes;
+			unset($tip->image_attributes);
+		}
+
+		foreach ($tip as $key => $value)
+		{
+			if (strpos($key, 'image_') !== 0)
+			{
+				continue;
+			}
+
+			$attributes[] = substr($key, 6) . '="' . $value . '"';
+			unset($tip->{$key});
+		}
+
+		return !empty($attributes) ? ' ' . implode(' ', $attributes) : '';
+	}
+
+	private function prepareTextString(&$string)
+	{
+		$string = $this->fixUrls($string);
+		$string = $this->makeSave($string);
+	}
+
+	private function fixUrls($string)
+	{
+		if (empty($string) || strpos($string, '="') === false)
+		{
+			return $string;
+		}
+
+		// JRoute internal links
+		preg_match_all('#href="([^"]*)"#si', $string, $url_matches, PREG_SET_ORDER);
+
+		if (!empty($url_matches))
+		{
+			foreach ($url_matches as $url_match)
+			{
+				$url    = 'href="' . JRoute::_($url_match['1']) . '"';
+				$string = str_replace($url_match['0'], $url, $string);
+			}
+		}
+
+		// Add root to internal image sources
+		preg_match_all('#src="([^"]*)"#si', $string, $url_matches, PREG_SET_ORDER);
+
+		if (!empty($url_matches))
+		{
+			foreach ($url_matches as $url_match)
+			{
+				$url = $url_match['1'];
+
+				if (strpos($url, 'http') !== 0)
+				{
+					$url = JUri::root() . $url;
+				}
+
+				$url    = 'src="' . $url . '"';
+				$string = str_replace($url_match['0'], $url, $string);
+			}
+		}
+
+		return $string;
+	}
+
+	private function getTipFromSyntax($string)
+	{
+		// Convert WYSIWYG image html style to html
+		if (strpos($string, '&lt;img'))
+		{
+			$string = preg_replace('#&lt;(img.+?)&gt;#', '<\1>', $string);
+		}
+
+		if (strpos($string, '::') !== false || strpos($string, '|') !== false)
+		{
+			return $this->getTipFromOldSyntax($string);
+		}
+
+		// Get the values from the tag
+		$tag = RLTags::getValuesFromString($string, 'content');
+
+		$key_aliases = array(
+			'title'    => array('header', 'heading'),
+			'content'  => array('tip', 'text', 'description'),
+			'position' => array('pos'),
+			'classes'  => array('class'),
+		);
+
+		RLTags::replaceKeyAliases($tag, $key_aliases);
+
+		$tag->classes_popover = isset($tag->classes) ? $tag->classes : array();
+
+		return $tag;
+	}
+
+	private function getTipFromOldSyntax($string)
+	{
+		$classes = str_replace('\|', '[:TT_BAR:]', $string);
+		$classes = explode('|', $classes);
+		foreach ($classes as $i => $class)
+		{
+			$classes[$i] = trim(str_replace('[:TT_BAR:]', '|', $class));
+		}
+		$string = array_shift($classes);
+
+		$classes_popover = $classes;
+
+		$mode = 'hover';
+
+		$position = 'top';
+
+		$tip = explode('::', $string, 2);
+
+		$title   = isset($tip['1']) ? $tip['0'] : '';
+		$content = isset($tip['1']) ? $tip['1'] : $tip['0'];
+
+		return (object) array(
+			'title'           => $title,
+			'content'         => $content,
+			'classes_popover' => $classes_popover,
+			'classes'         => $classes,
+			'mode'            => $mode,
+			'position'        => $position,
+		);
 	}
 
 	private function makeSave($string)

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Dummy Content
- * @version         3.0.0
+ * @version         3.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -39,7 +39,7 @@ class PlgButtonDummyContentHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_dummycontent');
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$icon = 'reglab icon-dummycontent';
 		$link = 'index.php?rl_qp=1'

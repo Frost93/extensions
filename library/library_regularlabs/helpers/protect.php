@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -16,16 +16,20 @@ require_once __DIR__ . '/text.php';
 
 class RLProtect
 {
-	static $protect_a      = '<!-- >> RL_PROTECTED >>';
-	static $protect_b      = ' << RL_PROTECTED << -->';
-	static $protect_tags_a = '<!-- >> RL_PROTECTED_TAGS >>';
-	static $protect_tags_b = ' << RL_PROTECTED_TAGS << -->';
-	static $sourcerer_tag  = null;
+	static $protect_start        = '<!-- RL_PROTECTED';
+	static $protect_end          = 'RL_PROTECTED -->';
+	static $protect_tags_start   = '<!-- RL_PROTECTED_TAGS';
+	static $protect_tags_end     = 'RL_PROTECTED_TAGS -->';
+	static $html_safe_start      = '___RL_PROTECTED___';
+	static $html_safe_end        = '___/RL_PROTECTED___';
+	static $html_safe_tags_start = '___RL_PROTECTED_TAGS___';
+	static $html_safe_tags_end   = '___/RL_PROTECTED_TAGS___';
+	static $sourcerer_tag        = null;
 
 	/**
 	 * check if page should be protected for certain extensions
 	 */
-	public static function isProtectedPage($extension_alias = '', $hastags = 0, $exclude_formats = array('pdf'))
+	public static function isProtectedPage($extension_alias = '', $hastags = false, $exclude_formats = array('pdf'))
 	{
 		// return if disabled via url
 		if (($extension_alias && JFactory::getApplication()->input->get('disable_' . $extension_alias)))
@@ -74,7 +78,7 @@ class RLProtect
 
 		return (
 			$app->isAdmin()
-			&& (!$block_login || $app->input->get('option') != 'com_login')
+			&& (!$block_login || !JFactory::getUser()->get('guest'))
 			&& $app->input->get('task') != 'preview'
 			&& !(
 				$app->input->get('option') == 'com_finder'
@@ -149,7 +153,10 @@ class RLProtect
 			return false;
 		}
 
-		$restricted_components = is_array($restricted_components) ? $restricted_components : explode('|', $restricted_components);
+		$restricted_components =
+			is_array($restricted_components)
+				? $restricted_components
+				: explode(',', str_replace('|', ',', $restricted_components));
 
 		if (in_array(JFactory::getApplication()->input->get('option'), $restricted_components))
 		{
@@ -195,7 +202,10 @@ class RLProtect
 	 */
 	public static function getFormRegex($regex_format = 0)
 	{
-		$regex = '(<' . 'form\s[^>]*((id|name)="(adminForm|postform|submissionForm|default_action_user)|action="[^"]*option=com_myjspace&(amp;)?view=see)")';
+		$regex = '(<' . 'form\s[^>]*('
+			. '(id|name)="(adminForm|postform|submissionForm|default_action_user|seblod_form)"'
+			. '|action="[^"]*option=com_myjspace&(amp;)?view=see"'
+			. '))';
 
 		if (!$regex_format)
 		{
@@ -210,23 +220,78 @@ class RLProtect
 	 */
 	public static function protectFields(&$string)
 	{
-		if (strpos($string, '<input') === false && strpos($string, '<textarea') === false)
+		if (
+			empty($string)
+			|| (strpos($string, '<input') === false && strpos($string, '<textarea') === false)
+		)
 		{
 			return;
 		}
 
-		$param_name  = '[a-z][a-z0-9-_]*';
-		$params      = '(?:\s+' . $param_name . '(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[0-9]+))?)*';
-		$type_values = '(?:text|email|hidden)';
-		$param_type  = '\s+type\s*=\s*(?:"' . $type_values . '"|\'' . $type_values . '\'])';
+		// Split string for large forms to prevent memory issues
+		$split_on = '</label>';
+		if (
+			strlen($string) > 50000
+			&& strpos($string, $split_on) !== false
+		)
+		{
+			$parts = explode($split_on, $string);
 
-		self::protectByRegex(
-			$string,
-			'#(?:(?:'
-			. '(?:<' . 'input' . $params . $param_type . $params . '\s*/?>)'
-			. '|(?:<' . 'textarea[\s>].*?</textarea>)'
-			. ')\s*)+#si'
-		);
+			$string = array();
+
+			foreach ($parts as $part)
+			{
+				self::protectFields($part);
+				$string[] = $part;
+			}
+
+			$string = implode($split_on, $string);
+
+			return;
+		}
+
+		if (strpos($string, '<textarea') !== false)
+		{
+			// Only replace non-empty textareas
+			// Todo: maybe also prevent empty textareas but with a non-empty placeholder attribute
+
+			// Temporarily replace empty textareas
+			$temp_tag = '___TEMP_TEXTAREA___';
+			$string   = preg_replace(
+				'#<textarea((?:\s[^>]*)?)>(\s*)</textarea>#si',
+				'<' . $temp_tag . '\1>\2</' . $temp_tag . '>',
+				$string
+			);
+
+			self::protectByRegex(
+				$string,
+				'#(?:'
+				. '<' . 'textarea.*?<' . '/textarea>'
+				. '\s*)+#si'
+			);
+
+			// Replace back the temporarily replaced empty textareas
+			$string = str_replace($temp_tag, 'textarea', $string);
+		}
+
+		if (strpos($string, '<input') !== false)
+		{
+			$type_values = '(?:text|email|hidden)';
+			// must be of certain type
+			$param_type = '\s+type\s*=\s*(?:"' . $type_values . '"|\'' . $type_values . '\'])';
+			// must have a non-empty value or placeholder attribute
+			$param_value = '\s+(?:value|placeholder)\s*=\s*(?:"[^"]+"|\'[^\']+\'])';
+			// Regex to match any other parameter
+			$params = '(?:\s+[a-z][a-z0-9-_]*(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[0-9]+))?)*';
+
+			self::protectByRegex(
+				$string,
+				'#(?:(?:'
+				. '<' . 'input' . $params . $param_type . $params . $param_value . $params . '\s*/?>'
+				. '|<' . 'input' . $params . $param_value . $params . $param_type . $params . '\s*/?>'
+				. ')\s*)+#si'
+			);
+		}
 	}
 
 	/**
@@ -259,7 +324,7 @@ class RLProtect
 	/**
 	 * protect text by given regex
 	 */
-	private static function protectByRegex(&$string, $regex)
+	public static function protectByRegex(&$string, $regex)
 	{
 		preg_match_all($regex, $string, $matches);
 
@@ -440,7 +505,8 @@ class RLProtect
 	 */
 	public static function unprotect(&$string)
 	{
-		$regex = '#' . preg_quote(self::$protect_a, '#') . '(.*?)' . preg_quote(self::$protect_b, '#') . '#si';
+		$regex = '#' . preg_quote(self::$protect_start, '#') . '(.*?)' . preg_quote(self::$protect_end, '#') . '#si';
+
 		while (preg_match_all($regex, $string, $matches, PREG_SET_ORDER))
 		{
 			foreach ($matches as $match)
@@ -448,6 +514,52 @@ class RLProtect
 				$string = str_replace($match['0'], base64_decode($match['1']), $string);
 			}
 		}
+	}
+
+	/**
+	 * replace any protected text to original
+	 */
+	public static function convertProtectionToHtmlSafe(&$string)
+	{
+		$string = str_replace(
+			array(
+				self::$protect_start,
+				self::$protect_end,
+				self::$protect_tags_start,
+				self::$protect_tags_end,
+			),
+			array(
+				self::$html_safe_start,
+				self::$html_safe_end,
+				self::$html_safe_tags_start,
+				self::$html_safe_tags_end,
+			),
+			$string
+		);
+	}
+
+	/**
+	 * replace any protected text to original
+	 */
+	public static function unprotectHtmlSafe(&$string)
+	{
+		$string = str_replace(
+			array(
+				self::$html_safe_start,
+				self::$html_safe_end,
+				self::$html_safe_tags_start,
+				self::$html_safe_tags_end,
+			),
+			array(
+				self::$protect_start,
+				self::$protect_end,
+				self::$protect_tags_start,
+				self::$protect_tags_end,
+			),
+			$string
+		);
+
+		self::unprotect($string);
 	}
 
 	/**
@@ -495,10 +607,10 @@ class RLProtect
 	{
 		if ($is_tag)
 		{
-			return self::$protect_tags_a . base64_encode($string) . self::$protect_tags_b;
+			return self::$protect_tags_start . base64_encode($string) . self::$protect_tags_end;
 		}
 
-		return self::$protect_a . base64_encode($string) . self::$protect_b;
+		return self::$protect_start . base64_encode($string) . self::$protect_end;
 	}
 
 	/**
@@ -508,10 +620,10 @@ class RLProtect
 	{
 		if ($is_tag)
 		{
-			return self::$protect_tags_a . base64_decode($string) . self::$protect_tags_b;
+			return self::$protect_tags_start . base64_decode($string) . self::$protect_tags_end;
 		}
 
-		return self::$protect_a . base64_decode($string) . self::$protect_b;
+		return self::$protect_start . base64_decode($string) . self::$protect_end;
 	}
 
 	/**
@@ -605,9 +717,14 @@ class RLProtect
 	/**
 	 * remove tags from tag attributes
 	 */
-	public static function removeFromHtmlTagAttributes(&$string, $tags, $attributes = array('title', 'alt'), $include_closing_tags = true)
+	public static function removeFromHtmlTagAttributes(&$string, $tags, $attributes = 'ALL', $include_closing_tags = true)
 	{
 		list($tags, $protected) = self::prepareTags($tags, $include_closing_tags);
+
+		if ($attributes == 'ALL')
+		{
+			$attributes = array('[a-z][a-z0-9-_]*');
+		}
 
 		if (!is_array($attributes))
 		{
@@ -616,7 +733,7 @@ class RLProtect
 
 		preg_match_all('#\s(?:' . implode('|', $attributes) . ')\s*=\s*".*?"#si', $string, $matches);
 
-		if (empty($matches))
+		if (empty($matches) || empty($matches['0']))
 		{
 			return;
 		}

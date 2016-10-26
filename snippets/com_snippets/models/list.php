@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,6 +12,7 @@
 defined('_JEXEC') or die;
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/string.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
 jimport('joomla.application.component.modellist');
 
@@ -146,6 +147,11 @@ class SnippetsModelList extends JModelList
 		// Add the list ordering clause.
 		$ordering  = $this->state->get('list.ordering', 'a.ordering');
 		$direction = $this->state->get('list.direction', 'ASC');
+
+		if (!in_array($ordering, $this->filter_fields))
+		{
+			$ordering = 'a.ordering';
+		}
 
 		if ($ordering == 'a.ordering')
 		{
@@ -346,7 +352,7 @@ class SnippetsModelList extends JModelList
 		$filename = 'Snippets Items';
 		if (count($rows) == 1)
 		{
-			$name = RLString::strtolower(html_entity_decode($rows['0']->name));
+			$name = RLString::strtolower(RLText::html_entity_decoder($rows['0']->name));
 			$name = preg_replace('#[^a-z0-9_-]#', '_', $name);
 			$name = trim(preg_replace('#__+#', '_', $name), '_-');
 

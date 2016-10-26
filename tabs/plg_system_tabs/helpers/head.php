@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tabs
- * @version         6.0.3
+ * @version         6.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -46,11 +46,11 @@ class PlgSystemTabsHelperHead
 		';
 		JFactory::getDocument()->addScriptDeclaration('/* START: Tabs scripts */ ' . preg_replace('#\n\s*#s', ' ', trim($script)) . ' /* END: Tabs scripts */');
 
-		RLFunctions::script('tabs/script.min.js', ($this->params->media_versioning ? '6.0.3' : false));
+		RLFunctions::script('tabs/script.min.js', ($this->params->media_versioning ? '6.2.3' : false));
 
 		if ($this->params->load_stylesheet)
 		{
-			RLFunctions::stylesheet('tabs/style.min.css', ($this->params->media_versioning ? '6.0.3' : false));
+			RLFunctions::stylesheet('tabs/style.min.css', ($this->params->media_versioning ? '6.2.3' : false));
 		}
 
 	}

@@ -1,6 +1,6 @@
 /**
  * @package         Cache Cleaner
- * @version         5.0.0
+ * @version         5.2.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

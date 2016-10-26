@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -20,20 +20,34 @@ class RLHtmlFix
 			return $string;
 		}
 
-		$string = function_exists('mb_convert_encoding')
-			? mb_convert_encoding($string, 'html-entities', 'utf-8')
-			: utf8_encode($string);
+		// Convert utf8 characters to html entities
+		if (function_exists('mb_convert_encoding'))
+		{
+			$string = mb_convert_encoding($string, 'html-entities', 'utf-8');
+		}
+
+		$string = self::protectSpecialCode($string);
 
 		$string = self::convertDivsInsideInlineElementsToSpans($string);
 		$string = self::removeParagraphsAroundBlockElements($string);
 		$string = self::removeInlineElementsAroundBlockElements($string);
 
-		if (class_exists('DOMDocument'))
+		$string = class_exists('DOMDocument')
+			? self::DOMDocument($string)
+			: self::custom($string);
+
+		$string = self::unprotectSpecialCode($string);
+
+		// Convert html entities back to utf8 characters
+		if (function_exists('mb_convert_encoding'))
 		{
-			return self::DOMDocument($string);
+			// Make sure &lt; and &gt; don't get converted
+			$string = str_replace(array('&lt;', '&gt;'), array('&amp;lt;', '&amp;gt;'), $string);
+
+			$string = mb_convert_encoding($string, 'utf-8', 'html-entities');
 		}
 
-		return self::custom($string);
+		return $string;
 	}
 
 	public static function DOMDocument($string)
@@ -219,5 +233,32 @@ class RLHtmlFix
 	private static function getInlineElementsNoAnchor($exclude = array())
 	{
 		return array_diff(self::getInlineElements($exclude), array('a'));
+	}
+
+	private static function protectSpecialCode($string)
+	{
+		require_once __DIR__ . '/protect.php';
+
+		// Protect PHP code
+		RLProtect::protectByRegex($string, '#(<|&lt;)\?php\s.*?\?(>|&gt;)#s');
+
+		// Protect {...} tags
+		RLProtect::protectByRegex($string, '#\{.*?\}#s');
+
+		// Protect [...] tags
+		RLProtect::protectByRegex($string, '#\[.*?\]#s');
+
+		RLProtect::convertProtectionToHtmlSafe($string);
+
+		return $string;
+	}
+
+	private static function unprotectSpecialCode($string)
+	{
+		require_once __DIR__ . '/protect.php';
+
+		RLProtect::unprotectHtmlSafe($string);
+
+		return $string;
 	}
 }

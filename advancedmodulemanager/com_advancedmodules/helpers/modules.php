@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -131,20 +131,19 @@ abstract class ModulesHelper
 		$query = $db->getQuery(true);
 
 		// Build the query.
-		$query->select('e.element, e.name, e.enabled')
-			->from('#__extensions as e');
-
-		if ($template != '')
-		{
-			$query->where('e.element = ' . $db->quote($template));
-		}
-
-		$query->where('e.type = ' . $db->quote('template'))
-			->where('e.client_id = ' . (int) $clientId);
+		$query->select('element, name, enabled')
+			->from('#__extensions')
+			->where('client_id = ' . (int) $clientId)
+			->where('type = ' . $db->quote('template'));
 
 		if ($state != '')
 		{
-			$query->where('e.enabled = ' . $db->quote($state));
+			$query->where('enabled = ' . $db->quote($state));
+		}
+
+		if ($template != '')
+		{
+			$query->where('element = ' . $db->quote($template));
 		}
 
 		// Set the query and load the templates.
@@ -167,9 +166,9 @@ abstract class ModulesHelper
 		$query = $db->getQuery(true)
 			->select('e.element AS value, e.name AS text')
 			->from('#__extensions as e')
-			->join('LEFT', '#__modules as m ON m.module=e.element AND m.client_id=e.client_id')
-			->where('e.type = ' . $db->quote('module'))
 			->where('e.client_id = ' . (int) $clientId)
+			->where('e.type = ' . $db->quote('module'))
+			->join('LEFT', '#__modules as m ON m.module=e.element AND m.client_id=e.client_id')
 			->where('m.module IS NOT NULL')
 			->group('e.element, e.name');
 

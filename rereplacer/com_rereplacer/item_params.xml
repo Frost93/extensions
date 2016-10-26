@@ -14,13 +14,13 @@
 		<field name="@toggler_search_regex_a" type="rl_toggler" param="regex" value="1" />
 		<field name="@block_search_regex" type="note" class="alert alert-notice" description="RR_REGULAR_EXPRESSIONS_ON_DESC" />
 		<field name="@toggler_search_regex_b" type="rl_toggler" />
-		<field name="search" type="rl_textareaplus" class="span12" height="120" resize="500" texttype="regex" default="" label="RR_SEARCH"
-			   description="RR_SEARCH_DESC" />
+		<field name="search" type="rl_textareaplus" class="span12" height="120" resize="500" texttype="regex" default=""
+			   label="RR_SEARCH" description="RR_SEARCH_DESC" />
 	</fieldset>
 
 	<fieldset name="replace">
-		<field name="replace" type="rl_textareaplus" class="span12" height="120" resize="500" texttype="regex" default="" label="RR_REPLACE"
-			   description="RR_REPLACE_DESC" />
+		<field name="replace" type="rl_textareaplus" class="span12" height="120" resize="500" texttype="regex" default=""
+			   label="RR_REPLACE" description="RR_REPLACE_DESC" />
 	</fieldset>
 
 	<fieldset name="xml">
@@ -88,8 +88,8 @@
 		<field name="@block_areas_enable_in_admin" type="note" class="alert alert-notice" description="RR_ENABLE_IN_ADMIN_ARE_YOU_SURE" />
 		<field name="@toggler_areas_enable_in_admin_b" type="rl_toggler" />
 
-		<field name="enable_in_edit_forms" type="radio" class="btn-group" default="0" label="RR_ENABLE_IN_EDIT_FORMS"
-			   description="RR_ENABLE_IN_EDIT_FORMS_DESC">
+		<field name="enable_in_edit_forms" type="radio" class="btn-group" default="0"
+			   label="RR_ENABLE_IN_EDIT_FORMS" description="RR_ENABLE_IN_EDIT_FORMS_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>

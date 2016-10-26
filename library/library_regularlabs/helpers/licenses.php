@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -30,6 +30,8 @@ class RLLicenses
 			return '';
 		}
 
+		require_once __DIR__ . '/text.php';
+
 		return
 			'<div class="alert rl_licence">'
 			. JText::sprintf('RL_IS_FREE_VERSION', $name)
@@ -38,7 +40,7 @@ class RLLicenses
 			. '<br>'
 			. '<a href="https://www.regularlabs.com/purchase?ext=' . $alias . '" target="_blank" class="btn btn-small btn-primary">'
 			. ' <span class="icon-basket"></span>'
-			. html_entity_decode(JText::_('RL_GO_PRO'), ENT_COMPAT, 'UTF-8')
+			. RLText::html_entity_decoder(JText::_('RL_GO_PRO'))
 			. '</a>'
 			. '</div>';
 	}

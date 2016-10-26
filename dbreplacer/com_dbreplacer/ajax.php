@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.1.0
+ * @version         5.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -166,130 +166,12 @@ class DBReplacer
 
 	private function getTableRow($rows, $cols)
 	{
-		$columns = $this->implodeParams($this->params->columns);
-		$search  = str_replace('||space||', ' ', $this->params->search);
-		$replace = str_replace('||space||', ' ', $this->params->replace);
-		$s1      = '|' . md5('<SEARCH TAG>') . '|';
-		$s2      = '|' . md5('</SEARCH TAG>') . '|';
-		$r1      = '|' . md5('<REPLACE TAG>') . '|';
-		$r2      = '|' . md5('</REPLACE TAG>') . '|';
-
 		foreach ($rows as $row)
 		{
 			$html[] = '<tr>';
 			foreach ($cols as $col)
 			{
-				$class = '';
-				$val   = $row->{$col};
-				if (!in_array($col, $columns))
-				{
-					$class = 'ghosted';
-					if ($val == '' || $val === null || $val == '0000-00-00')
-					{
-						if ($val === null)
-						{
-							$val = 'NULL';
-						}
-						$val = '<span class="null">' . $val . '</span>';
-					}
-					else
-					{
-						$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
-						if (strlen($val) > 300)
-						{
-							$val = substr($val, 0, 300) . '...';
-						}
-						$val = htmlentities($val, ENT_COMPAT, 'utf-8');
-					}
-				}
-				else
-				{
-					if ($search == 'NULL')
-					{
-						if ($val == '' || $val === null || $val == '0000-00-00')
-						{
-							if ($val === null)
-							{
-								$val = 'NULL';
-							}
-							if ($val === '')
-							{
-								$val = '&nbsp;';
-							}
-							$val = '<span class="search_string"><span class="null">' . $val . '</span></span><span class="replace_string">' . $replace . '</span>';
-						}
-						else
-						{
-							$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
-							if (strlen($val) > 300)
-							{
-								$val = substr($val, 0, 300) . '...';
-							}
-							$val = htmlentities($val, ENT_COMPAT, 'utf-8');
-						}
-					}
-					else if ($search == '*')
-					{
-						$class = 'search_string';
-						if (strlen($val) > 50)
-						{
-							$val = '*';
-							$class .= ' no-strikethrough';
-						}
-
-						$val = '<span class="' . $class . '"><span class="null">' . $val . '</span></span><span class="replace_string">' . $replace . '</span>';
-					}
-					else
-					{
-						if ($val === null)
-						{
-							$val = '<span class="null">NULL</span>';
-						}
-						else
-						{
-							$match = 0;
-							if ($search != '')
-							{
-								$s = $search;
-									$s = preg_quote($s, '#');
-									// replace multiple whitespace (with at least one enter) with regex whitespace match
-									$s = preg_replace('#\s*\n\s*#s', '\s*', $s);
-								$s = '#' . $s . '#s';
-								if (!$this->params->case)
-								{
-									$s .= 'i';
-								}
-								$r = $s1 . '\0' . $s2 . $r1 . $replace . $r2;
-
-								$match = @preg_match($s, $val);
-							}
-
-							if ($match)
-							{
-								$class = 'has_search';
-								$val   = preg_replace($s, $r, $val);
-								$val   = htmlentities($val, ENT_COMPAT, 'utf-8');
-								$val   = str_replace(' ', '&nbsp;', $val);
-								$val   = str_replace($s1, '<span class="search_string">', str_replace($s2, '</span>', $val));
-								$val   = str_replace($r1, '<span class="replace_string">', str_replace($r2, '</span>', $val));
-							}
-							else
-							{
-								$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
-								if (strlen($val) > 300)
-								{
-									$val = substr($val, 0, 300) . '...';
-								}
-								$val = htmlentities($val, ENT_COMPAT, 'utf-8');
-							}
-
-							if ($val == '0000-00-00')
-							{
-								$val = '<span class="null">' . $val . '</span>';
-							}
-						}
-					}
-				}
+				list($val, $class) = $this->getCellData($row, $col);
 				$val    = nl2br($val);
 				$html[] = '<td class="db_value ' . $class . '">' . $val . '</td>';
 			}
@@ -297,6 +179,139 @@ class DBReplacer
 		}
 
 		return implode('', $html);
+	}
+
+	function getCellData($row, $col)
+	{
+		$columns = $this->implodeParams($this->params->columns);
+
+		$class = '';
+		$val   = $row->{$col};
+
+		if (!in_array($col, $columns))
+		{
+			$class = 'ghosted';
+			if ($val == '' || $val === null || $val == '0000-00-00')
+			{
+				if ($val === null)
+				{
+					$val = 'NULL';
+				}
+				$val = '<span class="null">' . $val . '</span>';
+
+				return array($val, $class);
+			}
+			else
+			{
+				$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
+				if (strlen($val) > 300)
+				{
+					$val = substr($val, 0, 300) . '...';
+				}
+				$val = htmlentities($val, ENT_COMPAT, 'utf-8');
+			}
+
+			return array($val, $class);
+		}
+
+		$search  = str_replace('||space||', ' ', $this->params->search);
+		$replace = str_replace('||space||', ' ', $this->params->replace);
+
+
+		if ($search == 'NULL')
+		{
+			if ($val == '' || $val === null || $val == '0000-00-00')
+			{
+				if ($val === null)
+				{
+					$val = 'NULL';
+				}
+				if ($val === '')
+				{
+					$val = '&nbsp;';
+				}
+				$val = '<span class="search_string"><span class="null">' . $val . '</span></span><span class="replace_string">' . $replace . '</span>';
+
+				return array($val, $class);
+			}
+			$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
+			if (strlen($val) > 300)
+			{
+				$val = substr($val, 0, 300) . '...';
+			}
+			$val = htmlentities($val, ENT_COMPAT, 'utf-8');
+
+			return array($val, $class);
+		}
+
+		if ($search == '*')
+		{
+			$class = 'search_string';
+			if (strlen($val) > 50)
+			{
+				$val = '*';
+				$class .= ' no-strikethrough';
+			}
+
+			$val = '<span class="' . $class . '"><span class="null">' . $val . '</span></span><span class="replace_string">' . $replace . '</span>';
+
+			return array($val, $class);
+		}
+
+		if ($val === null)
+		{
+			$val = '<span class="null">NULL</span>';
+
+			return array($val, $class);
+		}
+
+		$s1 = '|' . md5('<SEARCH TAG>') . '|';
+		$s2 = '|' . md5('</SEARCH TAG>') . '|';
+		$r1 = '|' . md5('<REPLACE TAG>') . '|';
+		$r2 = '|' . md5('</REPLACE TAG>') . '|';
+
+		$match = 0;
+		if ($search != '')
+		{
+			$s = $search;
+				$s = preg_quote($s, '#');
+				// replace multiple whitespace (with at least one enter) with regex whitespace match
+				$s = preg_replace('#\s*\n\s*#s', '\s*', $s);
+			$s = '#' . $s . '#s';
+			if (!$this->params->case)
+			{
+				$s .= 'i';
+			}
+
+			$match = @preg_match($s, $val, $m);
+		}
+
+		if ($match)
+		{
+			$class = 'has_search';
+
+			$val = preg_replace($s, $s1 . '\0' . $s2 . $r1 . $replace . $r2, $val);
+			$val = htmlentities($val, ENT_COMPAT, 'utf-8');
+			$val = str_replace(' ', '&nbsp;', $val);
+			$val = str_replace($s1, '<span class="search_string">', str_replace($s2, '</span>', $val));
+			$val = str_replace($r1, '<span class="replace_string">', str_replace($r2, '</span>', $val));
+		}
+		else
+		{
+			$val = preg_replace('#^((.*?\n){4}).*?$#si', '\1...', $val);
+			if (strlen($val) > 300)
+			{
+				$val = substr($val, 0, 300) . '...';
+			}
+			$val = htmlentities($val, ENT_COMPAT, 'utf-8');
+		}
+
+		if ($val == '0000-00-00')
+		{
+			$val = '<span class="null">' . $val . '</span>';
+		}
+
+		return array($val, $class);
 	}
 
 	function getRows($cols, $max = 100)

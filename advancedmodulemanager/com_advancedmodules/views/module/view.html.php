@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -58,8 +58,10 @@ class AdvancedModulesViewModule extends JViewLegacy
 
 		if (preg_match('#_gk[1-9]#', $this->item->module))
 		{
+			require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
+
 			// Set message for Gavick modules
-			JFactory::getApplication()->enqueueMessage(JText::sprintf(html_entity_decode(JText::_('AMM_MODULE_INCOMPATIBLE')), '<a href="index.php?option=com_modules&force=1&task=module.edit&id=' . (int) $this->item->id . '">', '</a>'), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::sprintf(RLText::html_entity_decoder(JText::_('AMM_MODULE_INCOMPATIBLE')), '<a href="index.php?option=com_modules&force=1&task=module.edit&id=' . (int) $this->item->id . '">', '</a>'), 'warning');
 		}
 
 		$this->addToolbar();

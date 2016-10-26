@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -101,7 +101,7 @@ class PlgSystemAdvancedModulesHelper
 			JHtml::_('jquery.framework');
 
 			require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
-			RLFunctions::script('advancedmodules/frontediting.min.js', '6.0.1');
+			RLFunctions::script('advancedmodules/frontediting.min.js', '6.2.6');
 		}
 	}
 
@@ -128,9 +128,14 @@ class PlgSystemAdvancedModulesHelper
 
 	private function replaceLinksModules(&$string)
 	{
+		if (strpos($string, 'com_modules') === false)
+		{
+			return;
+		}
+
 		$string = preg_replace(
-			'#(\?option=com_)(modules[^a-z-_])#',
-			'\1advanced\2',
+			'#((["\'])[^\s"\'%]*\?option=com_)(modules[^a-z-_ "\']*?\2)#',
+			'\1advanced\3',
 			$string
 		);
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,19 +11,22 @@
 
 defined('_JEXEC') or die;
 
-require_once __DIR__ . '/script.install.helper.php';
-
-class RegularLabsInstallerScript extends RegularLabsInstallerScriptHelper
+if (!class_exists('RegularLabsInstallerScript'))
 {
-	public $name           = 'Regular Labs Library';
-	public $alias          = 'regularlabs';
-	public $extension_type = 'library';
+	require_once __DIR__ . '/script.install.helper.php';
 
-	public function onBeforeInstall()
+	class RegularLabsInstallerScript extends RegularLabsInstallerScriptHelper
 	{
-		if (!$this->isNewer())
+		public $name           = 'Regular Labs Library';
+		public $alias          = 'regularlabs';
+		public $extension_type = 'library';
+
+		public function onBeforeInstall()
 		{
-			return false;
+			if (!$this->isNewer())
+			{
+				return false;
+			}
 		}
 	}
 }

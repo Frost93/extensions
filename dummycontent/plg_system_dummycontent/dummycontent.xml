@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_dummycontent</name>
 	<description>PLG_SYSTEM_DUMMYCONTENT_DESC</description>
-	<version>3.0.0</version>
-	<creationDate>April 2016</creationDate>
+	<version>3.0.3</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -50,8 +50,8 @@
 				</field>
 
 				<field name="@toggler_type_paragraphs_a" type="rl_toggler" param="type" value="paragraphs" />
-				<field name="paragraphs_count" type="list" default="5" class="input-mini" label="DC_DEFAULT_PARAGRAPHS_COUNT"
-					   description="DC_DEFAULT_PARAGRAPHS_COUNT_DESC">
+				<field name="paragraphs_count" type="list" default="5" class="input-mini"
+					   label="DC_DEFAULT_PARAGRAPHS_COUNT" description="DC_DEFAULT_PARAGRAPHS_COUNT_DESC">
 					<option value="1">J1</option>
 					<option value="2">J2</option>
 					<option value="3">J3</option>
@@ -66,13 +66,13 @@
 				<field name="@toggler_wordlist_paragraphs_b" type="rl_toggler" />
 
 				<field name="@toggler_type_sentences_a" type="rl_toggler" param="type" value="sentences" />
-				<field name="sentences_count" type="text" default="10" class="input-mini" label="DC_DEFAULT_SENTENCES_COUNT"
-					   description="DC_DEFAULT_SENTENCES_COUNT_DESC" />
+				<field name="sentences_count" type="text" default="10" class="input-mini"
+					   label="DC_DEFAULT_SENTENCES_COUNT" description="DC_DEFAULT_SENTENCES_COUNT_DESC" />
 				<field name="@toggler_wordlist_sentences_b" type="rl_toggler" />
 
 				<field name="@toggler_type_words_a" type="rl_toggler" param="type" value="words" />
-				<field name="words_count" type="text" default="200" class="input-mini" label="DC_DEFAULT_WORDS_COUNT"
-					   description="DC_DEFAULT_WORDS_COUNT_DESC" />
+				<field name="words_count" type="text" default="200" class="input-mini"
+					   label="DC_DEFAULT_WORDS_COUNT" description="DC_DEFAULT_WORDS_COUNT_DESC" />
 				<field name="@toggler_wordlist_words_b" type="rl_toggler" />
 
 				<field name="@toggler_type_list_a" type="rl_toggler" param="type" value="list" />
@@ -109,8 +109,8 @@
 			<fieldset name="advanced">
 				<field name="@block_tag_a" type="rl_block" start="1" label="RL_TAG_SYNTAX" />
 				<field name="tag" type="text" default="dummy" label="DC_TAG" description="DC_TAG_DESC" />
-				<field name="tag_characters" type="list" default="{.}" class="input-small" label="RL_TAG_CHARACTERS"
-					   description="RL_TAG_CHARACTERS_DESC">
+				<field name="tag_characters" type="list" default="{.}" class="input-small"
+					   label="RL_TAG_CHARACTERS" description="RL_TAG_CHARACTERS_DESC">
 					<option value="{.}">{...}</option>
 					<option value="[.]">[...]</option>
 					<option value="{{.}}">{{...}}</option>

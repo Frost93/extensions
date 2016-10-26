@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.2
+ * @version         2.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -17,15 +17,9 @@
 defined('_JEXEC') or die;
 JHtml::_('behavior.tabstate');
 
-$app  = JFactory::getApplication();
-$user = JFactory::getUser();
-
-// ACL for hardening the access to the template manager.
-if (!$user->authorise('core.manage', 'com_templates'))
+if (!JFactory::getUser()->authorise('core.manage', 'com_templates'))
 {
-	$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-
-	return false;
+	throw new JAccessExceptionNotallowed(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 }
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';

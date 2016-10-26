@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -65,27 +65,31 @@ class PlgSystemContentTemplaterHelperContent
 
 	private function getContentHtmlList($item)
 	{
-		$options = $this->getOptions($item->items);
+		list($options, $categories) = $this->getOptions($item->items);
 
-		return
-			'<div id="contenttemplater-list-' . $this->editor . '-' . $item->id . '" class="contenttemplater-list">'
-			. '<ul role="menu" class="dropdown-menu">'
-			. '<li>' . implode('</li><li>', $options) . '</li>'
-			. '</ul>'
-			. '</div>';
+		$layout = new JLayoutFile('list', dirname(__DIR__) . '/layouts');
+
+		return $layout->render(array(
+			'id'      => 'contenttemplater-list-' . $this->editor . '-' . $item->id,
+			'options' => $options,
+			'categories' => $categories,
+		));
 	}
 
 	public function getContentHtmlModal($item)
 	{
-		$options = $this->getOptions($item->items, true);
+		$filter_category = JFactory::getApplication()->input->get('catid');
 
-		return
-			'<div id="contenttemplater-modal-' . $this->editor . '-' . $item->id . '" tabindex="-1"  class="contenttemplater-modal">' . '<h3>' . JText::_('INSERT_TEMPLATE') . '</h3>'
-			. '<div class="row-fluid">'
-			. '<ul class="list list-striped"><li>' . implode('</li><li>', $options) . '</li></ul>'
-			. '</div>'
-			. $this->getContentHtmlModalFooter()
-			. '</div>';
+		list($options, $categories) = $this->getOptions($item->items, true, $filter_category);
+
+		$layout = new JLayoutFile('modal', dirname(__DIR__) . '/layouts');
+
+		return $layout->render(array(
+			'form_id'    => 'contenttemplater-modal-' . $this->editor . '-' . $item->id,
+			'options'    => $options,
+			'categories' => $categories,
+			'footer'     => $this->getContentHtmlModalFooter(),
+		));
 	}
 
 	private function getContentHtmlModalFooter()
@@ -102,28 +106,20 @@ class PlgSystemContentTemplaterHelperContent
 			return '';
 		}
 
-		return
-			'<a target="_blank" href="index.php?option=com_contenttemplater&view=item&layout=edit" class="btn">'
-			. '<span class="icon-save-new"></span> '
-			. JText::_('CT_CREATE_NEW_TEMPLATE')
-			. '</a>'
+		$layout = new JLayoutFile('modal_footer', dirname(__DIR__) . '/layouts');
 
-			. ' '
-
-			. '<a target="_blank" href="index.php?option=com_contenttemplater" class="btn">'
-			. '<span class="icon-reglab icon-contenttemplater"></span> '
-			. JText::_('CT_MANAGE_TEMPLATES')
-			. '</a>';
+		return $layout->render('');
 	}
 
-	private function getOptions($items, $is_modal = false)
+	private function getOptions($items, $is_modal = false, $filter_category = null)
 	{
+		$options    = array();
+		$categories = array();
+
 		if (empty($items))
 		{
-			return array();
+			return array($options, $categories);
 		}
-
-		$options = array();
 
 		$onclick = ($is_modal ? 'parent.' : '')
 			. 'ContentTemplater.loadTemplate([:ID:], \'' . $this->editor . '\', false, ' . ($is_modal ? 'true' : 'false') . ');';
@@ -136,6 +132,16 @@ class PlgSystemContentTemplaterHelperContent
 
 		foreach ($items as $item)
 		{
+			if ($item->category != $previous_category)
+			{
+				$categories[] = $item->category;
+			}
+
+			if ($filter_category && $filter_category != $item->category)
+			{
+				continue;
+			}
+
 			if ($this->params->display_categories == 'titled' && $item->category != $previous_category)
 			{
 				$options[] = '<span><strong>' . $item->category . '</strong></span>';
@@ -143,17 +149,22 @@ class PlgSystemContentTemplaterHelperContent
 
 			$image = $this->getItemImage($item->image);
 
-			$options[] = '<a class="hasPopover" data-trigger="hover"'
-				. ' title="' . $item->text . '" data-content="' . $item->description . '"'
-				. ' href="javascript:;" onclick="' . str_replace('[:ID:]', $item->id, $onclick) . ';return false;"'
-				. '>'
-				. $image . $item->text
-				. '</a>';
+			$layout = new JLayoutFile('option', dirname(__DIR__) . '/layouts');
+
+			$options[] = $layout->render(array(
+				'text'        => $item->text,
+				'description' => $item->description,
+				'onclick'     => str_replace('[:ID:]', $item->id, $onclick) . ';return false;',
+				'image'       => $image,
+			));
 
 			$previous_category = $item->category;
 		}
 
-		return $options;
+		$categories = array_unique($categories);
+		asort($categories);
+
+		return array($options, $categories);
 	}
 
 	private function getItemImage($image)

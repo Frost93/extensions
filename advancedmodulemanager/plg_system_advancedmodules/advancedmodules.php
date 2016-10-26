@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -40,7 +40,7 @@ class PlgSystemAdvancedModules extends JPlugin
 
 	public function onAfterRoute()
 	{
-		if (JFactory::getDocument()->getType() != 'html')
+		if (!in_array(JFactory::getDocument()->getType(), array('html', 'raw', 'ajax')))
 		{
 			return;
 		}

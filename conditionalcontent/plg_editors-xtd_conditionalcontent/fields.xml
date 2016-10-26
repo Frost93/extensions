@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config addfieldpath="/libraries/regularlabs/fields">
+	<fieldset name="contents">
+		<field name="tag_type" type="radio" class="btn-group" default="show" label="COC_TAG_TYPE_DESC">
+			<option value="show">JSHOW</option>
+			<option value="hide">JHIDE</option>
+		</field>
+
+		<field name="content" type="rl_textareaplus" default="" hint="COC_CONTENT_TEXT" translate="true"
+			   label="COC_CONTENT" description="COC_CONTENT_DESC" />
+
+		<field name="use_content_else" type="radio" class="btn-group" default="0"
+			   label="COC_USE_ALTERNATIVE_CONTENT" description="COC_USE_ALTERNATIVE_CONTENT_DESC">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+		<field name="@toggler_use_content_else_1a" type="rl_toggler" param="use_content_else" value="1" />
+		<field name="content_else" type="rl_textareaplus" default="" hint="COC_ALTERNATIVE_CONTENT_TEXT" translate="true"
+			   label="COC_ALTERNATIVE_CONTENT" description="COC_ALTERNATIVE_CONTENT_DESC" />
+		<field name="@toggler_use_content_else_1b" type="rl_toggler" />
+	</fieldset>
+	<fieldset name="conditions">
+		<field name="matching_method" type="radio" class="btn-group" default="all"
+			   label="RL_MATCHING_METHOD" description="COC_MATCHING_METHOD_DESC,RL_ALL,COC_ALL_DESC,RL_ANY,COC_ANY_DESC">
+			<option value="all">RL_ALL</option>
+			<option value="any">RL_ANY</option>
+		</field>
+		<field name="@toggler_match_1a" type="rl_toggler" param="matching_method" value="all" />
+		<field name="@block_and" type="note" class="alert alert-info" description="COC_ALL_DESC" />
+		<field name="@toggler_match_1b" type="rl_toggler" />
+		<field name="@toggler_match_2a" type="rl_toggler" param="matching_method" value="any" />
+		<field name="@block_or" type="note" class="alert alert-info" description="COC_ANY_DESC" />
+		<field name="@toggler_match_2b" type="rl_toggler" />
+
+		<field name="menuitems" type="rl_assignmentselection" use_main_toggle="false" label="RL_MENU_ITEMS" />
+		<field name="menuitems_selection" type="rl_menuitems" multiple="true" default="" label="RL_SELECTION" description="RL_MENU_ITEMS_DESC" />
+		<field name="@menuitems" type="rl_assignmentselection" use_main_toggle="false" />
+
+		<field name="homepage" type="rl_assignmentselection" use_main_toggle="false" label="RL_HOME_PAGE" />
+		<field name="@text_homepage" type="note" description="RL_HOME_PAGE_DESC" />
+		<field name="@homepage" type="rl_assignmentselection" use_main_toggle="false" />
+
+		<field name="@block_group_date_a" type="rl_block" start="1" label="RL_DATE_TIME" />
+
+		<field name="date" type="rl_assignmentselection" use_main_toggle="false" label="RL_DATE" />
+		<field name="date_publish_up" type="calendar" filter="user_utc" format="%Y-%m-%d %H:%M" default=""
+			   label="RL_START_PUBLISHING" description="RL_START_PUBLISHING_DESC" />
+		<field name="date_publish_down" type="calendar" filter="user_utc" format="%Y-%m-%d %H:%M" default=""
+			   label="RL_FINISH_PUBLISHING" description="RL_FINISH_PUBLISHING_DESC" />
+		<field name="@text_date_1" type="note" description="RL_DATE_TIME_DESC" />
+		<field name="@text_date_2" type="rl_datetime" format="Y-m-d H:i" label="RL_CURRENT_DATE" />
+		<field name="@date" type="rl_assignmentselection" use_main_toggle="false" />
+
+
+		<field name="@block_group_date_b" type="rl_block" end="1" />
+
+		<field name="@block_group_users_a" type="rl_block" start="1" label="RL_USERS" />
+		<field name="accesslevels" type="rl_assignmentselection" use_main_toggle="false" label="RL_ACCESS_LEVELS" />
+		<field name="accesslevels_selection" type="rl_accesslevel" multiple="true" use_names="true" notregistered="1" default=""
+			   label="RL_SELECTION" description="RL_ACCESS_LEVELS_DESC" />
+		<field name="@accesslevels" type="rl_assignmentselection" use_main_toggle="false" />
+
+		<field name="usergrouplevels" type="rl_assignmentselection" use_main_toggle="false" label="RL_USER_GROUP_LEVELS" />
+		<field name="usergrouplevels_selection" type="rl_grouplevel" multiple="true" use_names="true" notregistered="1" default=""
+			   label="RL_SELECTION" description="RL_USER_GROUPS_DESC" />
+		<field name="@usergrouplevels" type="rl_assignmentselection" use_main_toggle="false" />
+
+
+		<field name="@block_group_users_b" type="rl_block" end="1" />
+
+		<field name="languages" type="rl_assignmentselection" use_main_toggle="false" label="RL_LANGUAGES" />
+		<field name="languages_selection" type="rl_languages" multiple="true" default="" label="RL_SELECTION" description="RL_LANGUAGES_DESC" />
+		<field name="@languages" type="rl_assignmentselection" use_main_toggle="false" />
+
+
+		
+
+		
+
+		
+
+		<field name="devices" type="rl_assignmentselection" use_main_toggle="false" label="RL_DEVICES" />
+		<field name="@text_devices" type="note" description="RL_DEVICES_DESC" />
+		<field name="devices_selection" type="rl_list" multiple="true" default=""
+			   label="RL_SELECTION" description="RL_DEVICES_DESC">
+			<option value="desktop">RL_DEVICE_DESKTOP</option>
+			<option value="tablet">RL_DEVICE_TABLET</option>
+			<option value="mobile">RL_DEVICE_MOBILE</option>
+		</field>
+		<field name="@devices" type="rl_assignmentselection" use_main_toggle="false" />
+
+
+		
+
+		
+
+		
+
+		
+
+		
+	</fieldset>
+</config>

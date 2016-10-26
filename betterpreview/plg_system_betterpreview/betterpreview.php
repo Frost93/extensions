@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -148,6 +148,11 @@ class PlgSystemBetterPreview extends JPlugin
 			return;
 		}
 
+		if (RLProtect::isRestrictedComponent($params->disabled_components))
+		{
+			return;
+		}
+
 		$type = $this->ispreview ? 'preview' : 'link';
 
 		// Include the Helpers
@@ -175,10 +180,10 @@ class PlgSystemBetterPreview extends JPlugin
 				JHtml::_('jquery.framework');
 				JHtml::_('bootstrap.tooltip');
 
-				RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-				RLFunctions::script('betterpreview/script.min.js', '5.0.1');
-				RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
-				RLFunctions::stylesheet('betterpreview/style.min.css', '5.0.1');
+				RLFunctions::script('regularlabs/script.min.js');
+				RLFunctions::script('betterpreview/script.min.js', '5.2.2');
+				RLFunctions::stylesheet('regularlabs/style.min.css');
+				RLFunctions::stylesheet('betterpreview/style.min.css', '5.2.2');
 
 				break;
 		}
@@ -191,7 +196,6 @@ class PlgSystemBetterPreview extends JPlugin
 			return;
 		}
 
-		$this->helper->restoreStates();
 		$this->helper->renderPreview($article, $context);
 	}
 
@@ -205,6 +209,7 @@ class PlgSystemBetterPreview extends JPlugin
 		switch (true)
 		{
 			case ($this->ispreview):
+				$this->helper->restoreStates();
 				$this->helper->addMessages();
 				break;
 

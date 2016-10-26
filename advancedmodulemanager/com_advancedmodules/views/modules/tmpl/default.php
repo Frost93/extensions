@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -30,11 +30,15 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 $trashed   = $this->state->get('filter.state') == -2 ? true : false;
 $canOrder  = $user->authorise('core.edit.state', 'com_modules');
 $saveOrder = ($listOrder == 'ordering');
+
+$langs = JLanguage::getKnownLanguages(constant('JPATH_' . strtoupper($client)));
+
 if ($saveOrder)
 {
 	$saveOrderingUrl = 'index.php?option=com_advancedmodules&task=modules.saveOrderAjax&tmpl=component';
 	JHtml::_('sortablelist.sortable', 'moduleList', 'adminForm', strtolower($listDirn), $saveOrderingUrl);
 }
+
 $showcolors = ($client == 'site' && $this->config->show_color);
 if ($showcolors)
 {
@@ -51,7 +55,7 @@ if ($showcolors)
 	JFactory::getDocument()->addScriptDeclaration($script);
 }
 
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_advancedmodules'); ?>" method="post" name="adminForm" id="adminForm">
 	<?php if (!empty($this->sidebar)) : ?>
@@ -119,7 +123,7 @@ RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 						<th width="10%" class="nowrap hidden-phone">
 							<?php echo JHtml::_('searchtools.sort', 'JGRID_HEADING_ACCESS', 'a.access', $listDirn, $listOrder); ?>
 						</th>
-						<th width="5%" class="nowrap hidden-phone">
+						<th width="10%" class="nowrap hidden-phone">
 							<?php echo JHtml::_('searchtools.sort', 'JGRID_HEADING_LANGUAGE', 'language', $listDirn, $listOrder); ?>
 						</th>
 						<th width="1%" class="nowrap center hidden-phone">
@@ -268,7 +272,7 @@ RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 							</td>
 							<td class="small hidden-phone">
 								<?php
-								if ($item->language == '')
+								if (empty($item->language))
 								{
 									echo JText::_('JDEFAULT');
 								}
@@ -293,8 +297,12 @@ RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
 								}
 								else
 								{
-									$language_params = json_decode($item->language_params);
-									echo !empty($language_params->name) ? $this->escape($language_params->name) : JText::_('JUNDEFINED');
+									echo $item->language_title
+										? JHtml::_('image', 'mod_languages/' . $item->language_image . '.gif', $item->language_title, array('title' => $item->language_title), true) . '&nbsp;' . $this->escape($item->language_title)
+										: ((isset($langs[$item->language]) && !empty($langs[$item->language]['name']))
+											? $this->escape($langs[$item->language]['name'])
+											: JText::_('JUNDEFINED')
+										);
 								}
 								?>
 							</td>

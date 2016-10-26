@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,6 +15,8 @@
  */
 
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 /**
  * Modules Component Module Model
@@ -40,14 +42,17 @@ class AdvancedModulesModelModules extends JModelList
 				'checked_out', 'a.checked_out',
 				'checked_out_time', 'a.checked_out_time',
 				'published', 'a.published', 'state',
-				'access', 'a.access', 'access_level',
+				'access', 'a.access',
+				'ag.title', 'access_level',
 				'ordering', 'a.ordering',
 				'module', 'a.module',
-				'language', 'a.language', 'language_title',
+				'language', 'a.language',
+				'l.title', 'language_title',
 				'publish_up', 'a.publish_up',
 				'publish_down', 'a.publish_down',
 				'client_id', 'a.client_id',
 				'position', 'a.position',
+				'menuitem',
 				'menuid',
 				'name', 'e.name',
 			);
@@ -367,17 +372,17 @@ class AdvancedModulesModelModules extends JModelList
 		$query = $db->getQuery(true)
 			// Select the required fields from the table.
 			->select('a.id')
-			->from('#__modules AS a')
+			->from($db->quoteName('#__modules', 'a'))
 			// Join over the module menus
-			->join('LEFT', '#__modules_menu AS mm ON mm.moduleid = a.id')
+			->join('LEFT', $db->quoteName('#__modules_menu', 'mm') . ' ON ' . $db->quoteName('mm.moduleid') . ' = ' . $db->quoteName('a.id'))
 			// Join over the extensions
-			->join('LEFT', '#__extensions AS e ON e.element = a.module');
+			->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.element') . ' = ' . $db->quoteName('a.module'));
 
 		// Filter by module
 		$module = $this->getState('filter.module');
 		if ($module)
 		{
-			$query->where('a.module = ' . $db->quote($module));
+			$query->where($db->quoteName('a.module') . ' = ' . $db->quote($module));
 		}
 
 		$wheres = array();
@@ -390,26 +395,27 @@ class AdvancedModulesModelModules extends JModelList
 			case '':
 				break;
 			case '0':
-				$wheres[] = 'mm.menuid = 0';
+				$wheres[] = $db->quoteName('mm.menuid') . ' = 0';
 				break;
 			case '-':
-				$wheres[] = 'mm.menuid IS NULL';
+				$wheres[] = $db->quoteName('mm.menuid') . ' IS NULL';
 				break;
 			case '-1':
-				$wheres[] = 'mm.menuid LIKE \'-%\'';
+				$wheres[] = $db->quoteName('mm.menuid') . ' LIKE \'-%\'';
 				break;
 			case '-2':
-				$wheres[] = 'mm.menuid NOT LIKE \'-%\' AND mm.menuid != 0';
+				$wheres[] = $db->quoteName('mm.menuid') . ' NOT LIKE \'-%\' AND ' . $db->quoteName('mm.menuid') . ' != 0';
 				break;
 			default:
-				$wheres[] = '(mm.menuid IN (0, ' . (int) $menuid . ') OR (mm.menuid LIKE \'-%\' AND mm.menuid != ' . $db->quote('-' . (int) $menuid) . '))';
+				$wheres[] = '(' . $db->quoteName('mm.menuid') . ' IN (0, ' . (int) $menuid . ')'
+					. ' OR (' . $db->quoteName('mm.menuid') . ' LIKE \'-%\' AND ' . $db->quoteName('mm.menuid') . ' != ' . $db->quote('-' . (int) $menuid) . '))';
 				break;
 		}
 
 		// Filter by position
 		if ($position = $this->getState('filter.position'))
 		{
-			$wheres[] = 'a.position = ' . $db->quote($position != 'none' ? $position : '');
+			$wheres[] = $db->quoteName('a.position') . ' = ' . $db->quote($position != 'none' ? $position : '');
 		}
 
 		// Filter by access level.
@@ -421,7 +427,7 @@ class AdvancedModulesModelModules extends JModelList
 		// Filter on the language.
 		if ($language = $this->getState('filter.language'))
 		{
-			$wheres[] = 'a.language = ' . $db->quote($language);
+			$wheres[] = $db->quoteName('a.language') . ' = ' . $db->quote($language);
 		}
 
 		// Filter by published state
@@ -435,11 +441,11 @@ class AdvancedModulesModelModules extends JModelList
 
 		if (is_numeric($published))
 		{
-			$wheres[] = 'a.published = ' . (int) $published;
+			$wheres[] = $db->quoteName('a.published') . ' = ' . (int) $published;
 		}
 		elseif ($published == '')
 		{
-			$wheres[] = '(a.published IN (0, 1))';
+			$wheres[] = '(' . $db->quoteName('a.published') . ' IN (0, 1))';
 		}
 
 		// Filter by client.
@@ -453,7 +459,8 @@ class AdvancedModulesModelModules extends JModelList
 
 		if (is_numeric($clientId))
 		{
-			$wheres[] = 'a.client_id = ' . (int) $clientId . ' AND e.client_id =' . (int) $clientId;
+			$wheres[] = $db->quoteName('a.client_id') . ' = ' . (int) $clientId
+				. ' AND ' . $db->quoteName('e.client_id') . ' =' . (int) $clientId;
 		}
 
 		// Modal view should return only specific language and ALL
@@ -461,13 +468,13 @@ class AdvancedModulesModelModules extends JModelList
 		{
 			if (JFactory::getApplication()->isSite() && JLanguageMultilang::isEnabled())
 			{
-				$query->where('a.language in (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+				$query->where($db->quoteName('a.language') . ' in (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 			}
 		}
 		elseif ($language = $this->getState('filter.language'))
 		{
 			// Filter on the language.
-			$query->where('a.language = ' . $db->quote($language));
+			$query->where($db->quoteName('a.language') . ' = ' . $db->quote($language));
 		}
 
 		// Set wheres
@@ -483,12 +490,15 @@ class AdvancedModulesModelModules extends JModelList
 		{
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where('a.id = ' . (int) substr($search, 3));
+				$query->where($db->quoteName('a.id') . ' = ' . (int) substr($search, 3));
 			}
 			else
 			{
 				$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-				$query->where('(' . 'a.title LIKE ' . $search . ' OR a.note LIKE ' . $search . ')');
+				$query->where('('
+					. $db->quoteName('a.title') . ' LIKE ' . $search
+					. ' OR ' . $db->quoteName('a.note') . ' LIKE ' . $search
+					. ')');
 			}
 		}
 
@@ -510,13 +520,13 @@ class AdvancedModulesModelModules extends JModelList
 			$mirror_wheres = $wheres;
 			array_unshift(
 				$mirror_wheres,
-				'aa.mirror_id IN (' . implode(',', $ids) . ',-' . implode(',-', $ids) . ')'
+				$db->quoteName('aa.mirror_id') . ' IN (' . implode(',', $ids) . ',-' . implode(',-', $ids) . ')'
 			);
 
 			$query->clear('where');
 
 			// Join advanced params
-			$query->join('LEFT', '#__advancedmodules AS aa ON aa.moduleid = a.id');
+			$query->join('LEFT', $db->quoteName('#__advancedmodules', 'aa') . ' ON ' . $db->quoteName('aa.moduleid') . ' = ' . $db->quoteName('a.id'));
 
 			// Set wheres
 			foreach ($mirror_wheres as $where)
@@ -553,24 +563,27 @@ class AdvancedModulesModelModules extends JModelList
 			)
 			->from('#__modules AS a')
 			// Join over the language
-			->select('l.manifest_cache AS language_params')
-			->join('LEFT', '#__extensions AS l ON l.element = a.language')
+			->select($db->quoteName('l.title', 'language_title'))
+			->select($db->quoteName('l.image', 'language_image'))
+			->join('LEFT', $db->quoteName('#__languages', 'l') . ' ON ' . $db->quoteName('l.lang_code') . ' = ' . $db->quoteName('a.language'))
+			->select($db->quoteName('le.element', 'language'))
+			->join('LEFT', $db->quoteName('#__extensions', 'le') . ' ON ' . $db->quoteName('le.element') . ' = ' . $db->quoteName('a.language'))
 			// Join over the users for the checked out user.
-			->select('uc.name AS editor')
-			->join('LEFT', '#__users AS uc ON uc.id = a.checked_out')
+			->select($db->quoteName('uc.name', 'editor'))
+			->join('LEFT', $db->quoteName('#__users', 'uc') . ' ON ' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out'))
 			// Join over the asset groups.
-			->select('ag.title AS access_level')
-			->join('LEFT', '#__viewlevels AS ag ON ag.id = a.access')
+			->select($db->quoteName('ag.title', 'access_level'))
+			->join('LEFT', $db->quoteName('#__viewlevels', 'ag') . ' ON ' . $db->quoteName('ag.id') . ' = ' . $db->quoteName('a.access'))
 			// Join over the module menus
 			->select('MIN(mm.menuid) AS menuid')
-			->join('LEFT', '#__modules_menu AS mm ON mm.moduleid = a.id')
+			->join('LEFT', $db->quoteName('#__modules_menu', 'mm') . ' ON ' . $db->quoteName('mm.moduleid') . ' = ' . $db->quoteName('a.id'))
 			// Join over the extensions
-			->select('e.name AS name')
-			->join('LEFT', '#__extensions AS e ON e.element = a.module')
+			->select($db->quoteName('e.name', 'name'))
+			->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.element') . ' = ' . $db->quoteName('a.module'))
 			// Join over the advanced params
-			->select('aa.params AS advancedparams')
-			->select('aa.mirror_id AS mirror_id')
-			->join('LEFT', '#__advancedmodules AS aa ON aa.moduleid = a.id')
+			->select($db->quoteName('aa.params', 'advancedparams'))
+			->select($db->quoteName('aa.mirror_id', 'mirror_id'))
+			->join('LEFT', $db->quoteName('#__advancedmodules', 'aa') . ' ON ' . $db->quoteName('aa.moduleid') . ' = ' . $db->quoteName('a.id'))
 			// Group
 			->group(
 				'a.id, a.title, a.note, a.position, a.module, a.language, a.checked_out,' .
@@ -587,7 +600,7 @@ class AdvancedModulesModelModules extends JModelList
 
 		$ids = array_unique($ids);
 
-		$query->where('a.id IN (' . implode(',', $ids) . ')');
+		$query->where($db->quoteName('a.id') . ' IN (' . implode(',', $ids) . ')');
 
 		return $query;
 	}

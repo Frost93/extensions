@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -20,33 +20,36 @@ class RLAssignmentsGeo extends RLAssignment
 	/**
 	 * passContinents
 	 */
-	function passContinents()
+	public function passContinents()
 	{
 		if (!$this->getGeo() || empty($this->geo->continentCode))
 		{
 			return $this->pass(false);
 		}
 
-		return $this->passSimple($this->geo->continentCode);
+		return $this->passSimple(array($this->geo->continent, $this->geo->continentCode));
 	}
 
 	/**
 	 * passCountries
 	 */
-	function passCountries()
+	public function passCountries()
 	{
+		$this->getGeo();
+
 		if (!$this->getGeo() || empty($this->geo->countryCode))
 		{
 			return $this->pass(false);
 		}
 
-		return $this->passSimple($this->geo->countryCode);
+
+		return $this->passSimple(array($this->geo->country, $this->geo->countryCode));
 	}
 
 	/**
 	 * passRegions
 	 */
-	function passRegions()
+	public function passRegions()
 	{
 		if (!$this->getGeo() || empty($this->geo->countryCode) || empty($this->geo->regionCodes))
 		{
@@ -65,7 +68,7 @@ class RLAssignmentsGeo extends RLAssignment
 	/**
 	 * passPostalcodes
 	 */
-	function passPostalcodes()
+	public function passPostalcodes()
 	{
 		if (!$this->getGeo() || empty($this->geo->postalCode))
 		{
@@ -95,6 +98,12 @@ class RLAssignmentsGeo extends RLAssignment
 		$geo = new GeoIp($ip);
 
 		$this->geo = $geo->get();
+
+		if (JDEBUG)
+		{
+			JLog::addLogger(array('text_file' => 'regularlabs_geoip.log.php'), JLog::ALL, array('regularlabs_geoip'));
+			JLog::add(json_encode($this->geo), JLog::DEBUG, 'regularlabs_geoip');
+		}
 
 		return $this->geo;
 	}

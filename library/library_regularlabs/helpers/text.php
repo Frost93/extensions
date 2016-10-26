@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -561,7 +561,7 @@ class RLText
 		$string = str_replace(array('&lt;', '&gt;'), '', $string);
 
 		// Convert html entities
-		$string = html_entity_decode($string, ENT_COMPAT, 'UTF-8');
+		$string = RLText::html_entity_decoder($string);
 
 		// Convert to lowercase
 		$string = RLString::strtolower($string);
@@ -624,7 +624,7 @@ class RLText
 
 		foreach ($matches as $title)
 		{
-			$matches[] = htmlspecialchars(html_entity_decode($title, ENT_COMPAT, 'UTF-8'));
+			$matches[] = htmlspecialchars(RLText::html_entity_decoder($title));
 		}
 
 		$matches = array_unique($matches);
@@ -814,5 +814,31 @@ class RLText
 		}
 
 		return preg_match('#^[a-zA-Z0-9]+$#', $string);
+	}
+
+	public static function convertWysiwygToPlainText($string)
+	{
+		// replace chr style enters with normal enters
+		$string = str_replace(array(chr(194) . chr(160), '&#160;', '&nbsp;'), ' ', $string);
+
+		// replace linbreak tags with normal linebreaks (paragraphs, enters, etc).
+		$enter_tags = array('p', 'br');
+		$regex      = '#</?((' . implode(')|(', $enter_tags) . '))+[^>]*?>\n?#si';
+		$string     = preg_replace($regex, " \n", $string);
+
+		// replace indent characters with spaces
+		$string = preg_replace('#<' . 'img [^>]*/sourcerer/images/tab\.png[^>]*>#si', '    ', $string);
+
+		// strip all other tags
+		$regex  = '#<(/?\w+((\s+\w+(\s*=\s*(?:".*?"|\'.*?\'|[^\'">\s]+))?)+\s*|\s*)/?)>#si';
+		$string = preg_replace($regex, "", $string);
+
+		// reset htmlentities
+		$string = RLText::html_entity_decoder($string);
+
+		// convert protected html entities &_...; -> &...;
+		$string = preg_replace('#&_([a-z0-9\#]+?);#i', '&\1;', $string);
+
+		return $string;
 	}
 }

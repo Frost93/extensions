@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="editors-xtd" method="upgrade">
 	<name>plg_editors-xtd_sourcerer</name>
 	<description>PLG_EDITORS-XTD_SOURCERER_DESC</description>
-	<version>6.0.2</version>
-	<creationDate>May 2016</creationDate>
+	<version>6.3.4</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>

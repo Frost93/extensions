@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -96,7 +96,7 @@ class PlgSystemSliders extends JPlugin
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/protect.php';
 
-		if (RLProtect::isProtectedPage($this->_alias, 1))
+		if (RLProtect::isProtectedPage($this->_alias, true, array()))
 		{
 			return false;
 		}

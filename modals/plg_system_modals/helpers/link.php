@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -24,6 +24,8 @@ class PlgSystemModalsHelperLink
 
 	public function buildLink($attributes, $data, $content = '')
 	{
+
+		$this->setVideoUrl($attributes, $data);
 
 		$isexternal = $this->helpers->get('file')->isExternal($attributes->href);
 		$ismedia    = $this->helpers->get('file')->isMedia($attributes->href);
@@ -85,13 +87,44 @@ class PlgSystemModalsHelperLink
 	{
 		$attributes = $this->prepareLinkAttributeList($link);
 
-		// map href to url
-		$string = preg_replace('#^href=#', 'url=', $string);
+		RLTags::protectSpecialChars($string);
 
-		$tag = RLTags::getTagValues(
-			$string,
-			($attributes->href ? array() : array('url'))
+		$is_old_syntax =
+			(strpos($string, '|') !== false)
+			|| (strpos($string, '"') === false && strpos($string, '&quot;') === false);
+
+		if ($is_old_syntax)
+		{
+			// Replace open attribute with open=1
+			$string = preg_replace('#(^|\|)open($|\|)#', '\1open=1\2', $string);
+
+			// Add empty url attribute to beginning if no url/href attribute is there,
+			// to prevent issues with grabbing values from old syntax
+			if (preg_match('#^([a-z]+)=#s', $string, $match))
+			{
+				if ($match['1'] != 'url' && $match['1'] != 'href')
+				{
+					$string = 'url=|' . $string;
+				}
+			}
+		}
+
+		RLTags::unprotectSpecialChars($string);
+
+		$known_boolean_keys = array(
+			'openOnce', 'inline', 'iframe',
+			'auto_titles',
 		);
+
+		// Get the values from the tag
+		$tag = RLTags::getValuesFromString($string, 'url', $known_boolean_keys);
+
+		$key_aliases = array(
+			'url'     => array('href', 'link', 'image', 'src'),
+			'gallery' => array('galery', 'images'),
+		);
+
+		RLTags::replaceKeyAliases($tag, $key_aliases);
 
 		if (!empty($tag->url))
 		{
@@ -114,6 +147,16 @@ class PlgSystemModalsHelperLink
 		$attributes->class .= !empty($tag->class) ? ' ' . $tag->class : '';
 		unset($tag->class);
 
+		if (!empty($tag->title))
+		{
+			$tag->title = $this->translateString($tag->title);
+		}
+
+		if (!empty($tag->description))
+		{
+			$tag->description = $this->translateString($tag->description);
+		}
+
 		// move onSomething params to attributes, except the modal callbacks
 		$callbacks = array('onopen', 'onload', 'oncomplete', 'oncleanup', 'onclosed');
 		foreach ($tag as $key => $val)
@@ -131,13 +174,6 @@ class PlgSystemModalsHelperLink
 
 		$data = array();
 
-		// set data by keys set in tag without values (and see them as true)
-		foreach ($tag->params as $key)
-		{
-			$data[strtolower($key)] = 'true';
-		}
-		unset($tag->params);
-
 
 		// set data by values set in tag
 		foreach ($tag as $key => $val)
@@ -148,11 +184,85 @@ class PlgSystemModalsHelperLink
 		return array($attributes, $data, $extra);
 	}
 
+	private function translateString($string = '')
+	{
+		if (empty($string) || !preg_match('#^[A-Z][A-Z0-9_]+$#', $string))
+		{
+			return $string;
+		}
+
+		return JText::_($string);
+	}
+
 	private function cleanUrl($url)
 	{
 		return preg_replace('#<a[^>]*>(.*?)</a>#si', '\1', $url);
 	}
 
+	private function setVideoUrl(&$attributes, &$data)
+	{
+
+		$attributes->href = $this->fixVideoUrl($attributes->href);
+	}
+
+	private function fixVideoUrl($url)
+	{
+		switch (true)
+		{
+			case(
+				strpos($url, 'youtu.be') !== false
+				|| strpos($url, 'youtube.com') !== false
+			) :
+				return $this->fixUrlYoutube($url);
+
+			case(
+				strpos($url, 'vimeo.com') !== false
+			) :
+				return $this->fixUrlVimeo($url);
+		}
+
+		return $url;
+	}
+
+	private function fixUrlYoutube($url)
+	{
+		if (!preg_match(
+			'#(?:^youtube=|youtu\.be/?|youtube\.com/embed/?|youtube\.com\/watch\?v=)([^/&\?]+)(?:\?|&amp;|&)?(.*)$#i',
+			trim($url),
+			$parts
+		)
+		)
+		{
+			return $url;
+		}
+
+		$url = 'https://www.youtube.com/embed/' . $parts['1'] . '?' . $parts['2'];
+
+		if (strpos($parts['2'], 'wmode=transparent') !== false)
+		{
+			return $url;
+		}
+
+		return $url . '&wmode=transparent';
+	}
+
+	private function fixUrlVimeo($url)
+	{
+		if (!preg_match(
+			'#(?:^vimeo=|vimeo\.com/(?:video/)?)([0-9]+)(.*)$#i',
+			trim($url),
+			$parts
+		)
+		)
+		{
+			return $url;
+		}
+
+		return
+			'https://player.vimeo.com/video/'
+			. $parts['1']
+			. $parts['2'];
+	}
 
 	private function prepareLinkAttributeList($link)
 	{

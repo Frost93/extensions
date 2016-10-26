@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,34 +15,47 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsTags extends RLAssignment
 {
-	function passTags()
+	public function passTags()
 	{
-		$is_content = in_array($this->request->option, array('com_content', 'com_flexicontent'));
+		if (in_array($this->request->option, array('com_content', 'com_flexicontent')))
+		{
+			return $this->passTagsContent();
+		}
 
-		if (!$is_content)
+		if ($this->request->option != 'com_tags'
+			|| $this->request->view != 'tag'
+			|| !$this->request->id
+		)
 		{
 			return $this->pass(false);
 		}
 
+		return $this->passTag($this->request->id);
+	}
+
+	private function passTagsContent()
+	{
 		$is_item     = in_array($this->request->view, array('', 'article', 'item'));
 		$is_category = in_array($this->request->view, array('category'));
 
-		if ($is_item)
+		switch (true)
 		{
-			$prefix = 'com_content.article';
-		}
-		else if ($is_category)
-		{
-			$prefix = 'com_content.category';
-		}
-		else
-		{
-			return $this->pass(false);
+			case ($is_item):
+				$prefix = 'com_content.article';
+				break;
+
+			case ($is_category):
+				$prefix = 'com_content.category';
+				break;
+
+			default:
+				return $this->pass(false);
 		}
 
 		// Load the tags.
 		$query = $this->db->getQuery(true)
 			->select($this->db->quoteName('t.id'))
+			->select($this->db->quoteName('t.title'))
 			->from('#__tags AS t')
 			->join(
 				'INNER', '#__contentitem_tag_map AS m'
@@ -51,7 +64,7 @@ class RLAssignmentsTags extends RLAssignment
 				. ' AND m.content_item_id IN ( ' . $this->request->id . ')'
 			);
 		$this->db->setQuery($query);
-		$tags = $this->db->loadColumn();
+		$tags = $this->db->loadObjectList();
 
 		if (empty($tags))
 		{
@@ -60,7 +73,7 @@ class RLAssignmentsTags extends RLAssignment
 
 		foreach ($tags as $tag)
 		{
-			if (!$this->passTag($tag))
+			if (!$this->passTag($tag->id) && !$this->passTag($tag->title))
 			{
 				continue;
 			}

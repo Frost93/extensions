@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,7 +29,7 @@ $fid = JFactory::getApplication()->input->get('fid');
 		);
 
 		previewdata = [];
-		els = data.form.elements;
+		els         = data.form.elements;
 		for (i = 0; i < els.length; i++) {
 			el = els[i];
 			if (!el || el.name == undefined || !el.name || (data.isjform && el.name.substr(0, 6) != "jform[")) {

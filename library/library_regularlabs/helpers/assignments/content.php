@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -210,14 +210,24 @@ class RLAssignmentsContent extends RLAssignment
 			return $this->article;
 		}
 
-		require_once JPATH_SITE . '/components/com_content/models/article.php';
-		$model         = JModelLegacy::getInstance('article', 'contentModel');
+		if (!class_exists('ContentModelArticle'))
+		{
+			require_once JPATH_SITE . '/components/com_content/models/article.php';
+		}
+
+		$model = JModelLegacy::getInstance('article', 'contentModel');
+
+		if (!method_exists($model, 'getItem'))
+		{
+			return null;
+		}
+
 		$this->article = $model->getItem($this->request->id);
 
 		return $this->article;
 	}
 
-	public function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'categories');
 	}

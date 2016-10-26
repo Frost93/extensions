@@ -20,8 +20,8 @@
 
 	<fieldset name="params">
 		<field name="mainclass" type="text" default="" label="TAB_MAIN_CLASS" description="TAB_MAIN_CLASS_DESC" />
-		<field name="color_inactive_handles" type="radio" class="btn-group" default="" label="TAB_COLOR_INACTIVE_HANDLES"
-			   description="TAB_COLOR_INACTIVE_HANDLES_DESC">
+		<field name="color_inactive_handles" type="radio" class="btn-group" default=""
+			   label="TAB_COLOR_INACTIVE_HANDLES" description="TAB_COLOR_INACTIVE_HANDLES_DESC">
 			<option value="">JDEFAULT</option>
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>

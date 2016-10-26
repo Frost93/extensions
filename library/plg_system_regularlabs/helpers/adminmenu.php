@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,7 +29,7 @@ class PlgSystemRegularLabsAdminMenuHelper
 			return;
 		}
 
-		if (!preg_match_all('#<li><a class="menu-[^>]*>Regular Labs [^<]*</a></li>#si', $html, $matches))
+		if (!preg_match_all('#<li><a class="(?:no-dropdown )?menu-[^>]*>Regular Labs [^<]*</a></li>#si', $html, $matches))
 		{
 			return;
 		}
@@ -45,15 +45,17 @@ class PlgSystemRegularLabsAdminMenuHelper
 
 		foreach ($menu_items as $i => &$menu_item)
 		{
-			preg_match('#class="menu-(.*?)"#s', $menu_item, $icon);
+			preg_match('#class="(?:no-dropdown )?menu-(.*?)"#s', $menu_item, $icon);
+
+			$icon = str_replace('icon-icon-', 'icon-', 'icon-' . $icon['1']);
 
 			$menu_item = str_replace(
 				array('>Regular Labs - ', '>Regular Labs '),
-				'><span class="icon-reglab icon-' . $icon['1'] . '"></span> ',
+				'><span class="icon-reglab ' . $icon . '"></span> ',
 				$menu_item
 			);
 
-			if ($icon['1'] != 'regularlabsmanager')
+			if ($icon != 'icon-regularlabsmanager')
 			{
 				continue;
 			}
@@ -73,9 +75,9 @@ class PlgSystemRegularLabsAdminMenuHelper
 		$new_menu_item =
 			'<li class="dropdown-submenu">'
 			. '<a class="dropdown-toggle menu-regularlabs" data-toggle="dropdown" ' . $main_link . '>Regular Labs</a>'
-			. '<ul id="menu-cregularlabs" class="dropdown-menu menu-component">'
-			. implode('', $menu_items)
-			. '</ul>'
+			. "\n" . '<ul id="menu-cregularlabs" class="dropdown-menu menu-scrollable menu-component">'
+			. "\n" . implode("\n", $menu_items)
+			. "\n" . '</ul>'
 			. '</li>';
 
 		$first = array_shift($matches['0']);

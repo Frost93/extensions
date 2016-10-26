@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -128,7 +128,7 @@ class PlgSystemModalsHelperPass
 			return false;
 		}
 
-		$urls = array($url, html_entity_decode($url, ENT_COMPAT, 'UTF-8'));
+		$urls = array($url, RLText::html_entity_decoder($url));
 
 		foreach ($urls as $url)
 		{

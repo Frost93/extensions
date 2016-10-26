@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -23,6 +23,7 @@ if ($user->get('guest')
 }
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/string.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
 $parameters = RLParameters::getInstance();
 $params     = $parameters->getPluginParams('articlesanywhere');
@@ -266,8 +267,8 @@ class PlgButtonArticlesAnywherePopup
 				<div class="btn-toolbar" id="toolbar">
 					<div class="btn-wrapper" id="toolbar-options">
 						<button
-							onclick="window.open('index.php?option=com_plugins&filter_folder=system&filter_search=articles anywhere');"
-							class="btn btn-small">
+								onclick="window.open('index.php?option=com_plugins&filter_folder=system&filter_search=articles anywhere');"
+								class="btn btn-small">
 							<span class="icon-options"></span> <?php echo JText::_('JOPTIONS') ?>
 						</button>
 					</div>
@@ -285,27 +286,71 @@ class PlgButtonArticlesAnywherePopup
 					$tag = $tag_start . $plugin_tag . ' ' . JText::_('JGRID_HEADING_ID') . '/' . JText::_('JGLOBAL_TITLE') . '/' . JText::_('JFIELD_ALIAS_LABEL') . $tag_end
 						. $tag_data_start . JText::_('AA_DATA') . $tag_data_end
 						. $tag_start . '/' . $plugin_tag . $tag_end;
-					echo html_entity_decode(JText::sprintf('AA_CLICK_ON_ONE_OF_THE_ARTICLE_LINKS', $tag), ENT_COMPAT, 'UTF-8');
+					echo RLText::html_entity_decoder(JText::sprintf('AA_CLICK_ON_ONE_OF_THE_ARTICLE_LINKS', $tag));
 					?>
 				</div>
 
 				<div class="row-fluid form-vertical">
-					<div class="span3 well well">
-						<div class="control-group">
-							<label id="data_title_enable-lbl" for="data_title_enable" class="control-label"
-							       rel="tooltip" title="<?php echo JText::_('AA_TITLE_TAG_DESC'); ?>">
-								<?php echo JText::_('JGLOBAL_TITLE'); ?>
-							</label>
+					<div class="span3">
+						<div class="well">
+							<div class="control-group">
+								<label id="data_title_enable-lbl" for="data_title_enable" class="control-label"
+								       rel="tooltip" title="<?php echo JText::_('AA_TITLE_TAG_DESC'); ?>">
+									<?php echo JText::_('JGLOBAL_TITLE'); ?>
+								</label>
 
-							<div class="controls">
-								<fieldset id="data_title_enable" class="radio btn-group">
-									<input type="radio" id="data_title_enable0" name="data_title_enable"
-									       value="0" <?php echo !$params->data_title_enable ? 'checked="checked"' : ''; ?>>
-									<label for="data_title_enable0"><?php echo JText::_('JNO'); ?></label>
-									<input type="radio" id="data_title_enable1" name="data_title_enable"
-									       value="1" <?php echo $params->data_title_enable ? 'checked="checked"' : ''; ?>>
-									<label for="data_title_enable1"><?php echo JText::_('JYES'); ?></label>
-								</fieldset>
+								<div class="controls">
+									<fieldset id="data_title_enable" class="radio btn-group">
+										<input type="radio" id="data_title_enable0" name="data_title_enable"
+										       value="0" <?php echo !$params->data_title_enable ? 'checked="checked"' : ''; ?>>
+										<label for="data_title_enable0"><?php echo JText::_('JNO'); ?></label>
+										<input type="radio" id="data_title_enable1" name="data_title_enable"
+										       value="1" <?php echo $params->data_title_enable ? 'checked="checked"' : ''; ?>>
+										<label for="data_title_enable1"><?php echo JText::_('JYES'); ?></label>
+									</fieldset>
+								</div>
+							</div>
+
+							<div rel="data_title_enable" class="toggle_div" style="display:none;">
+								<div class="control-group">
+									<label id="data_text_type-lbl" for="data_text_type" class="control-label" rel="tooltip"
+									       title="<?php echo JText::_('AA_TITLE_HEADING_DESC'); ?>">
+										<?php echo JText::_('AA_TITLE_HEADING'); ?>
+									</label>
+
+									<div class="controls">
+										<select name="data_title_heading">
+											<option value=""<?php echo !$params->data_title_heading ? 'selected="selected"' : ''; ?>>
+												<?php echo JText::_('JNONE'); ?>
+											</option>
+											<?php for ($i = 1; $i <= 6; $i++) : ?>
+												<option value="<?php echo 'h' . $i; ?>"<?php echo $params->data_title_heading == 'h' . $i ? 'selected="selected"' : ''; ?>>
+													<?php echo JText::_('RL_HEADING_' . $i); ?>
+												</option>
+											<?php endfor; ?>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="well">
+							<div class="control-group">
+								<label id="data_intro_image_enable-lbl" for="data_intro_image_enable" class="control-label"
+								       rel="tooltip" title="<?php echo JText::_('AA_INTRO_IMAGE_TAG_DESC'); ?>">
+									<?php echo JText::_('COM_CONTENT_FIELD_INTRO_LABEL'); ?>
+								</label>
+
+								<div class="controls">
+									<fieldset id="data_intro_image_enable" class="radio btn-group">
+										<input type="radio" id="data_intro_image_enable0" name="data_intro_image_enable"
+										       value="0" <?php echo !$params->data_intro_image_enable ? 'checked="checked"' : ''; ?>>
+										<label for="data_intro_image_enable0"><?php echo JText::_('JNO'); ?></label>
+										<input type="radio" id="data_intro_image_enable1" name="data_intro_image_enable"
+										       value="1" <?php echo $params->data_intro_image_enable ? 'checked="checked"' : ''; ?>>
+										<label for="data_intro_image_enable1"><?php echo JText::_('JYES'); ?></label>
+									</fieldset>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -340,16 +385,13 @@ class PlgButtonArticlesAnywherePopup
 
 								<div class="controls">
 									<select name="data_text_type">
-										<option
-											value="text"<?php echo $params->data_text_type == 'text' ? 'selected="selected"' : ''; ?>>
+										<option value="text"<?php echo $params->data_text_type == 'text' ? 'selected="selected"' : ''; ?>>
 											<?php echo JText::_('AA_ALL_TEXT'); ?>
 										</option>
-										<option
-											value="introtext"<?php echo $params->data_text_type == 'introtext' ? 'selected="selected"' : ''; ?>>
+										<option value="introtext"<?php echo $params->data_text_type == 'introtext' ? 'selected="selected"' : ''; ?>>
 											<?php echo JText::_('AA_INTRO_TEXT'); ?>
 										</option>
-										<option
-											value="fulltext"<?php echo $params->data_text_type == 'fulltext' ? 'selected="selected"' : ''; ?>>
+										<option value="fulltext"<?php echo $params->data_text_type == 'fulltext' ? 'selected="selected"' : ''; ?>>
 											<?php echo JText::_('AA_FULL_TEXT'); ?>
 										</option>
 									</select>
@@ -537,7 +579,21 @@ class PlgButtonArticlesAnywherePopup
 					var str = '';
 
 					if ($('input[name="data_title_enable"]:checked').val() == 1) {
-						str += ' ' + td_start + 'title' + td_end;
+						var title_heading = $('select[name="data_title_heading"]').val();
+
+						var heading_start = '';
+						var heading_end   = ' ';
+
+						if (title_heading) {
+							heading_start = '</p><' + title_heading + '>';
+							heading_end   = '</' + title_heading + '><p>';
+
+						}
+						str += heading_start + td_start + 'title' + td_end + heading_end;
+					}
+
+					if ($('input[name="data_intro_image_enable"]:checked').val() == 1) {
+						str += td_start + 'image-intro' + td_end + ' ';
 					}
 
 					if ($('input[name="data_text_enable"]:checked').val() == 1) {
@@ -552,7 +608,7 @@ class PlgButtonArticlesAnywherePopup
 							tag += ' strip="1"';
 						}
 
-						str += ' ' + td_start + tag + td_end;
+						str += td_start + tag + td_end + ' ';
 					}
 
 					if ($('input[name="data_readmore_enable"]:checked').val() == 1) {
@@ -568,7 +624,7 @@ class PlgButtonArticlesAnywherePopup
 							tag += ' class="' + readmore_class + '"';
 						}
 
-						str += ' ' + td_start + tag + td_end;
+						str += td_start + tag + td_end + ' ';
 					}
 
 					if ($('input[name="enable_div"]:checked').val() == 1) {
@@ -586,10 +642,9 @@ class PlgButtonArticlesAnywherePopup
 							params[params.length] = 'class="' + $('input[name="div_class"]').val() + '"';
 						}
 						str = td_start + ('div ' + params.join(' ') ).trim() + td_end
-							+ str.trim()
-							+ td_start + '/div' + td_end;
+								+ str.trim()
+								+ td_start + '/div' + td_end;
 					}
-
 
 					if (content_type == 'k2') {
 						id = 'type="k2" id="' + id.replace(/"/g, '\\"') + '"';
@@ -598,8 +653,8 @@ class PlgButtonArticlesAnywherePopup
 					}
 
 					str = t_start + '<?php echo $plugin_tag; ?> ' + id + t_end
-						+ str.trim()
-						+ t_start + '/<?php echo $plugin_tag; ?>' + t_end;
+							+ str.trim()
+							+ t_start + '/<?php echo $plugin_tag; ?>' + t_end;
 
 					window.parent.jInsertEditorText(str, '<?php echo JFactory::getApplication()->input->getString('name', 'text'); ?>');
 					window.parent.SqueezeBox.close();

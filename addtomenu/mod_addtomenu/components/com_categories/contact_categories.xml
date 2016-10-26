@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addtomenu>
 	<name>Add to Menu Component XML - com_categories : All Contact Categories</name>
-	<version>5.0.0</version>
+	<version>5.0.5</version>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>

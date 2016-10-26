@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modules Anywhere
- * @version         5.0.0
+ * @version         6.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -382,13 +382,16 @@ class PlgSystemModulesAnywhereHelper
 		}
 
 		$type = trim($data['type']);
-		$id   = trim($data['id']);
 
 		// The core loadposition tag supports chrome after a comma. Modules Anywhere uses a bar.
 		if ($type == 'loadposition')
 		{
-			$id = str_replace(',', '|', $id);
+			$data['id'] = str_replace(',', '|', $data['id']);
 		}
+
+		$tag = $this->getTagValues($data);
+
+		$id = trim($tag->id);
 
 		$chrome     = '';
 		$forcetitle = 0;
@@ -396,39 +399,18 @@ class PlgSystemModulesAnywhereHelper
 		$ignores   = array();
 		$overrides = array();
 
-		$vars = str_replace('\|', '[:MA_BAR:]', $id);
-		$vars = explode('|', $vars);
-		$id   = array_shift($vars);
-
-		foreach ($vars as $var)
+		if ($this->params->override_style && isset($tag->style))
 		{
-			$var = trim(str_replace('[:MA_BAR:]', '|', $var));
+			$chrome = $tag->style;
+		}
 
-			if (!$var)
-			{
-				continue;
-			}
-
-			if (strpos($var, '=') === false)
-			{
-				if ($this->params->override_style)
-				{
-					$chrome = $var;
-				}
-
-				continue;
-			}
-
-			if ($type != $this->params->module_tag)
-			{
-				continue;
-			}
-
-			list($key, $val) = explode('=', $var, 2);
-			$val = str_replace(array('\{', '\}'), array('{', '}'), $val);
-
+		foreach ($tag as $key => $val)
+		{
 			switch ($key)
 			{
+				case 'id':
+					break;
+
 				case 'style':
 					$chrome = $val;
 					break;
@@ -502,6 +484,70 @@ class PlgSystemModulesAnywhereHelper
 		return $id;
 	}
 
+	private function getTagValues($data)
+	{
+		$string = RLText::html_entity_decoder($data['id']);
+
+		if (strpos($string, '="') == false)
+		{
+			$string = $this->convertTagToNewSyntax($string, $data['type']);
+		}
+
+		$known_boolean_keys = array(
+			'ignore_access', 'ignore_state', 'ignore_assignments', 'ignore_caching',
+			'showtitle',
+		);
+
+		// Get the values from the tag
+		$set = RLTags::getValuesFromString($string, 'id', $known_boolean_keys);
+
+		$key_aliases = array(
+			'id'    => array('ids', 'module', 'position', 'title', 'alias'),
+			'style' => array('module_style', 'chrome'),
+		);
+
+		RLTags::replaceKeyAliases($set, $key_aliases);
+
+		return $set;
+	}
+
+	private function convertTagToNewSyntax($string, $tag_type)
+	{
+		RLTags::protectSpecialChars($string);
+
+		if (strpos($string, '|') == false && strpos($string, ':') == false)
+		{
+			RLTags::unprotectSpecialChars($string);
+
+			return $string;
+		}
+
+		RLTags::protectSpecialChars($string);
+
+		$sets = explode('|', $string);
+
+		foreach ($sets as $i => &$set)
+		{
+			if ($i == 0)
+			{
+				$set = 'id="' . $set . '"';
+				continue;
+			}
+
+			if (strpos($set, '=') == false)
+			{
+				$set = 'style="' . $set . '"';
+				continue;
+			}
+
+			$key_val = explode('=', $set, 2);
+
+			$set = $key_val['0'] . '="' . $key_val['1'] . '"';
+		}
+
+		return implode(' ', $sets);
+	}
+
 	function processPosition($position, $chrome = 'none')
 	{
 		$document = clone JFactory::getDocument();
@@ -561,7 +607,7 @@ class PlgSystemModulesAnywhereHelper
 		$db->setQuery($query);
 		$module = $db->loadObject();
 
-		if ($module && !$ignore_assignments)
+		if (!$ignore_assignments)
 		{
 			$this->applyAssignments($module);
 		}
@@ -671,6 +717,11 @@ class PlgSystemModulesAnywhereHelper
 
 	function applyAssignments(&$module)
 	{
+		if (empty($module))
+		{
+			return;
+		}
+
 		$this->setModulePublishState($module);
 
 		if (empty($module->published))
@@ -681,6 +732,11 @@ class PlgSystemModulesAnywhereHelper
 
 	function setModulePublishState(&$module)
 	{
+		if (empty($module->id))
+		{
+			return;
+		}
+
 		$module->published = true;
 
 		// for old Advanced Module Manager versions
@@ -712,7 +768,8 @@ class PlgSystemModulesAnywhereHelper
 			->where('mm.moduleid = ' . (int) $module->id)
 			->where('(mm.menuid = ' . ((int) JFactory::getApplication()->input->getInt('Itemid')) . ' OR mm.menuid <= 0)');
 		$db->setQuery($query);
-		$result            = $db->loadResult();
+		$result = $db->loadResult();
+
 		$module->published = !empty($result);
 	}
 

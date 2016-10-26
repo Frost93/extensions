@@ -1,6 +1,6 @@
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,7 +27,7 @@ var modalsResize = null;
 		var modal_delay = null;
 
 		$.each($('.' + modals_class), function(i, el) {
-			var $el      = $(el);
+			var $el = $(el);
 
 			// Prevent modals from being initialised multiple times when initModals is triggered again
 			if ($el.attr('data-modal-done')) {
@@ -69,6 +69,12 @@ var modalsResize = null;
 
 			
 			defaults['onComplete'] = function() {
+				$('.cboxIframe').attr({
+					webkitAllowFullScreen: true,
+					mozallowfullscreen   : true,
+					allowFullScreen      : true
+				});
+
 				modalsResize();
 
 
@@ -93,13 +99,13 @@ var modalsResize = null;
 
 		$(document).bind('cbox_open', function() {
 			$("#colorbox").swipe({
-				swipeLeft : function(event, direction, distance, duration, fingerCount) {
+				swipeLeft            : function(event, direction, distance, duration, fingerCount) {
 					$.colorbox.next();
 				},
-				swipeRight: function(event, direction, distance, duration, fingerCount) {
+				swipeRight           : function(event, direction, distance, duration, fingerCount) {
 					$.colorbox.prev();
 				},
-				fallbackToMouseEvents : false
+				fallbackToMouseEvents: false
 			});
 		});
 	};

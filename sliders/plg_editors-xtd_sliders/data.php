@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -42,7 +42,7 @@ class PlgButtonSnippetsHelper
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$icon = 'reglab icon-snippets';
 		$link = 'index.php?rl_qp=1'

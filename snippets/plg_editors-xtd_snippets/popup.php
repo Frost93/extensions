@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -18,6 +18,7 @@ if (JFactory::getUser()->get('guest'))
 
 require_once JPATH_ADMINISTRATOR . '/components/com_snippets/helpers/helper.php';
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/string.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/parameters.php';
 $parameters = RLParameters::getInstance();
 $params     = $parameters->getComponentParams('snippets');
@@ -50,7 +51,6 @@ class PlgButtonSnippetsPopup
 
 		$filter_order     = $app->getUserStateFromRequest('filter_order', 'filter_order', 'ordering', 'cmd');
 		$filter_order_Dir = $app->getUserStateFromRequest('filter_order_Dir', 'filter_order_Dir', '', 'word');
-		$filter_state     = $app->getUserStateFromRequest('filter_state', 'filter_state', $config->get('state', ''), 'word');
 		$filter_search    = $app->getUserStateFromRequest('filter_search', 'filter_search', '', 'string');
 		$filter_search    = RLString::strtolower($filter_search);
 
@@ -60,7 +60,8 @@ class PlgButtonSnippetsPopup
 		require_once JPATH_ADMINISTRATOR . '/components/com_snippets/models/list.php';
 		$list = new SnippetsModelList;
 
-		$list->setState('filter.state', $filter_state);
+		$list->setState('filter.state', '');
+		$list->setState('filter.category', '');
 		$list->setState('filter.search', $filter_search);
 		$list->setState('filter.limit', $limit);
 		$list->setState('filter.limitstart', $limitstart);
@@ -75,7 +76,6 @@ class PlgButtonSnippetsPopup
 			'order_Dir'     => $filter_order_Dir,
 			'order'         => $filter_order,
 			'filter_search' => $filter_search,
-			'state'         => $filter_state,
 		);
 
 		$this->outputHTML();
@@ -97,8 +97,8 @@ class PlgButtonSnippetsPopup
 		RLFunctions::loadLanguage('plg_system_regularlabs');
 		RLFunctions::loadLanguage('com_snippets');
 
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		// Add scripts and styles
 		$script = "
@@ -126,7 +126,7 @@ class PlgButtonSnippetsPopup
 		<div class="container-fluid container-main">
 			<form action="" method="post" name="adminForm" id="adminForm">
 				<div class="well well-small">
-					<?php echo html_entity_decode(JText::_('SNP_CLICK_ON_ONE_OF_THE_SNIPPETS'), ENT_COMPAT, 'UTF-8'); ?>
+					<?php echo RLText::html_entity_decoder(JText::_('SNP_CLICK_ON_ONE_OF_THE_SNIPPETS')); ?>
 				</div>
 
 				<div style="clear:both;"></div>
@@ -167,7 +167,7 @@ class PlgButtonSnippetsPopup
 							</th>
 							<?php if ($this->hasCategories) : ?>
 								<th width="5%" class="nowrap left hidden-phone">
-									<?php echo JHtml::_('searchtools.sort', 'JCATEGORY', 'category', $this->filters['order_Dir'], $this->filters['order']); ?>
+									<?php echo JHtml::_('grid.sort', 'JCATEGORY', 'category', $this->filters['order_Dir'], $this->filters['order']); ?>
 								</th>
 							<?php endif; ?>
 							<th width="5%" class="nowrap center hidden-phone">

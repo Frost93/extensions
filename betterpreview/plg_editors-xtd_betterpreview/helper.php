@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -48,7 +48,7 @@ class PlgButtonBetterPreviewHelper
 		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		if ($itemId = $this->helper->getItemId($url))
 		{
@@ -102,6 +102,8 @@ class PlgButtonBetterPreviewHelper
 			$icon = 'reglab icon-' . $icon;
 		}
 
+		$width = $this->params->preview_window_width ? (int) $this->params->preview_window_width : 'window.getSize().x-100';
+
 		if (!defined('BETTERPREVIEW_INIT') && $this->params->display_toolbar_button)
 		{
 			JHTML::_('behavior.modal');
@@ -110,7 +112,7 @@ class PlgButtonBetterPreviewHelper
 			// Generate html for toolbar button
 			$html    = array();
 			$html[]  = '<a href="' . $link . '" class="btn btn-small betterpreview_link modal' . ($this->params->button_primary ? ' btn-primary' : '') . '"'
-				. ' rel="{handler: \'iframe\', size: {x:window.getSize().x-100, y: window.getSize().y-100}}">';
+				. ' rel="{handler: \'iframe\', size: {x: ' . $width . ', y: window.getSize().y-100}}">';
 			$html[]  = '<span class="icon-' . $icon . '"></span> ';
 			$html[]  = $text;
 			$html[]  = '</a>';
@@ -125,7 +127,7 @@ class PlgButtonBetterPreviewHelper
 			$button->link    = $link;
 			$button->text    = $text;
 			$button->name    = $icon;
-			$button->options = "{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}";
+			$button->options = '{handler: \'iframe\', size: {x: ' . $width . ', y: window.getSize().y-100}}';
 		}
 
 		return $button;

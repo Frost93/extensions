@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,7 +11,10 @@
 
 defined('_JEXEC') or die;
 
-include_once JPATH_SITE . '/components/com_content/helpers/route.php';
+if (!class_exists('ContentHelperRoute'))
+{
+	require_once JPATH_SITE . '/components/com_content/helpers/route.php';
+}
 
 class HelperBetterPreviewHelperContentArticle extends PlgSystemBetterPreviewHelper
 {
@@ -32,19 +35,6 @@ class HelperBetterPreviewHelperContentArticle extends PlgSystemBetterPreviewHelp
 		);
 
 		$item->url = ContentHelperRoute::getArticleRoute($item->id, $item->parent, $item->language);
-
-		$default_menu_item = JFactory::getApplication()->getMenu('site')->getDefault($item->language);
-		if (empty($default_menu_item))
-		{
-			$default_menu_item = JFactory::getApplication()->getMenu('site')->getDefault();
-		}
-		$default_menu_url = $default_menu_item->link . '&Itemid=' . $default_menu_item->id;
-
-		if (!$this->params->use_home_menu_id && $item->url != $default_menu_url)
-		{
-			// Remove the home Itemid
-			$item->url = preg_replace('#&(amp;)?Itemid=' . $default_menu_item->id . '$#', '', $item->url);
-		}
 
 		return $item;
 	}

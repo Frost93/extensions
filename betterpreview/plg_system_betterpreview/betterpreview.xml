@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_betterpreview</name>
 	<description>PLG_SYSTEM_BETTERPREVIEW_DESC</description>
-	<version>5.0.1</version>
-	<creationDate>April 2016</creationDate>
+	<version>5.2.2</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -49,19 +49,19 @@
 					   url="https://www.regularlabs.com/betterpreview" />
 			</fieldset>
 			<fieldset name="BP_SETTINGS_LINK">
-				<field name="display_title_link" type="radio" class="btn-group" default="1" label="BP_DISPLAY_TITLE_LINK"
-					   description="BP_DISPLAY_TITLE_LINK_DESC">
+				<field name="display_title_link" type="radio" class="btn-group" default="1"
+					   label="BP_DISPLAY_TITLE_LINK" description="BP_DISPLAY_TITLE_LINK_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
-				<field name="display_status_link" type="radio" class="btn-group" default="1" label="BP_DISPLAY_STATUS_LINK"
-					   description="BP_DISPLAY_STATUS_LINK_DESC">
+				<field name="display_status_link" type="radio" class="btn-group" default="1"
+					   label="BP_DISPLAY_STATUS_LINK" description="BP_DISPLAY_STATUS_LINK_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
 				<field name="@toggler_display_status_link_a" type="rl_toggler" param="display_status_link" value="1" />
-				<field name="reverse_status_link" type="radio" class="btn-group" default="1" label="BP_REVESE_STATUS_LINK"
-					   description="BP_REVESE_STATUS_LINK_DESC">
+				<field name="reverse_status_link" type="radio" class="btn-group" default="1"
+					   label="BP_REVERSE_STATUS_LINK" description="BP_REVERSE_STATUS_LINK_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -76,13 +76,13 @@
 			</fieldset>
 
 			<fieldset name="BP_SETTINGS_PREVIEW">
-				<field name="display_editor_button" type="radio" class="btn-group" default="1" label="RL_DISPLAY_EDITOR_BUTTON"
-					   description="RL_DISPLAY_EDITOR_BUTTON_DESC">
+				<field name="display_editor_button" type="radio" class="btn-group" default="1"
+					   label="RL_DISPLAY_EDITOR_BUTTON" description="RL_DISPLAY_EDITOR_BUTTON_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
-				<field name="display_toolbar_button" type="radio" class="btn-group" default="1" label="RL_DISPLAY_TOOLBAR_BUTTON"
-					   description="RL_DISPLAY_TOOLBAR_BUTTON_DESC">
+				<field name="display_toolbar_button" type="radio" class="btn-group" default="1"
+					   label="RL_DISPLAY_TOOLBAR_BUTTON" description="RL_DISPLAY_TOOLBAR_BUTTON_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -96,6 +96,7 @@
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
+				<field name="preview_window_width" type="text" default="" size="5" class="input-mini" label="BP_PREVIEW_WINDOW_WIDTH" description="BP_PREVIEW_WINDOW_WIDTH_DESC" />
 				<!--field name="enable_frontend" type="radio" class="btn-group" default="1" label="RL_ENABLE_IN_FRONTEND" description="RL_ENABLE_IN_FRONTEND_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
@@ -104,10 +105,10 @@
 
 			<fieldset name="advanced">
 				<field name="index_timeout" type="text" default="24" size="5" class="input-mini" label="BP_INDEX_TIMEOUT" description="BP_INDEX_TIMEOUT_DESC" />
-				<field name="@purgesefs" type="rl_ajax" url="index.php?bp_purgesefs=1" text="BP_PURGE" label="BP_PURGE_INDEX"
-					   description="BP_PURGE_INDEX_DESC" />
-				<field name="purge_component_cache" type="radio" default="1" class="btn-group" label="BP_PURGE_COMPONENT_CACHE"
-					   description="BP_PURGE_COMPONENT_CACHE_DESC">
+				<field name="@purgesefs" type="rl_ajax" url="index.php?bp_purgesefs=1" text="BP_PURGE"
+					   label="BP_PURGE_INDEX" description="BP_PURGE_INDEX_DESC" />
+				<field name="purge_component_cache" type="radio" default="1" class="btn-group"
+					   label="BP_PURGE_COMPONENT_CACHE" description="BP_PURGE_COMPONENT_CACHE_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -119,10 +120,12 @@
 				<field name="@text_comp" type="rl_plaintext"
 					   description="&#60;&#99;&#101;&#110;&#116;&#101;&#114;&#62;&#60;&#105;&#109;&#103;&#32;&#115;&#114;&#99;&#61;&#34;&#46;&#46;&#47;&#109;&#101;&#100;&#105;&#97;&#47;&#98;&#101;&#116;&#116;&#101;&#114;&#112;&#114;&#101;&#118;&#105;&#101;&#119;&#47;&#105;&#109;&#97;&#103;&#101;&#115;&#47;&#112;&#114;&#101;&#118;&#105;&#101;&#119;&#46;&#103;&#105;&#102;&#34;&#32;&#47;&#62;&#60;&#47;&#99;&#101;&#110;&#116;&#101;&#114;&#62;" />
 				<field name="@toggler_comp_b" type="rl_toggler" />
-				<field name="use_home_menu_id" type="radio" class="btn-group" default="1" label="BP_USE_HOME_MENU_ID" description="BP_USE_HOME_MENU_ID_DESC">
-					<option value="0">JNO</option>
-					<option value="1">JYES</option>
+				<field name="default_menu_id" type="menuitem" default="0" label="BP_DEFAULT_MENU_ID" description="BP_DEFAULT_MENU_ID_DESC">
+					<option value="-1">JNONE</option>
+					<option value="0">BP_DEFAULT_HOME_MENU</option>
 				</field>
+				<field name="disabled_components" type="rl_components" multiple="1" default="com_adagency" admin="1"
+					   label="RL_DISABLE_ON_COMPONENTS" description="RL_DISABLE_ON_COMPONENTS_DESC" />
 			</fieldset>
 		</fields>
 	</config>

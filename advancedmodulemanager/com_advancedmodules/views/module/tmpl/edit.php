@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -71,8 +71,8 @@ if (JFactory::getUser()->authorise('core.admin'))
 }
 
 JFactory::getDocument()->addScriptDeclaration($script);
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-RLFunctions::script('regularlabs/toggler.min.js', '16.5.10919');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::script('regularlabs/toggler.min.js');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_advancedmodules&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm"
@@ -150,7 +150,7 @@ RLFunctions::script('regularlabs/toggler.min.js', '16.5.10919');
 			</div>
 			<div class="span3">
 				<fieldset class="form-vertical">
-					<?php echo $this->form->getControlGroup('showtitle'); ?>
+					<?php echo $this->form->renderField('showtitle'); ?>
 					<div class="control-group">
 						<div class="control-label">
 							<?php echo $this->form->getLabel('position'); ?>

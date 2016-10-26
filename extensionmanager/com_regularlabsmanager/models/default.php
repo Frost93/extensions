@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.3
+ * @version         6.1.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -123,13 +123,16 @@ class RegularLabsManagerModelDefault extends JModelList
 		$db->setQuery($query);
 		$db->execute();
 
-		$query->clear()
-			->update('#__update_sites')
-			->set($db->quoteName('extra_query') . ' = ' . $db->quote('k=' . $key))
-			->where($db->quoteName('location') . ' LIKE ' . $db->quote('http://download.regularlabs.com%'))
-			->where($db->quoteName('location') . ' LIKE ' . $db->quote('%&pro=1%'));
-		$db->setQuery($query);
-		$db->execute();
+		if ($key)
+		{
+			$query->clear()
+				->update('#__update_sites')
+				->set($db->quoteName('extra_query') . ' = ' . $db->quote('k=' . $key))
+				->where($db->quoteName('location') . ' LIKE ' . $db->quote('http://download.regularlabs.com%'))
+				->where($db->quoteName('location') . ' LIKE ' . $db->quote('%&pro=1%'));
+			$db->setQuery($query);
+			$db->execute();
+		}
 
 		JFactory::getCache()->clean('_system');
 	}

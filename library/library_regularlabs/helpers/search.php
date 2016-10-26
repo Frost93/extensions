@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -187,7 +187,7 @@ class SearchModelSearch extends JModelLegacy
 			{
 				if ($item->text != '')
 				{
-					$dispatcher->trigger('onContentPrepare', array('com_content.article', &$item, &$params, 0));
+					$dispatcher->trigger('onContentPrepare', array('com_search.search.article', &$item, &$params, 0));
 					// strip html tags from title
 					$item->title = strip_tags($item->title);
 				}

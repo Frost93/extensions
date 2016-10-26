@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -78,7 +78,7 @@ class RLFunctions
 	{
 		if (strpos($file, 'regularlabs/') === 0)
 		{
-			$version = '16.5.22807';
+			$version = '16.10.22333';
 		}
 
 		if (!$file = self::getFileByFolder('js', $file))
@@ -88,9 +88,6 @@ class RLFunctions
 
 		if (!empty($version))
 		{
-			/* >>> [NONE] >>> */
-			$version = $version == '5.4.0' ? '1.2.3' : $version;
-			/* <<< [NONE] <<< */
 			$file .= '?v=' . $version;
 		}
 
@@ -101,7 +98,7 @@ class RLFunctions
 	{
 		if (strpos($file, 'regularlabs/') === 0)
 		{
-			$version = '16.5.22807';
+			$version = '16.10.22333';
 		}
 
 		if (!$file = self::getFileByFolder('css', $file))
@@ -111,9 +108,6 @@ class RLFunctions
 
 		if (!empty($version))
 		{
-			/* >>> [NONE] >>> */
-			$version = $version == '5.4.0' ? '1.2.3' : $version;
-			/* <<< [NONE] <<< */
 			$file .= '?v=' . $version;
 		}
 
@@ -499,7 +493,7 @@ class RLFunctions
 					|| JFile::exists(JPATH_SITE . '/components/com_' . $extension . '/' . $extension . '.php')
 				)
 				{
-					if ($extension == 'cookieconfirm')
+					if ($extension == 'cookieconfirm' && JFile::exists(JPATH_ADMINISTRATOR . '/components/com_cookieconfirm/version.php'))
 					{
 						// Only Cookie Confirm 2.0.0.rc1 and above is supported, because
 						// previous versions don't have isCookiesAllowed()

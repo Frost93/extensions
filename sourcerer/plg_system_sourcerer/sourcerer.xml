@@ -2,8 +2,8 @@
 <extension version="3.4" type="plugin" group="system" method="upgrade">
 	<name>plg_system_sourcerer</name>
 	<description>PLG_SYSTEM_SOURCERER_DESC</description>
-	<version>6.0.2</version>
-	<creationDate>May 2016</creationDate>
+	<version>6.3.4</version>
+	<creationDate>October 2016</creationDate>
 	<author>Regular Labs (Peter van Westen)</author>
 	<authorEmail>info@regularlabs.com</authorEmail>
 	<authorUrl>https://www.regularlabs.com</authorUrl>
@@ -46,8 +46,8 @@
 			</fieldset>
 			<fieldset name="advanced">
 				<field name="syntax_word" type="text" size="20" default="source" label="SRC_SYNTAX_WORD" description="SRC_SYNTAX_WORD_DESC" />
-				<field name="tag_characters" type="list" default="{.}" class="input-small" label="RL_TAG_CHARACTERS"
-					   description="RL_TAG_CHARACTERS_DESC">
+				<field name="tag_characters" type="list" default="{.}" class="input-small"
+					   label="RL_TAG_CHARACTERS" description="RL_TAG_CHARACTERS_DESC">
 					<option value="{.}">{...}</option>
 					<option value="[.]">[...]</option>
 					<option value="{{.}}">{{...}}</option>
@@ -56,6 +56,14 @@
 					<option value="[%.%]">[%...%]</option>
 				</field>
 				<field name="trim" type="radio" class="btn-group" default="0" label="SRC_TRIM" description="SRC_TRIM_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field name="enable_in_head" type="radio" class="btn-group" default="0" label="SRC_ENABLE_IN_HEAD" description="SRC_ENABLE_IN_HEAD_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field name="remove_from_search" type="radio" class="btn-group" default="0" label="SRC_REMOVE_FROM_SEARCH" description="SRC_REMOVE_FROM_SEARCH_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -72,8 +80,8 @@
 				<field name="@block_default_css_b" type="rl_block" end="1" />
 
 				<field name="@block_default_js_a" type="rl_block" start="1" label="SRC_JAVASCRIPT" />
-				<field name="enable_js" type="radio" class="btn-group" default="1" label="SRC_ALLOW_JAVASCRIPT_TAGS"
-					   description="SRC_ALLOW_JAVASCRIPT_TAGS_DESC">
+				<field name="enable_js" type="radio" class="btn-group" default="1"
+					   label="SRC_ALLOW_JAVASCRIPT_TAGS" description="SRC_ALLOW_JAVASCRIPT_TAGS_DESC">
 					<option value="0">JNO</option>
 					<option value="1">JYES</option>
 				</field>
@@ -88,8 +96,8 @@
 				<field name="forbidden_php" type="textarea" rows="3" cols="40"
 					   default="dl, escapeshellarg, escapeshellcmd, exec, passthru, popen, proc_close, proc_open, shell_exec, symlink, system"
 					   label="SRC_FORBIDDEN_PHP_FUNCTIONS" description="SRC_FORBIDDEN_PHP_FUNCTIONS_DESC" />
-				<field name="forbidden_tags" type="rl_textareaplus" width="400" height="80" default="" label="SRC_FORBIDDEN_HTML_TAGS"
-					   description="SRC_FORBIDDEN_HTML_TAGS_DESC" />
+				<field name="forbidden_tags" type="rl_textareaplus" width="400" height="80" default=""
+					   label="SRC_FORBIDDEN_HTML_TAGS" description="SRC_FORBIDDEN_HTML_TAGS_DESC" />
 				<field name="@toggler_default_php_b" type="rl_toggler" />
 				<field name="@block_default_php_b" type="rl_block" end="1" />
 

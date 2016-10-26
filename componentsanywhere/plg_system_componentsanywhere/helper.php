@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Components Anywhere
- * @version         3.0.1
+ * @version         3.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -462,7 +462,7 @@ class PlgSystemComponentsAnywhereHelper
 
 	function processComponent($tag, $area = '')
 	{
-		$url = ltrim(html_entity_decode(trim($tag->url)), '/');
+		$url = ltrim(RLText::html_entity_decoder(trim($tag->url)), '/');
 
 		$pagination_stuff = array('p', 'page', 'limitstart', 'start', 'filter', 'filter-search');
 		$full_url         = $url;
@@ -480,8 +480,8 @@ class PlgSystemComponentsAnywhereHelper
 		if ($tag->force_itemid)
 		{
 			$full_url = preg_replace(
-				'#((?:\?|&(?:amp;)?)Itemid=)[0-9]+#',
-				'\1' . JFactory::getApplication()->input->get('Itemid'),
+				'#((?:\?|&(?:amp;)?)Itemid)=[0-9]+#',
+				'\1=' . JFactory::getApplication()->input->get('Itemid'),
 				$full_url
 			);
 

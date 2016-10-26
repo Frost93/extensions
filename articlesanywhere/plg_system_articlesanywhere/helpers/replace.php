@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -60,10 +60,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 
 	public function _(&$string, $area = 'article', $context = '', $current_article_id = null)
 	{
-		if (!is_null($current_article_id))
-		{
-			$this->current_article_id = $current_article_id;
-		}
+		$this->current_article_id = $current_article_id;
 
 		if (!is_string($string) || $string == '')
 		{
@@ -112,7 +109,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 		RLProtect::unprotect($string);
 	}
 
-	public function prepareStringForArticles(&$string, $context = '')
+	private function prepareStringForArticles(&$string, $context = '')
 	{
 		if (strpos($context, 'com_search.') === 0)
 		{
@@ -135,7 +132,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 		return true;
 	}
 
-	public function prepareStringForComponent(&$string)
+	private function prepareStringForComponent(&$string)
 	{
 
 		if (RLFunctions::isFeed())
@@ -166,7 +163,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 		return false;
 	}
 
-	public function prepareStringForBody(&$string)
+	private function prepareStringForBody(&$string)
 	{
 
 		return true;
@@ -207,11 +204,12 @@ class PlgSystemArticlesAnywhereHelperReplace
 			return;
 		}
 
-		$matches = array();
-		$break   = 0;
+		$matches   = array();
+		$break     = 0;
+		$max_loops = 10;
 
 		while (
-			$break++ < 10
+			$break++ < $max_loops
 			&& (
 				strpos($string, $this->params->article_tag) !== false
 			)
@@ -243,7 +241,7 @@ class PlgSystemArticlesAnywhereHelperReplace
 		}
 	}
 
-	public function processMatch(&$string, $items)
+	private function processMatch(&$string, $items)
 	{
 		foreach ($items as $item)
 		{
@@ -252,15 +250,38 @@ class PlgSystemArticlesAnywhereHelperReplace
 		}
 	}
 
-	public function processData(&$string)
+	private function processData(&$string)
 	{
 		$output = $this->getOutputHtml(implode('', $this->data->output));
 
 		$string = RLText::strReplaceOnce($this->data->original_string, $output, $string);
 	}
 
-	public function getOutputHtml($html)
+	private function triggerContentPlugins($string)
 	{
+		$item       = new stdClass;
+		$item->text = $string;
+
+		$params = new JObject;
+		$params->set('inline', false);
+
+		$dispatcher = JEventDispatcher::getInstance();
+		JPluginHelper::importPlugin('content');
+
+		$dispatcher->trigger('onContentPrepare', array('com_content.article', &$item, &$params, 0));
+
+		return $item->text;
+	}
+
+	private function getOutputHtml($html)
+	{
+		if ($this->params->force_content_triggers && strpos($html, '<!-- AA:CT -->') === false)
+		{
+			$html = $this->triggerContentPlugins($html);
+		}
+
+		$html = str_replace('<!-- AA:CT -->', '', $html);
+
 		if (empty($this->data->opening_tags_main) || empty($this->data->closing_tags_main))
 		{
 			return

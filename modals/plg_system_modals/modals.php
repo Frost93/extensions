@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -96,7 +96,7 @@ class PlgSystemModals extends JPlugin
 
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/protect.php';
 
-		if (RLProtect::isProtectedPage($this->_alias, 1))
+		if (RLProtect::isProtectedPage($this->_alias, true, array()))
 		{
 			return false;
 		}

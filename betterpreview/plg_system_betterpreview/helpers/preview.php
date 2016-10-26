@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -29,8 +29,8 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 
 		JHtml::_('jquery.framework');
 
-		RLFunctions::script('betterpreview/preview.min.js', '5.0.1');
-		RLFunctions::stylesheet('betterpreview/preview.min.css', '5.0.1');
+		RLFunctions::script('betterpreview/preview.min.js', '5.2.2');
+		RLFunctions::stylesheet('betterpreview/preview.min.css', '5.2.2');
 
 		$has_changes = 0;
 		$data        = JFactory::getApplication()->input->get('previewdata', array(), 'array');
@@ -54,7 +54,7 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 			// ignore crappy tags
 			// and dynamic/unsettable fields
 			// and date fields (because offset checking is a hell)
-			if (in_array($key, array('published', 'access', 'tags', 'hits', 'version', 'created', 'modified', 'publish_up', 'publish_down')))
+			if (in_array($key, array('published', 'state', 'access', 'tags', 'hits', 'version', 'created', 'modified', 'publish_up', 'publish_down')))
 			{
 				continue;
 			}
@@ -67,18 +67,23 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 				{
 					foreach ($val as $k => $v)
 					{
-						if (!is_string($v) || $v != '')
+						if (is_string($v) && $v == '')
 						{
-							if (!$has_changes && $this->diff($article->{$key}->get($k), $v))
-							{
-								$has_changes = 1;
-							}
-							$article->{$key}->set($k, $v);
+							continue;
 						}
+
+						if (!$has_changes && $this->diff($article->{$key}->get($k), $v))
+						{
+							$has_changes = 1;
+						}
+
+						$article->{$key}->set($k, $v);
 					}
+
 					continue;
 				}
-				else if (is_string($article->{$key}))
+
+				if (is_string($article->{$key}))
 				{
 					$obj = (object) json_decode($article->{$key});
 					if (is_object($obj))
@@ -90,12 +95,12 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 							if (!isset($v))
 							{
 								unset($val[$k]);
+								continue;
 							}
-							else
-							{
-								$val[$k] = $v;
-							}
+
+							$val[$k] = $v;
 						}
+
 						$val = urldecode(json_encode($val));
 					}
 				}
@@ -314,7 +319,9 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 			$item_name,
 			$item_states
 		);
+
 		$item = $this->states[count($this->states) - 1];
+
 		while ($item->parent != 0)
 		{
 			$this->getState(
@@ -323,8 +330,10 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 				$parent_states,
 				1
 			);
+
 			$item = $this->states[count($this->states) - 1];
 		}
+
 		$this->setStates();
 	}
 
@@ -422,69 +431,79 @@ class HelperBetterPreviewPreview extends PlgSystemBetterPreviewHelper
 	{
 		foreach ($this->states as $state)
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true)
-				->update('#__' . $state->table)
-				->where($db->quoteName($state->names->id) . ' = ' . $state->id);
-
-			if (isset($state->names->published))
-			{
-				$query->set($db->quoteName($state->names->published) . ' = 1');
-			}
-
-			if (isset($state->names->access))
-			{
-				$query->set($db->quoteName($state->names->access) . ' = 1');
-			}
-
-			if (isset($state->names->publish_up) && $state->publish_up > 0)
-			{
-				$query->set($db->quoteName($state->names->publish_up) . ' = CURDATE() - INTERVAL 1 DAY');
-			}
-
-			if (isset($state->names->publish_down) && $state->publish_down > 0)
-			{
-				$query->set($db->quoteName($state->names->publish_down) . ' = CURDATE() + INTERVAL 1 DAY');
-			}
-
-			$db->setQuery($query);
-			$db->execute();
+			$this->setState($state);
 		}
+	}
+
+	function setState($state)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->update('#__' . $state->table)
+			->where($db->quoteName($state->names->id) . ' = ' . $db->quote($state->id));
+
+		if (isset($state->names->published))
+		{
+			$query->set($db->quoteName($state->names->published) . ' = 1');
+		}
+
+		if (isset($state->names->access))
+		{
+			$query->set($db->quoteName($state->names->access) . ' = 1');
+		}
+
+		if (isset($state->names->publish_up) && $state->publish_up > 0)
+		{
+			$query->set($db->quoteName($state->names->publish_up) . ' = CURDATE() - INTERVAL 1 DAY');
+		}
+
+		if (isset($state->names->publish_down) && $state->publish_down > 0)
+		{
+			$query->set($db->quoteName($state->names->publish_down) . ' = CURDATE() + INTERVAL 1 DAY');
+		}
+
+		$db->setQuery($query);
+		$db->execute();
 	}
 
 	function restoreStates()
 	{
 		foreach ($this->states as $state)
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true)
-				->update('#__' . $state->table)
-				->where($db->quoteName($state->names->id) . ' = ' . $state->id);
-
-			if (isset($state->names->published))
-			{
-				$query->set($db->quoteName($state->names->published) . ' = ' . $state->published);
-			}
-			if (isset($state->names->access))
-			{
-				$query->set($db->quoteName($state->names->access) . ' = ' . $state->access);
-			}
-			if (isset($state->names->hits))
-			{
-				$query->set($db->quoteName($state->names->hits) . ' = ' . $state->hits);
-			}
-			if (isset($state->names->publish_up) && $state->publish_up > 0)
-			{
-				$query->set($db->quoteName($state->names->publish_up) . ' = ' . $db->quote($state->publish_up));
-			}
-			if (isset($state->names->publish_down) && $state->publish_down > 0)
-			{
-				$query->set($db->quoteName($state->names->publish_down) . ' = ' . $db->quote($state->publish_down));
-			}
-
-			$db->setQuery($query);
-			$db->execute();
+			$this->restoreState($state);
 		}
+	}
+
+	function restoreState($state)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->update('#__' . $state->table)
+			->where($db->quoteName($state->names->id) . ' = ' . $db->quote($state->id));
+
+		if (isset($state->names->published))
+		{
+			$query->set($db->quoteName($state->names->published) . ' = ' . $state->published);
+		}
+		if (isset($state->names->access))
+		{
+			$query->set($db->quoteName($state->names->access) . ' = ' . $state->access);
+		}
+		if (isset($state->names->hits))
+		{
+			$query->set($db->quoteName($state->names->hits) . ' = ' . $state->hits);
+		}
+		if (isset($state->names->publish_up) && $state->publish_up > 0)
+		{
+			$query->set($db->quoteName($state->names->publish_up) . ' = ' . $db->quote($state->publish_up));
+		}
+		if (isset($state->names->publish_down) && $state->publish_down > 0)
+		{
+			$query->set($db->quoteName($state->names->publish_down) . ' = ' . $db->quote($state->publish_down));
+		}
+
+		$db->setQuery($query);
+		$db->execute();
 	}
 
 	function checkSession()

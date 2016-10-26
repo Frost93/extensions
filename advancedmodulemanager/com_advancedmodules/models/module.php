@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -459,13 +459,6 @@ class AdvancedModulesModelModule extends JModelAdmin
 
 				$table->position = $position;
 
-				// Alter the title if necessary
-				$data         = $this->generateNewTitle(0, $table->title, $table->position);
-				$table->title = $data['0'];
-
-				// Unpublish the moved module
-				$table->published = 0;
-
 				if (!$table->store())
 				{
 					$this->setError($table->getError());
@@ -829,6 +822,10 @@ class AdvancedModulesModelModule extends JModelAdmin
 			$module   = JArrayHelper::getValue($data, 'module');
 			$id       = JArrayHelper::getValue($data, 'id');
 		}
+
+		// Add the default fields directory
+		$baseFolder = ($clientId) ? JPATH_ADMINISTRATOR : JPATH_SITE;
+		JForm::addFieldPath($baseFolder . '/modules' . '/' . $module . '/field');
 
 		// These variables are used to add data from the plugin XML files.
 		$this->setState('item.client_id', $clientId);
@@ -1593,13 +1590,19 @@ class AdvancedModulesModelModule extends JModelAdmin
 			$module->advancedparams = (array) $module->advancedparams;
 		}
 
+		$changed = false;
+
 		if (!isset($module->advancedparams['assignto_menuitems']))
 		{
 			$this->setMenuItemAssignments($id, $module->advancedparams);
+
+			$changed = true;
 		}
 		else if (isset($module->advancedparams['assignto_menuitems_selection']['0']) && strpos($module->advancedparams['assignto_menuitems_selection']['0'], ',') !== false)
 		{
 			$module->advancedparams['assignto_menuitems_selection'] = explode(',', $module->advancedparams['assignto_menuitems_selection']['0']);
+
+			$changed = true;
 		}
 
 		if (!isset($module->advancedparams['assignto_date']) || !$module->advancedparams['assignto_date'])
@@ -1611,6 +1614,8 @@ class AdvancedModulesModelModule extends JModelAdmin
 				$module->advancedparams['assignto_date']              = 1;
 				$module->advancedparams['assignto_date_publish_up']   = isset($module->publish_up) ? $module->publish_up : '';
 				$module->advancedparams['assignto_date_publish_down'] = isset($module->publish_down) ? $module->publish_down : '';
+
+				$changed = true;
 			}
 		}
 
@@ -1620,10 +1625,15 @@ class AdvancedModulesModelModule extends JModelAdmin
 			{
 				$module->advancedparams['assignto_languages']           = 1;
 				$module->advancedparams['assignto_languages_selection'] = array($module->language);
+
+				$changed = true;
 			}
 		}
 
-		AdvancedModulesModelModule::saveAdvancedParams($module->advancedparams, $id);
+		if ($changed)
+		{
+			AdvancedModulesModelModule::saveAdvancedParams($module->advancedparams, $id);
+		}
 
 		return $module->advancedparams;
 	}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Tooltips
- * @version         5.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -52,7 +52,7 @@ class PlgButtonTooltipsHelper
 	{
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$button = new JObject;
 
@@ -78,8 +78,8 @@ class PlgButtonTooltipsHelper
 
 		RLFunctions::loadLanguage('plg_editors-xtd_tooltips');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$this->params->tag = preg_replace('#[^a-z0-9-_]#s', '', $this->params->tag);
 

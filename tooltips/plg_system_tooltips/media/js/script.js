@@ -1,6 +1,6 @@
 /**
  * @package         Tooltips
- * @version         5.0.0
+ * @version         6.0.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -14,7 +14,7 @@
 
 	$(document).ready(function() {
 		var tt_timeout    = null;
-		var tt_timeoutOff = 0;
+		var tt_timeoutOff = false;
 
 		// hover mode
 		$('.rl_tooltips-link.hover').popover({
@@ -23,7 +23,7 @@
 		});
 
 
-		// close all popovers on click ouside
+		// close all popovers on click outside
 		$('html').click(function() {
 			$('.rl_tooltips-link').popover('hide');
 		});
@@ -59,15 +59,19 @@
 
 			clearTimeout(tt_timeout);
 
+			var popover = typeof(el.data('popover')) != "undefined" ? el.data('popover') : el.data('bs.popover');
+
 			// close all other popovers
 			$('.rl_tooltips-link.' + cls).each(function() {
-				if ($(this).data('popover') != el.data('popover')) {
+				var popover2 = typeof($(this).data('popover')) != "undefined" ? $(this).data('popover') : $(this).data('bs.popover');
+
+				if (popover2 != popover) {
 					$(this).popover('hide');
 				}
 			});
 
 			// open current
-			if (!el.data('popover').tip().hasClass('in')) {
+			if (!popover.tip().hasClass('in')) {
 				el.popover('show');
 			}
 
@@ -77,7 +81,7 @@
 					evt.stopPropagation();
 
 					// switch timeout off for this tooltip
-					tt_timeoutOff = 1;
+					tt_timeoutOff = true;
 					clearTimeout(tt_timeout);
 				})
 			;

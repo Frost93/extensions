@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -16,7 +16,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsHomePage extends RLAssignment
 {
-	function passHomePage()
+	public function passHomePage()
 	{
 		$home = JFactory::getApplication()->getMenu('site')->getDefault(JFactory::getLanguage()->getTag());
 
@@ -73,7 +73,7 @@ class RLAssignmentsHomePage extends RLAssignment
 		return $this->pass($pass);
 	}
 
-	function checkPass(&$home, $addlang = 0)
+	private function checkPass(&$home, $addlang = 0)
 	{
 		$uri = JUri::getInstance();
 

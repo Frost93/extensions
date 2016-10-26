@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         IP Login
- * @version         3.0.0
+ * @version         3.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -62,6 +62,7 @@ class PlgSystemIPLoginInstallerScriptHelper
 			return;
 		}
 
+		$this->fixExtensionNames();
 		$this->updateUpdateSites();
 		$this->removeAdminCache();
 
@@ -536,6 +537,77 @@ class PlgSystemIPLoginInstallerScriptHelper
 		}
 	}
 
+	public function fixAssetsRules($rules = '{"core.admin":[],"core.manage":[]}')
+	{
+		// replace default rules value {} with the correct initial value
+		$query = $this->db->getQuery(true)
+			->update($this->db->quoteName('#__assets'))
+			->set($this->db->quoteName('rules') . ' = ' . $this->db->quote($rules))
+			->where($this->db->quoteName('title') . ' = ' . $this->db->quote('com_' . $this->extname))
+			->where($this->db->quoteName('rules') . ' = ' . $this->db->quote('{}'));
+		$this->db->setQuery($query);
+		$this->db->execute();
+	}
+
+	private function fixExtensionNames()
+	{
+		switch ($this->extension_type)
+		{
+			case 'module' :
+				$this->fixModuleNames();
+		}
+	}
+
+	private function fixModuleNames()
+	{
+		// Get module id
+		$query = $this->db->getQuery(true)
+			->select('id')
+			->from('#__modules')
+			->where($this->db->quoteName('module') . ' = ' . $this->db->quote('mod_' . $this->extname))
+			->where($this->db->quoteName('client_id') . ' = ' . (int) $this->client_id);
+		$this->db->setQuery($query, 0, 1);
+		$module_id = $this->db->loadResult();
+
+		if (empty($module_id))
+		{
+			return;
+		}
+
+		$title = 'Regular Labs - ' . JText::_($this->name);
+
+		$query->clear()
+			->update('#__modules')
+			->set($this->db->quoteName('title') . ' = ' . $this->db->quote($title))
+			->where($this->db->quoteName('id') . ' = ' . (int) $module_id)
+			->where($this->db->quoteName('title') . ' LIKE ' . $this->db->quote('NoNumber%'));
+		$this->db->setQuery($query);
+		$this->db->execute();
+
+		// Fix module assets
+
+		// Get asset id
+		$query = $this->db->getQuery(true)
+			->select('id')
+			->from('#__assets')
+			->where($this->db->quoteName('name') . ' = ' . $this->db->quote('com_modules.module.' . (int) $module_id))
+			->where($this->db->quoteName('title') . ' LIKE ' . $this->db->quote('NoNumber%'));
+		$this->db->setQuery($query, 0, 1);
+		$asset_id = $this->db->loadResult();
+
+		if (empty($asset_id))
+		{
+			return;
+		}
+
+		$query->clear()
+			->update('#__assets')
+			->set($this->db->quoteName('title') . ' = ' . $this->db->quote($title))
+			->where($this->db->quoteName('id') . ' = ' . (int) $asset_id);
+		$this->db->setQuery($query);
+		$this->db->execute();
+	}
+
 	private function updateUpdateSites()
 	{
 		$this->removeOldUpdateSites();
@@ -616,10 +688,13 @@ class PlgSystemIPLoginInstallerScriptHelper
 		$query->clear()
 			->update('#__update_sites')
 			->set($this->db->quoteName('extra_query') . ' = ' . $this->db->quote(''))
-			->where(array(
-				$this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.nonumber.nl%'),
-				$this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.regularlabs.com%'),
-			), 'OR');
+			->where(
+				'('
+				. $this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.nonumber.nl%')
+				. ' OR '
+				. $this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.regularlabs.com%')
+				. ')'
+			);
 		$this->db->setQuery($query);
 		$this->db->execute();
 
@@ -627,10 +702,13 @@ class PlgSystemIPLoginInstallerScriptHelper
 			->update('#__update_sites')
 			->set($this->db->quoteName('extra_query') . ' = ' . $this->db->quote('k=' . $params->key))
 			->where($this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%&pro=1%'))
-			->where(array(
-				$this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.nonumber.nl%'),
-				$this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.regularlabs.com%'),
-			), 'OR');
+			->where(
+				'('
+				. $this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.nonumber.nl%')
+				. ' OR '
+				. $this->db->quoteName('location') . ' LIKE ' . $this->db->quote('%download.regularlabs.com%')
+				. ')'
+			);
 		$this->db->setQuery($query);
 		$this->db->execute();
 	}

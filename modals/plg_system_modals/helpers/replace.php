@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Modals
- * @version         7.0.0
+ * @version         8.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -106,7 +106,8 @@ class PlgSystemModalsHelperReplace
 		}
 
 		RLProtect::removeFromHtmlTagAttributes(
-			$string, array(
+			$string,
+			array(
 				$this->params->tag,
 			)
 		);
@@ -178,7 +179,7 @@ class PlgSystemModalsHelperReplace
 			$attributes = $this->helpers->get('link')->getLinkAttributeList($match['0']);
 
 			// ignore if the link has no href or is an anchor or has a target
-			if (empty($attributes->href) || $attributes->href['0'] != '#' || isset($attributes->target))
+			if (empty($attributes->href) || $attributes->href['0'] == '#' || isset($attributes->target))
 			{
 				continue;
 			}

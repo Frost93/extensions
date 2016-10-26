@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Add to Menu
- * @version         5.0.0
+ * @version         5.0.5
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -80,10 +80,10 @@ class ModAddToMenu
 		$script = "var addtomenu_root = '" . JUri::root() . "';";
 		JFactory::getDocument()->addScriptDeclaration($script);
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::script('addtomenu/script.min.js', '5.0.0');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
-		RLFunctions::stylesheet('addtomenu/style.min.css', '5.0.0');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('addtomenu/script.min.js', '5.0.5');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
+		RLFunctions::stylesheet('addtomenu/style.min.css', '5.0.5');
 
 		// set height for popup
 		$popup_width  = 600 + (int) $this->params->adjust_modal_w;
@@ -180,6 +180,7 @@ class ModAddToMenu
 			// Generate html for status link
 			$html   = array();
 			$html[] = '<div class="btn-group addtomenu">';
+			$html[] = '<span class="btn-group separator"></span>';
 			$html[] = '<a href="' . $link . '" class="addtomenu_link modal' . ($tip ? ' hasTooltip" title="' . $tip : '') . '"'
 				. ' rel="{handler: \'iframe\', size: {x: ' . $popup_width . ', y: ' . $popup_height . '}}">';
 			if ($this->params->display_link != 'text')

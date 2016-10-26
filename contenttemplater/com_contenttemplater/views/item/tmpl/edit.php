@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Content Templater
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -17,14 +17,28 @@ require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
 RLFunctions::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
-$user  = JFactory::getUser();
-$db    = JFactory::getDbo();
-$query = $db->getQuery(true)
-	->select('c.misc')
-	->from('#__' . $this->config->contact_table . ' as c')
-	->where('c.user_id = ' . (int) $user->id);
-$db->setQuery($query);
-$contact = $db->loadObject();
+$user    = JFactory::getUser();
+$contact = new stdClass;
+
+$db         = JFactory::getDbo();
+$table_name = $db->getPrefix() . $this->config->contact_table;
+
+if (in_array($table_name, $db->getTableList()))
+{
+	$query = 'SHOW FIELDS FROM ' . $db->quoteName($table_name);
+	$db->setQuery($query);
+	$columns = $db->loadColumn();
+
+	if (in_array('misc', $columns))
+	{
+		$query = $db->getQuery(true)
+			->select('c.misc')
+			->from('#__' . $this->config->contact_table . ' as c')
+			->where('c.user_id = ' . (int) $user->id);
+		$db->setQuery($query);
+		$contact = $db->loadObject();
+	}
+}
 
 RLFunctions::script('regularlabs/script.min.js');
 RLFunctions::stylesheet('regularlabs/style.min.css');

@@ -2,14 +2,14 @@
 <config addfieldpath="/libraries/regularlabs/fields">
 	<fieldset name="options" label="JOPTIONS">
 		<field name="@loadlanguage" type="rl_loadlanguage" extension="com_rereplacer" />
-		<field name="show_fields" type="radio" class="btn-group" default="0" label="RR_SHOW_SEARCH_AND_REPLACE_FIELDS"
-			   description="RR_SHOW_SEARCH_AND_REPLACE_FIELDS_DESC">
+		<field name="show_fields" type="radio" class="btn-group" default="0"
+			   label="RR_SHOW_SEARCH_AND_REPLACE_FIELDS" description="RR_SHOW_SEARCH_AND_REPLACE_FIELDS_DESC">
 			<option value="0">JHIDE</option>
 			<option value="1">JSHOW</option>
 		</field>
 		<field name="contact_table" type="text" default="contact_details" label="RR_CONTACT_TABLE" description="RR_CONTACT_TABLE_DESC" />
-		<field name="show_update_notification" type="radio" class="btn-group" default="1" label="RL_SHOW_UPDATE_NOTIFICATION"
-			   description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
+		<field name="show_update_notification" type="radio" class="btn-group" default="1"
+			   label="RL_SHOW_UPDATE_NOTIFICATION" description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>

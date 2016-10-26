@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsZoo extends RLAssignment
 {
-	function init()
+	public function init()
 	{
 		if (!$this->request->view)
 		{
@@ -55,12 +55,12 @@ class RLAssignmentsZoo extends RLAssignment
 		}
 	}
 
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		return $this->passByPageTypes('com_zoo', $this->selection, $this->assignment);
 	}
 
-	function passCategories()
+	public function passCategories()
 	{
 		if ($this->request->option != 'com_zoo')
 		{
@@ -190,7 +190,7 @@ class RLAssignmentsZoo extends RLAssignment
 		}
 	}
 
-	function passItems()
+	public function passItems()
 	{
 		if (!$this->request->id || $this->request->option != 'com_zoo')
 		{
@@ -230,7 +230,7 @@ class RLAssignmentsZoo extends RLAssignment
 		return $this->db->loadObject();
 	}
 
-	function getCatParentIds($id = 0)
+	private function getCatParentIds($id = 0)
 	{
 		$parent_ids = array();
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         ReReplacer
- * @version         7.0.1
+ * @version         7.1.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,6 +12,7 @@
 defined('_JEXEC') or die;
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/string.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
 jimport('joomla.application.component.modellist');
 
@@ -374,7 +375,7 @@ class ReReplacerModelList extends JModelList
 		$filename = 'ReReplacer Items';
 		if (count($rows) == 1)
 		{
-			$name = RLString::strtolower(html_entity_decode($rows['0']->name));
+			$name = RLString::strtolower(RLText::html_entity_decoder($rows['0']->name));
 			$name = preg_replace('#[^a-z0-9_-]#', '_', $name);
 			$name = trim(preg_replace('#__+#', '_', $name), '_-');
 

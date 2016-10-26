@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -49,6 +49,9 @@ class JFormFieldRL_Agents extends RLFormField
 				$agents[] = array('Windows CE', 'Windows ce');
 				$agents[] = array('Mac OS (' . JText::_('JALL') . ')', '#(Mac OS|Mac_PowerPC|Macintosh)#');
 				$agents[] = array('Mac OSX (' . JText::_('JALL') . ')', 'Mac OS X');
+				$agents[] = array('Mac OSX El Capitan', 'Mac OS X 10.11');
+				$agents[] = array('Mac OSX Yosemite', 'Mac OS X 10.10');
+				$agents[] = array('Mac OSX Mavericks', 'Mac OS X 10.9');
 				$agents[] = array('Mac OSX Mountain Lion', 'Mac OS X 10.8');
 				$agents[] = array('Mac OSX Lion', 'Mac OS X 10.7');
 				$agents[] = array('Mac OSX Snow Leopard', 'Mac OS X 10.6');
@@ -69,7 +72,20 @@ class JFormFieldRL_Agents extends RLFormField
 
 			/* Browsers */
 			case 'browsers':
+				if ($this->get('simple') && $this->get('simple') !== 'false')
+				{
+
+					$agents[] = array('Chrome', 'Chrome');
+					$agents[] = array('Firefox', 'Firefox');
+					$agents[] = array('Edge', 'Edge');
+					$agents[] = array('Internet Explorer', 'MSIE');
+					$agents[] = array('Opera', 'Opera');
+					$agents[] = array('Safari', 'Safari');
+					break;
+				}
+
 				$agents[] = array('Chrome (' . JText::_('JALL') . ')', 'Chrome');
+				$agents[] = array('Chrome 51-60', '#Chrome/(5[1-9]|60)\.#');
 				$agents[] = array('Chrome 41-50', '#Chrome/(4[1-9]|50)\.#');
 				$agents[] = array('Chrome 31-40', '#Chrome/(3[1-9]|40)\.#');
 				$agents[] = array('Chrome 21-30', '#Chrome/(2[1-9]|30)\.#');

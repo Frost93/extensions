@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Dummy Content
- * @version         3.0.0
+ * @version         3.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -105,13 +105,16 @@ class PlgButtonDummyContentPopup
 		RLFunctions::loadLanguage('plg_editors-xtd_dummycontent');
 		RLFunctions::loadLanguage('plg_system_dummycontent');
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/popup.min.css', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::stylesheet('regularlabs/popup.min.css');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 		?>
 		<div class="header">
 			<div class="container-fluid">
-				<h1 class="page-title"><?php echo JText::_('DUMMY_CONTENT'); ?></h1>
+				<h1 class="page-title">
+					<span class="icon-reglab icon-dummycontent"></span>
+					<?php echo JText::_('DUMMY_CONTENT'); ?>
+				</h1>
 			</div>
 		</div>
 
@@ -140,7 +143,7 @@ class PlgButtonDummyContentPopup
 
 							<?php if (JFactory::getApplication()->isAdmin() && JFactory::getUser()->authorise('core.admin', 1)) : ?>
 								<div class="btn-wrapper" id="toolbar-options">
-									<button onclick="window.open('index.php?option=com_plugins&filter_folder=system&filter_search=dummycontent');"
+									<button onclick="window.open('index.php?option=com_plugins&filter_folder=system&filter_search=dummy content');"
 									        class="btn btn-small">
 										<span class="icon-options"></span> <?php echo JText::_('JOPTIONS') ?>
 									</button>

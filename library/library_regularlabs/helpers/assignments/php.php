@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsPHP extends RLAssignment
 {
-	function passPHP()
+	public function passPHP()
 	{
 		$article = $this->article;
 
@@ -40,12 +40,10 @@ class RLAssignmentsPHP extends RLAssignment
 
 			if (!$article && strpos($php, '$article') !== false)
 			{
-				$article = '';
+				$article = null;
 				if ($this->request->option == 'com_content' && $this->request->view == 'article')
 				{
-					require_once JPATH_SITE . '/components/com_content/models/article.php';
-					$model   = JModelLegacy::getInstance('article', 'contentModel');
-					$article = $model->getItem($this->request->id);
+					$article = $this->getArticleById($this->request->id);
 				}
 			}
 			if (!isset($Itemid))
@@ -97,5 +95,27 @@ class RLAssignmentsPHP extends RLAssignment
 		}
 
 		return $this->pass($pass);
+	}
+
+	private function getArticleById($id = 0)
+	{
+		if (!$id)
+		{
+			return null;
+		}
+
+		if (!class_exists('ContentModelArticle'))
+		{
+			require_once JPATH_SITE . '/components/com_content/models/article.php';
+		}
+
+		$model = JModelLegacy::getInstance('article', 'contentModel');
+
+		if (!method_exists($model, 'getItem'))
+		{
+			return null;
+		}
+
+		return $model->getItem($this->request->id);
 	}
 }

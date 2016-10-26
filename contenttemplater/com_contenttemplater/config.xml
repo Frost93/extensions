@@ -13,8 +13,8 @@
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
-		<field name="show_confirm" type="radio" class="btn-group" default="0" label="CT_ASK_BEFORE_INSERTING_TEMPLATE"
-			   description="CT_ASK_BEFORE_INSERTING_TEMPLATE_DESC">
+		<field name="show_confirm" type="radio" class="btn-group" default="0"
+			   label="CT_ASK_BEFORE_INSERTING_TEMPLATE" description="CT_ASK_BEFORE_INSERTING_TEMPLATE_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
@@ -44,8 +44,8 @@
 
 		<field name="@block_other_a" type="rl_block" start="1" label="RL_OTHER_SETTINGS" />
 		<field name="contact_table" type="text" default="contact_details" label="CT_CONTACT_TABLE" description="CT_CONTACT_TABLE_DESC" />
-		<field name="show_update_notification" type="radio" class="btn-group" default="1" label="RL_SHOW_UPDATE_NOTIFICATION"
-			   description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
+		<field name="show_update_notification" type="radio" class="btn-group" default="1"
+			   label="RL_SHOW_UPDATE_NOTIFICATION" description="RL_SHOW_UPDATE_NOTIFICATION_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>

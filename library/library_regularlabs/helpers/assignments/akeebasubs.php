@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsAkeebaSubs extends RLAssignment
 {
-	function init()
+	public function init()
 	{
 		if (!$this->request->id && $this->request->view == 'level')
 		{
@@ -32,12 +32,12 @@ class RLAssignmentsAkeebaSubs extends RLAssignment
 		}
 	}
 
-	function passPageTypes()
+	public function passPageTypes()
 	{
 		return $this->passByPageTypes('com_akeebasubs', $this->selection, $this->assignment);
 	}
 
-	function passLevels()
+	public function passLevels()
 	{
 		if (!$this->request->id || $this->request->option != 'com_akeebasubs' || $this->request->view != 'level')
 		{

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -312,7 +312,7 @@ class PlgSystemArticlesAnywhereHelperText
 		// This doesn't seem to work correctly and causes issues with other links in the article
 		// So commented out until I find a better solution
 		/*if ($art && isset($art->id) && $art->id) {
-			$string = str_replace('view=article&amp;id=' . $art->id, 'view=article&amp;id=' . $this->article->id, $string);
+			$string = str_replace('view=article&amp;id=' . $art->id, 'view=article&amp;id=' . $this->data->article->id, $string);
 		}*/
 
 		return $string;

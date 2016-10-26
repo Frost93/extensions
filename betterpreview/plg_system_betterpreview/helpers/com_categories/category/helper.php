@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,7 +11,10 @@
 
 defined('_JEXEC') or die;
 
-include_once JPATH_SITE . '/components/com_content/helpers/route.php';
+if (!class_exists('ContentHelperRoute'))
+{
+	require_once JPATH_SITE . '/components/com_content/helpers/route.php';
+}
 
 class HelperBetterPreviewHelperCategoriesCategory extends PlgSystemBetterPreviewHelper
 {

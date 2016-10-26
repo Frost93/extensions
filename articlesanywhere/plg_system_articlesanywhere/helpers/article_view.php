@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -11,14 +11,18 @@
 
 defined('_JEXEC') or die;
 
-require_once JPATH_SITE . '/components/com_content/views/article/view.html.php';
+if (!class_exists('ContentViewArticle'))
+{
+	require_once JPATH_SITE . '/components/com_content/views/article/view.html.php';
+}
 
 class ArticlesAnywhereArticleView extends ContentViewArticle
 {
 	public function setParams($id, $template, $layout, $params)
 	{
-		require_once JPATH_SITE . '/components/com_content/models/article.php';
-		$model = new ContentModelArticle;
+		require_once __DIR__ . '/article_model.php';
+
+		$model = new ArticlesAnywhereArticleModel;
 
 		$this->plugin_params = $params;
 
@@ -31,6 +35,9 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 
 		$this->_addPath('template', JPATH_SITE . '/components/com_content/views/article/tmpl');
 		$this->_addPath('template', JPATH_SITE . '/templates/' . $template . '/html/com_content/article');
+
+		JHTML::addIncludePath(JPATH_SITE . '/components/com_content/helpers');
+		JHTML::addIncludePath(JPATH_SITE . '/templates/' . $template . '/html/com_content/helpers');
 	}
 
 	public function display($tpl = null)
@@ -42,7 +49,13 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 		$this->user  = $user;
 
 		// Create a shortcut for $item.
-		$item            = $this->item;
+		$item = $this->item;
+
+		if (empty($item))
+		{
+			return false;
+		}
+
 		$item->tagLayout = new JLayoutFile('joomla.content.tags');
 
 		// Add router helpers.
@@ -57,7 +70,11 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 		}
 
 		// TODO: Change based on shownoauth
-		require_once JPATH_SITE . '/components/com_content/helpers/route.php';
+		if (!class_exists('ContentHelperRoute'))
+		{
+			require_once JPATH_SITE . '/components/com_content/helpers/route.php';
+		}
+
 		$item->readmore_link = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catid, $item->language));
 
 		// Merge article params. If this is single-article view, menu params override article params
@@ -76,6 +93,8 @@ class ArticlesAnywhereArticleView extends ContentViewArticle
 		{
 			$item->text = $item->introtext;
 		}
+
+		$item->text .= '<!-- AA:CT -->';
 
 		$item->tags = new JHelperTags;
 		$item->tags->getItemTags('com_content.article', $this->item->id);

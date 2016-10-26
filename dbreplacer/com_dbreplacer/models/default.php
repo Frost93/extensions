@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.1.0
+ * @version         5.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -94,7 +94,39 @@ class DBReplacerModelDefault extends JModelLegacy
 		}
 
 
-		$query = 'SELECT * FROM `' . trim(preg_replace('#^__#', $this->_db->getPrefix(), $params->table)) . '`'
+		$query = 'SHOW COLUMNS FROM `' . trim(preg_replace('#^__#', $this->_db->getPrefix(), $params->table)) . '`';
+		$this->_db->setQuery($query);
+		$all_columns = $this->_db->loadObjectList();
+
+		$index_columns = array();
+
+		foreach ($all_columns as $column)
+		{
+			if ($column->Key != 'PRI')
+			{
+				continue;
+			}
+
+			$index_columns[] = $column->Field;
+		}
+
+		if (empty($index_columns))
+		{
+			foreach ($all_columns as $column)
+			{
+				if (strpos($column->Type, 'float') !== 0)
+				{
+					continue;
+				}
+
+				$index_columns[] = $column->Field;
+			}
+		}
+
+		$select_columns = array_merge($index_columns, $params->columns);
+
+		$query = 'SELECT `' . implode('`,`', $select_columns) . '`'
+			. ' FROM `' . trim(preg_replace('#^__#', $this->_db->getPrefix(), $params->table)) . '`'
 			. $where
 			. ' LIMIT ' . (int) $params->max;
 		$this->_db->setQuery($query);
@@ -109,7 +141,7 @@ class DBReplacerModelDefault extends JModelLegacy
 
 			foreach ($row as $key => $val)
 			{
-				if ($val != '' && $val !== null && $val != '0000-00-00')
+				if (in_array($key, $index_columns) && $val != '' && $val !== null && $val != '0000-00-00')
 				{
 					$where[] = $this->_db->quoteName(trim($key)) . ' = ' . $this->_db->quote($val);
 				}
@@ -153,25 +185,26 @@ class DBReplacerModelDefault extends JModelLegacy
 				$set[] = $this->_db->quoteName(trim($key)) . ' = ' . $this->_db->quote(preg_replace($dbs, $r, $val));
 			}
 
-			if (!empty($set) && !empty($where))
+			if (empty($set) || empty($where))
 			{
-				$where = ' WHERE ( ' . implode(' AND ', $where) . ' )';
-
-				$query = 'UPDATE `' . trim(preg_replace('#^__#', $this->_db->getPrefix(), $params->table)) . '`'
-					. ' SET ' . implode(', ', $set)
-					. $where
-					. ' LIMIT 1';
-				$this->_db->setQuery($query);
-
-				if (!$this->_db->execute())
-				{
-					JFactory::getApplication()->enqueueMessage(JText::_('???'), 'error');
-				}
-				else
-				{
-					$count++;
-				}
+				continue;
 			}
+
+			$where = ' WHERE (' . implode(' AND ', $where) . ')';
+
+			$query = 'UPDATE `' . trim(preg_replace('#^__#', $this->_db->getPrefix(), $params->table)) . '`'
+				. ' SET ' . implode(', ', $set)
+				. $where
+				. ' LIMIT 1';
+			$this->_db->setQuery($query);
+
+			if (!$this->_db->execute())
+			{
+				JFactory::getApplication()->enqueueMessage(JText::_('???'), 'error');
+				continue;
+			}
+
+			$count++;
 		}
 
 		if (!$count)

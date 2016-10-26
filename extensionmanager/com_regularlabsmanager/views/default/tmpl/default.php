@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Extension Manager
- * @version         6.0.3
+ * @version         6.1.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -17,6 +17,7 @@ JHtml::_('behavior.tooltip');
 JHtml::_('bootstrap.popover');
 
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
 $ids = array();
 foreach ($this->items as $item)
@@ -28,8 +29,8 @@ $config            = JComponentHelper::getParams('com_regularlabsmanager');
 $check_data        = $config->get('check_data', 1);
 $hide_notinstalled = $config->get('hide_notinstalled', 0);
 
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.5.10919');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 
 $key    = trim($config->get('key'));
 $js_key = $key ? strtolower(substr($key, 0, 8) . md5(substr($key, 8))) : '';
@@ -46,8 +47,8 @@ $script = "
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
 
-RLFunctions::script('regularlabsmanager/script.min.js', '16.5.10919');
-RLFunctions::stylesheet('regularlabsmanager/style.min.css', '16.5.10919');
+RLFunctions::script('regularlabsmanager/script.min.js', '6.1.1');
+RLFunctions::stylesheet('regularlabsmanager/style.min.css', '6.1.1');
 
 $script = "
 	jQuery(document).ready(function() {
@@ -63,10 +64,10 @@ $loading = '<div class="progress progress-striped active" style="min-width: 60px
 			<div class="well">
 				<h4><?php echo JText::_('RLEM_DOWNLOAD_KEY'); ?></h4>
 
-				<p id="nnkey_text_empty"><?php echo html_entity_decode(JText::sprintf('RLEM_DOWNLOAD_KEY_DESC', '<a href="https://www.regularlabs.com/purchase" target="_blank">', '</a>', '<a href="https://www.regularlabs.com/downloads" target="_blank">', '</a>')); ?></p>
+				<p id="nnkey_text_empty"><?php echo RLText::html_entity_decoder(JText::sprintf('RLEM_DOWNLOAD_KEY_DESC', '<a href="https://www.regularlabs.com/purchase" target="_blank">', '</a>', '<a href="https://www.regularlabs.com/downloads" target="_blank">', '</a>')); ?></p>
 
 				<p id="nnkey_text_invalid"
-				   style="display:none;"><?php echo html_entity_decode(JText::sprintf('RLEM_DOWNLOAD_KEY_INVALID', '<a href="https://www.regularlabs.com/downloads" target="_blank">', '</a>')); ?></p>
+				   style="display:none;"><?php echo RLText::html_entity_decoder(JText::sprintf('RLEM_DOWNLOAD_KEY_INVALID', '<a href="https://www.regularlabs.com/downloads" target="_blank">', '</a>')); ?></p>
 
 				<div>
 					<?php

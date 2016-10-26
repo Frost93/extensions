@@ -1,6 +1,6 @@
 /**
  * @package         Add to Menu
- * @version         5.0.0
+ * @version         5.0.5
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

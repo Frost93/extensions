@@ -1,6 +1,6 @@
 /**
  * @package         Tabs
- * @version         6.0.3
+ * @version         6.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,7 +27,9 @@ var RegularLabsTabs = null;
 	});
 
 	RegularLabsTabs = {
-		timers: [],
+		timers   : [],
+		scroll_to: null,
+		scrolling: false,
 
 		init: function() {
 			var self = this;
@@ -46,6 +48,8 @@ var RegularLabsTabs = null;
 			// Remove the transition durations off to make initial setting of active tabs as fast as possible
 			$('.rl_tabs').removeClass('has_effects');
 
+
+			this.initScrollTracking();
 
 			this.showByURL();
 
@@ -79,7 +83,7 @@ var RegularLabsTabs = null;
 
 		show: function(id, scroll, openparents, slideshow) {
 			if (openparents) {
-				this.openParents(id, scroll);
+				this.openParents(id);
 				return;
 			}
 
@@ -91,6 +95,10 @@ var RegularLabsTabs = null;
 			}
 
 
+			if (this.scroll_to) {
+				this.setScrollOnLoad($el);
+			}
+
 			$el.tab('show');
 
 			$el.closest('ul.nav-tabs').find('.rl_tabs-toggle').attr('aria-selected', false);
@@ -101,9 +109,48 @@ var RegularLabsTabs = null;
 
 			this.updateActiveClassesOnTabLinks($el);
 
-			if(!slideshow) {
+			if (!slideshow) {
 				$el.focus();
 			}
+		},
+
+		setScrollOnLoad: function($el) {
+
+			var self = this;
+
+			// If tab is already open, do scroll immediatly
+			if ($el.parent().hasClass('in') || $el.parent().hasClass('active')) {
+				self.scrollOnLoad();
+				return;
+			}
+
+			// If tab is not open yet, do scroll when opened
+			$el.one('shown.bs.tab', function() {
+				self.scrollOnLoad();
+			});
+		},
+
+		scrollOnLoad: function() {
+			var self = this;
+
+			if (this.scrolling) {
+				setTimeout(function() {
+					self.scrollOnLoad();
+				}, 100);
+
+				return;
+			}
+
+			clearTimeout(self.timers['scroll']);
+
+			self.timers['scroll'] = setTimeout(function() {
+				if (!self.scroll_to) {
+					return;
+				}
+
+				$('html,body').animate({scrollTop: self.scroll_to.offset().top});
+				self.scroll_to = null;
+			}, 100);
 		},
 
 
@@ -119,6 +166,32 @@ var RegularLabsTabs = null;
 			return $('#' + id + '.rl_sliders-body');
 		},
 
+
+		initScrollTracking: function() {
+			var self = this;
+
+			self.scrolling = true;
+
+			self.timers['scrolling'] = setTimeout((function() {
+				self.scrolling = false;
+			}), 250);
+
+			var scroll_function_orig = window.onscroll;
+
+			window.onscroll = (function() {
+				self.scrolling = true;
+
+				clearTimeout(self.timers['scrolling']);
+
+				self.timers['scrolling'] = setTimeout((function() {
+					self.scrolling = false;
+				}), 250);
+
+				if (scroll_function_orig) {
+					scroll_function_orig();
+				}
+			});
+		},
 
 		showByURL: function() {
 			var id = this.getUrlVar();
@@ -141,8 +214,13 @@ var RegularLabsTabs = null;
 				return;
 			}
 
-			// hash is a text anchor
-			if ($('a.rl_tabs-toggle[data-id="' + id + '"]').length == 0) {
+			// check if element is a slider -> leave to Sliders
+			if ($('a#rl_sliders-scrollto_' + id).length) {
+				return;
+			}
+
+			// check if element is not a tab
+			if (!$('a.rl_tabs-toggle[data-id="' + id + '"]').length) {
 				this.showByHashAnchor(id);
 
 				return;
@@ -166,44 +244,47 @@ var RegularLabsTabs = null;
 				return;
 			}
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
+			var $anchor = $('#' + id + ',a[name="' + id + '"],a#anchor-' + id + '');
 
-			if ($anchor.length == 0) {
+			if (!$anchor.length) {
 				return;
 			}
 
 			$anchor = $anchor.first();
 
 			// Check if anchor has a parent tab
-			if ($anchor.closest('.rl_tabs').length == 0) {
+			if (!$anchor.closest('.rl_tabs').length) {
 				return;
 			}
 
 			var $tab = $anchor.closest('.tab-pane').first();
 
-			// Check if tab has sliders. If so, let Sliders handle it.
-			if ($tab.find('.rl_sliders').length > 0) {
-				return;
-			}
+			this.setScrollToElement($anchor);
 
-			this.openParents($tab.attr('id'), false);
-
-			setTimeout(function() {
-				$('html,body').animate({scrollTop: $anchor.offset().top});
-			}, 250);
+			this.openParents($tab.attr('id'));
 		},
 
-		showByID: function(id) {
+		showByID: function(id, scroll) {
 			var $el = $('a.rl_tabs-toggle[data-id="' + id + '"]');
 
-			if ($el.length == 0) {
+			if (!$el.length) {
 				return;
 			}
 
-			this.openParents(id, rl_tabs_urlscroll);
+
+			this.openParents(id);
 		},
 
-		openParents: function(id, scroll) {
+
+		setScrollToElement: function($el) {
+			if (!$el.length) {
+				return;
+			}
+
+			this.scroll_to = $el;
+		},
+
+		openParents: function(id) {
 			var $el = this.getElement(id);
 
 			if (!$el.length) {
@@ -223,15 +304,14 @@ var RegularLabsTabs = null;
 				return false;
 			}
 
-			this.stepThroughParents(parents, null, scroll);
+			this.stepThroughParents(parents, null);
 		},
 
-		stepThroughParents: function(parents, parent, scroll) {
+		stepThroughParents: function(parents, parent) {
 			var self = this;
 
 			if (!parents.length && parent) {
-
-				parent.el.focus();
+				self.show(parent.id);
 				return;
 			}
 
@@ -244,26 +324,21 @@ var RegularLabsTabs = null;
 
 			switch (parent.type) {
 				case 'tab':
-					if (typeof( window['RegularLabsTabs'] ) == "undefined") {
-						self.stepThroughParents(parents, parent, scroll);
-						break;
-					}
-
 					parent.el.one('shown.bs.tab', function() {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 					});
 
-					RegularLabsTabs.show(parent.id);
+					self.show(parent.id);
 					break;
 
 				case 'slider':
 					if (typeof( window['RegularLabsSliders'] ) == "undefined") {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 						break;
 					}
 
 					parent.el.one('shown.bs.collapse', function() {
-						self.stepThroughParents(parents, parent, scroll);
+						self.stepThroughParents(parents, parent);
 					});
 
 					RegularLabsSliders.show(parent.id);
@@ -399,17 +474,17 @@ var RegularLabsTabs = null;
 
 			var scroll = false;
 
-			var $anchor = $('a#anchor-' + id + ',a#' + id + ',a[name="' + id + '"]');
+			var $anchor = $('#' + id + ',a[name="' + id + '"],a#anchor-' + id + '');
 
 			// No accompanying link found
-			if ($anchor.length == 0) {
+			if (!$anchor.length) {
 				return;
 			}
 
 			$anchor = $anchor.first();
 
 			// Check if anchor has a parent tab
-			if ($anchor.closest('.rl_tabs').length == 0) {
+			if (!$anchor.closest('.rl_tabs').length) {
 				return;
 			}
 
@@ -417,16 +492,16 @@ var RegularLabsTabs = null;
 			var tab_id = $tab.attr('id');
 
 			// Check if link is inside the same tab
-			if ($link.closest('.rl_tabs').length > 0) {
+			if ($link.closest('.rl_tabs').length) {
 				if ($link.closest('.tab-pane').first().attr('id') == tab_id) {
 					return;
 				}
 			}
 
 			$link.click(function(e) {
-				// Open parent tab and parents
+				// Open tab and parents
 				e.preventDefault();
-				self.openParents(tab_id);
+				self.showByID(tab_id);
 				e.stopPropagation();
 			});
 		},
@@ -526,5 +601,4 @@ var RegularLabsTabs = null;
 			return '';
 		}
 	};
-})
-(jQuery);
+})(jQuery);

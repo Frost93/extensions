@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.4" type="plugin" group="system" method="upgrade">
+	<name>plg_system_simpleusernotes</name>
+	<description>PLG_SYSTEM_SIMPLEUSERNOTES_DESC</description>
+	<version>0.1.0</version>
+	<creationDate>September 2016</creationDate>
+	<author>Regular Labs (Peter van Westen)</author>
+	<authorEmail>info@regularlabs.com</authorEmail>
+	<authorUrl>https://www.regularlabs.com</authorUrl>
+	<copyright>Copyright © 2016 Regular Labs - All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<scriptfile>script.install.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" priority="1" name="Regular Labs Simple User Notes">
+			http://download.regularlabs.com/updates.xml?e=simpleusernotes&amp;type=.xml
+		</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="simpleusernotes">simpleusernotes.php</filename>
+		<filename>helper.php</filename>
+		<filename>script.install.helper.php</filename>
+		<folder>form</folder>
+		<folder>language</folder>
+	</files>
+
+	<config>
+		<fields name="params" addfieldpath="/libraries/regularlabs/fields">
+			<fieldset name="description">
+				<field name="@loadlanguage_regularlabs" type="rl_loadlanguage" extension="plg_system_regularlabs" />
+				<field name="@loadlanguage" type="rl_loadlanguage" extension="plg_system_simpleusernotes" />
+				<field name="@license" type="rl_license" extension="SIMPLE_USER_NOTES" />
+				<field name="@version" type="rl_version" extension="SIMPLE_USER_NOTES" />
+				<field name="@header" type="rl_header"
+					   label="SIMPLE_USER_NOTES"
+					   description="SIMPLE_USER_NOTES_DESC"
+					   url="https://www.nonumber.nl/simpleusernotes" />
+			</fieldset>
+			<fieldset name="basic">
+				<field name="remove_core_links" type="radio" class="btn-group" default="1" label="SUN_REMOVE_CORE_LINKS" description="SUN_REMOVE_CORE_LINKS_DESC">
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -31,6 +31,7 @@ class Com_SnippetsInstallerScript extends Com_SnippetsInstallerScriptHelper
 		$this->fixOldFormatInDatabase();
 		$this->disableEditorPlugin();
 		$this->deleteOldFiles();
+		$this->fixAssetsRules();
 	}
 
 	public function createTable()
@@ -124,5 +125,12 @@ class Com_SnippetsInstallerScript extends Com_SnippetsInstallerScriptHelper
 				JPATH_SITE . '/components/com_snippets',
 			)
 		);
+	}
+
+	public function fixAssetsRules($rules = '')
+	{
+		$rules = '{"core.admin":[],"core.manage":[],"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}';
+
+		parent::fixAssetsRules($rules);
 	}
 }

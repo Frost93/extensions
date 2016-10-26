@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,6 +12,7 @@
 defined('_JEXEC') or die;
 
 require_once dirname(__DIR__) . '/helpers/field.php';
+require_once dirname(__DIR__) . '/helpers/text.php';
 
 class JFormFieldRL_CustomFieldKey extends RLFormField
 {
@@ -24,7 +25,7 @@ class JFormFieldRL_CustomFieldKey extends RLFormField
 		$label       = $this->get('label') ? $this->get('label') : '';
 		$size        = $this->get('size') ? 'style="width:' . $this->get('size') . 'px"' : '';
 		$class       = 'class="' . ($this->get('class') ? $this->get('class') : 'text_area') . '"';
-		$this->value = htmlspecialchars(html_entity_decode($this->value, ENT_QUOTES), ENT_QUOTES);
+		$this->value = htmlspecialchars(RLText::html_entity_decoder($this->value), ENT_QUOTES);
 
 		return
 			'<label for="' . $this->id . '" style="margin-top: -5px;">'

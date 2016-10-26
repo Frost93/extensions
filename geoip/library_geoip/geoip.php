@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         GeoIp
- * @version         1.2.0
+ * @version         1.2.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -26,7 +26,7 @@ class GeoIp
 	{
 		$this->ip = $ip ?: $_SERVER['REMOTE_ADDR'];
 
-		if ($this->ip == '127.0.0.1')
+		if (in_array($this->ip, array('127.0.0.1', '::1')))
 		{
 			$this->ip = '';
 		}
@@ -146,7 +146,11 @@ class GeoIp
 	{
 		if (is_null($fields))
 		{
-			return array('continentCode', 'countryCode', 'regionCodes', 'postalCode');
+			return array(
+				'continentCode','continent',
+				'countryCode','country',
+				'regionCodes','regions',
+				'postalCode');
 		}
 
 		if (is_string($fields))

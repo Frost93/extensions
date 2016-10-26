@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         CDN for Joomla!
- * @version         5.2.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

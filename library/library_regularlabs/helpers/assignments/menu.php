@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . '/assignment.php';
 
 class RLAssignmentsMenu extends RLAssignment
 {
-	function passMenu()
+	public function passMenu()
 	{
 		// return if no Itemid or selection is set
 		if (!$this->request->Itemid || empty($this->selection))
@@ -57,15 +57,31 @@ class RLAssignmentsMenu extends RLAssignment
 		return $this->pass(false);
 	}
 
-	function getMenuParentIds($id = 0)
+	private function getMenuParentIds($id = 0)
 	{
 		return $this->getParentIds($id, 'menu');
 	}
 
-	function getMenuType()
+	private function getMenuType()
 	{
 		if (isset($this->request->menutype))
 		{
+			return $this->request->menutype;
+		}
+
+		if (empty($this->request->Itemid))
+		{
+			$this->request->menutype = '';
+
+			return $this->request->menutype;
+		}
+
+		if (JFactory::getApplication()->isSite())
+		{
+			$menu = JFactory::getApplication()->getMenu()->getItem((int) $this->request->Itemid);
+
+			$this->request->menutype = isset($menu->menutype) ? $menu->menutype : '';
+
 			return $this->request->menutype;
 		}
 

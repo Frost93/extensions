@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -18,7 +18,7 @@ class RLAssignmentsDateTime extends RLAssignment
 	var $timezone = null;
 	var $dates    = array();
 
-	function passDate()
+	public function passDate()
 	{
 		if (!$this->params->publish_up && !$this->params->publish_down)
 		{
@@ -87,26 +87,26 @@ class RLAssignmentsDateTime extends RLAssignment
 		return ($this->assignment == 'include');
 	}
 
-	function passSeasons()
+	public function passSeasons()
 	{
 		$season = self::getSeason($this->date, $this->params->hemisphere);
 
 		return $this->passSimple($season);
 	}
 
-	function passMonths()
+	public function passMonths()
 	{
 		$month = $this->date->format('m', true); // 01 (for January) through 12 (for December)
 		return $this->passSimple((int) $month);
 	}
 
-	function passDays()
+	public function passDays()
 	{
 		$day = $this->date->format('N', true); // 1 (for Monday) though 7 (for Sunday )
 		return $this->passSimple($day);
 	}
 
-	function passTime()
+	public function passTime()
 	{
 		$now  = $this->getNow();
 		$up   = strtotime($this->date->format('Y-m-d ', true) . $this->params->publish_up);
@@ -138,7 +138,7 @@ class RLAssignmentsDateTime extends RLAssignment
 		return $this->pass(false);
 	}
 
-	function getSeason(&$d, $hemisphere = 'northern')
+	private function getSeason(&$d, $hemisphere = 'northern')
 	{
 		// Set $date to today
 		$date = strtotime($d->format('Y-m-d H:i:s', true));

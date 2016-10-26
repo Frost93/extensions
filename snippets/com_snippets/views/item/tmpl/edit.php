@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -19,8 +19,8 @@ require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
 RLFunctions::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
-RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+RLFunctions::script('regularlabs/script.min.js');
+RLFunctions::stylesheet('regularlabs/style.min.css');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_snippets&id=' . ( int ) $this->item->id); ?>" method="post"

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -12,10 +12,11 @@
 defined('_JEXEC') or die;
 
 require_once dirname(__DIR__) . '/assignment.php';
+require_once dirname(__DIR__) . '/text.php';
 
 class RLAssignmentsURLs extends RLAssignment
 {
-	function passURLs()
+	public function passURLs()
 	{
 		$regex = isset($this->params->regex) ? $this->params->regex : 0;
 
@@ -33,9 +34,9 @@ class RLAssignmentsURLs extends RLAssignment
 		$url = $url->toString();
 
 		$urls = array(
-			html_entity_decode(urldecode($url), ENT_COMPAT, 'UTF-8'),
+			RLText::html_entity_decoder(urldecode($url)),
 			urldecode($url),
-			html_entity_decode($url, ENT_COMPAT, 'UTF-8'),
+			RLText::html_entity_decoder($url),
 			$url,
 		);
 		$urls = array_unique($urls);

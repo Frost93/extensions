@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Email Protector
- * @version         3.0.0
+ * @version         3.0.1
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -375,7 +375,7 @@ class PlgSystemEmailProtectorHelper
 	/**
 	 * Protects the email address with a series of spans
 	 *
-	 * @param   string  $mailto The mailto address in the surronding link.
+	 * @param   string  $mailto The mailto address in the surrounding link.
 	 * @param   string  $text   Text containing possible emails
 	 * @param   boolean $pre    Prepending attributes in <a> tag
 	 * @param   boolean $post   Ending attributes in <a> tag

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Better Preview
- * @version         5.0.1
+ * @version         5.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,7 +27,12 @@ class PlgSystemBetterPreviewInstallerScript extends PlgSystemBetterPreviewInstal
 	public function onAfterInstall()
 	{
 		$this->createTable();
+
+		$this->convertOldSettings();
 		$this->fixSystemPluginOrdering();
+
+		JFactory::getCache()->clean('_system');
+
 		$this->deleteOldModule();
 	}
 
@@ -69,8 +74,33 @@ class PlgSystemBetterPreviewInstallerScript extends PlgSystemBetterPreviewInstal
 			->where($this->db->quoteName('folder') . ' = ' . $this->db->quote('system'));
 		$this->db->setQuery($query);
 		$this->db->execute();
+	}
 
-		JFactory::getCache()->clean('_system');
+	public function convertOldSettings()
+	{
+		$query = $this->db->getQuery(true)
+			->select('params')
+			->from('#__extensions')
+			->where($this->db->quoteName('element') . ' = ' . $this->db->quote('betterpreview'))
+			->where($this->db->quoteName('folder') . ' = ' . $this->db->quote('system'));
+		$this->db->setQuery($query);
+
+		$params = $this->db->loadResult();
+
+		if (strpos($params, 'default_menu_id') !== false)
+		{
+			return;
+		}
+
+		$params = str_replace('"use_home_menu_id":"0"', '"default_menu_id":"-1"', $params);
+
+		$query = $this->db->getQuery(true)
+			->update('#__extensions')
+			->set($this->db->quoteName('params') . ' = ' . $this->db->quote($params))
+			->where($this->db->quoteName('element') . ' = ' . $this->db->quote('betterpreview'))
+			->where($this->db->quoteName('folder') . ' = ' . $this->db->quote('system'));
+		$this->db->setQuery($query);
+		$this->db->execute();
 	}
 
 	public function deleteOldModule()

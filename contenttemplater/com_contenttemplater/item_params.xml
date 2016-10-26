@@ -17,8 +17,8 @@
 
 	<fieldset name="-content-settings">
 		<field name="@block_content-settings" type="note" class="alert alert-info" description="CT_CONTENT_SETTINGS_DESC" />
-		<field name="override_settings" type="radio" class="btn-group btn-group-yesno" default="0" label="CT_OVERRIDE_SETTINGS"
-			   description="CT_OVERRIDE_SETTINGS_DESC">
+		<field name="override_settings" type="radio" class="btn-group btn-group-yesno" default="0"
+			   label="CT_OVERRIDE_SETTINGS" description="CT_OVERRIDE_SETTINGS_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
@@ -35,8 +35,8 @@
 		<field
 				name="jform_alias" type="text" size="30" default="" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC"
 				hint="JFIELD_ALIAS_PLACEHOLDER" />
-		<field name="jform_catid" type="rl_content" group="categories" default="-1" multiple="0" show_ignore="1" label="JCATEGORY"
-			   description="JFIELD_CATEGORY_DESC" />
+		<field name="jform_catid" type="rl_content" group="categories" default="-1" multiple="0" show_ignore="1"
+			   label="JCATEGORY" description="JFIELD_CATEGORY_DESC" />
 		<field name="@toggler_cat_k2_a" type="rl_toggler" param="has_k2" value="1" />
 		<field name="@notice_categories_k2" type="rl_plaintext" label="RL_K2_CATEGORIES" description="" default="RL_ONLY_AVAILABLE_IN_PRO" />
 		<field name="@toggler_cat_k2_b" type="rl_toggler" />
@@ -105,20 +105,20 @@
 
 	<fieldset name="publishing-button">
 		<field name="@block_button" type="note" class="alert alert-info" description="CT_EDITOR_BUTTON_LIST_DESC" />
-		<field name="button_enabled" type="radio" class="btn-group btn-group-yesno" default="1" label="CT_SHOW_IN_EDITOR_BUTTON_LIST"
-			   description="CT_SHOW_IN_EDITOR_BUTTON_LIST_DESC">
+		<field name="button_enabled" type="radio" class="btn-group btn-group-yesno" default="1"
+			   label="CT_SHOW_IN_EDITOR_BUTTON_LIST" description="CT_SHOW_IN_EDITOR_BUTTON_LIST_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
 		<field name="@toggler_button_a" type="rl_toggler" param="button_enabled" value="1" />
-		<field name="button_enable_in_frontend" type="radio" class="btn-group btn-group-yesno" default="1" label="RL_ENABLE_IN_FRONTEND"
-			   description="CT_ENABLE_BUTTON_IN_FRONTEND_DESC">
+		<field name="button_enable_in_frontend" type="radio" class="btn-group btn-group-yesno" default="1"
+			   label="RL_ENABLE_IN_FRONTEND" description="CT_ENABLE_BUTTON_IN_FRONTEND_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 			<option value="2">RL_ONLY</option>
 		</field>
-		<field name="button_separate" type="radio" class="btn-group btn-group-yesno" default="0" label="CT_AS_SEPARATE_EDITOR_BUTTON"
-			   description="CT_AS_SEPARATE_EDITOR_BUTTON_DESC">
+		<field name="button_separate" type="radio" class="btn-group btn-group-yesno" default="0"
+			   label="CT_AS_SEPARATE_EDITOR_BUTTON" description="CT_AS_SEPARATE_EDITOR_BUTTON_DESC">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>

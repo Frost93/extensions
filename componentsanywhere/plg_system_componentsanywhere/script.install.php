@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Components Anywhere
- * @version         3.0.1
+ * @version         3.0.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com

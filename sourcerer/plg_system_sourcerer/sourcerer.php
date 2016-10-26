@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sourcerer
- * @version         6.0.2
+ * @version         6.3.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -31,7 +31,7 @@ class PlgSystemSourcerer extends JPlugin
 		{
 			require_once JPATH_LIBRARIES . '/regularlabs/helpers/protect.php';
 			// return if page should be protected
-			if (RLProtect::isProtectedPage('', 1))
+			if (RLProtect::isProtectedPage('', true, array()))
 			{
 				return;
 			}

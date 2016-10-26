@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Articles Anywhere
- * @version         5.4.0
+ * @version         5.8.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -16,8 +16,6 @@ class PlgSystemArticlesAnywhereHelperDataTags
 	var $helpers = array();
 	var $params  = null;
 	var $config  = null;
-	var $article = null;
-	var $images  = null;
 	var $data    = null;
 
 	public function __construct()
@@ -121,7 +119,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 			return false;
 		}
 
-		$statement = html_entity_decode($statement);
+		$statement = RLText::html_entity_decoder($statement);
 		$statement = str_replace(
 			array(' AND ', ' OR '),
 			array(' && ', ' || '),
@@ -179,12 +177,28 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		*/
 		if (preg_match('#^(?P<key>[a-z0-9-_]+)\s*(?P<operator>\!?=)=*\s*[\'"]?(?P<val>.*?)[\'"]?$#si', $statement, $match))
 		{
-			$reverse = ($match['2'] == '!=');
+			$reverse = ($match['operator'] == '!=');
 
 			return $this->passIfStatementArray(
 				$this->getValueFromData($match['key']),
 				$this->getValueFromData($match['val'], $match['val']),
 				$reverse
+			);
+		}
+
+		/*
+		* Lesser/Greater than comparison syntax:
+		* foo < bar
+		* foo > bar
+		* foo <= bar
+		* foo >= bar
+		*/
+		if (preg_match('#^(?P<key>[a-z0-9-_]+)\s*(?P<operator>>=?|<=?)=*\s*[\'"]?(?P<val>.*?)[\'"]?$#si', $statement, $match))
+		{
+			return $this->passIfStatementCompare(
+				$this->getValueFromData($match['key']),
+				$this->getValueFromData($match['val'], $match['val']),
+				$match['operator']
 			);
 		}
 
@@ -206,15 +220,27 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		return $this->passIfStatementPHP($statement);
 	}
 
-	private function getValueFromData($key, $default = null)
+	protected function getValueFromData($key, $default = null)
 	{
 		if (!is_string($key))
 		{
 			return $default;
 		}
 
-		return isset($this->data->{$key}) ? $this->data->{$key} : (isset($this->data->article->{$key}) ? $this->data->article->{$key} : $default);
+		if (isset($this->data->{$key}))
+		{
+			return $this->data->{$key};
+		}
+
+		if (isset($this->data->article->{$key}))
+		{
+			return $this->data->article->{$key};
+		}
+
+
+		return $default;
 	}
+
 
 	private function passIfStatementSimple($haystack, $reverse = 0)
 	{
@@ -228,21 +254,24 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		return $reverse ? !$pass : $pass;
 	}
 
-	private function passIfStatementString($haystack, $needle, $reverse = 0)
+	private function passIfStatementCompare($haystack, $needle, $operator)
 	{
-		if (is_null($haystack))
+		switch ($operator)
 		{
-			return false;
+			case '<':
+				return $haystack < $needle;
+
+			case '<=':
+				return $haystack <= $needle;
+
+			case '>':
+				return $haystack > $needle;
+
+			case '>=':
+				return $haystack >= $needle;
 		}
 
-		if (is_array($haystack))
-		{
-			return $this->passIfStatementArray($haystack, $needle, $reverse);
-		}
-
-		$pass = $this->passString($haystack, $needle);
-
-		return $reverse ? !$pass : $pass;
+		return false;
 	}
 
 	private function passIfStatementArray($haystack, $needle, $reverse = 0)
@@ -276,7 +305,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	private function passIfStatementPHP($statement)
 	{
-		$php = html_entity_decode($statement);
+		$php = RLText::html_entity_decoder($statement);
 		$php = preg_replace('#([^<>])=([^<>])#', '\1==\2', $php);
 
 		// replace keys with $article->key
@@ -355,7 +384,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	public function replaceTags(&$text, &$matches, &$article)
 	{
-		$this->article = $article;
+		$this->data->article = $article;
 		foreach ($matches as $match)
 		{
 			$string = $this->processTag($match['1']);
@@ -573,6 +602,10 @@ class PlgSystemArticlesAnywhereHelperDataTags
 			case ($tag->type == 'image-fulltext'):
 				return $this->processTagImageFulltext();
 
+			// Layout
+			case ($tag->type == 'layout'):
+				return $this->processTagLayout($tag);
+
 
 			// Database values
 			case (RLText::is_alphanumeric(str_replace(array('-', '_'), '', $tag->type))):
@@ -654,11 +687,11 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 		if ($text = $this->getCustomReadMoreText($tag))
 		{
-			$this->article->alternative_readmore = $text;
+			$this->data->article->alternative_readmore = $text;
 			$params->set('show_readmore_title', false);
 		}
 
-		return JLayoutHelper::render('joomla.content.readmore', array('item' => $this->article, 'params' => $params, 'link' => $link));
+		return JLayoutHelper::render('joomla.content.readmore', array('item' => $this->data->article, 'params' => $params, 'link' => $link));
 	}
 
 	private function getCustomReadMoreText($tag)
@@ -669,7 +702,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		}
 
 		$title = trim($tag->text);
-		$text  = JText::sprintf($title, $this->article->title);
+		$text  = JText::sprintf($title, $this->data->article->title);
 
 		return $text ?: $title;
 	}
@@ -683,8 +716,8 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 		switch (true)
 		{
-			case (isset($this->article->alternative_readmore) && $this->article->alternative_readmore) :
-				$text = $this->article->alternative_readmore;
+			case (isset($this->data->article->alternative_readmore) && $this->data->article->alternative_readmore) :
+				$text = $this->data->article->alternative_readmore;
 				break;
 			case (!$this->config->get('show_readmore_title', 0)) :
 				$text = JText::_('COM_CONTENT_READ_MORE_TITLE');
@@ -699,7 +732,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 			return $text;
 		}
 
-		return $text . JHtml::_('string.truncate', ($this->article->title), $this->config->get('readmore_limit'));
+		return $text . JHtml::_('string.truncate', ($this->data->article->title), $this->config->get('readmore_limit'));
 	}
 
 	public function processTagLink()
@@ -714,7 +747,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	public function processTagTitle($extra)
 	{
-		$title = isset($this->article->title) ? $this->article->title : '';
+		$title = isset($this->data->article->title) ? $this->data->article->title : '';
 
 		if (empty($title) || empty($extra))
 		{
@@ -729,60 +762,79 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		switch (true)
 		{
 			case (strpos($tag->type, 'intro') === 0):
-				if (!isset($this->article->introtext))
+				if (!isset($this->data->article->introtext))
 				{
 					return false;
 				}
-				$this->article->text = $this->article->introtext;
+
+				$this->data->article->text = $this->data->article->introtext;
 				break;
 
 			case (strpos($tag->type, 'full') === 0):
-				if (!isset($this->article->fulltext))
+				if (!isset($this->data->article->fulltext))
 				{
 					return false;
 				}
 
-				$this->article->text = $this->article->fulltext;
+				$this->data->article->text = $this->data->article->fulltext;
+
+				$this->hitArticle();
 				break;
 
 			case (strpos($tag->type, 'text') === 0):
-				$this->article->text = (isset($this->article->introtext) ? $this->article->introtext : '')
-					. (isset($this->article->fulltext) ? $this->article->fulltext : '');
+				$this->data->article->text = (isset($this->data->article->introtext) ? $this->data->article->introtext : '')
+					. (isset($this->data->article->fulltext) ? $this->data->article->fulltext : '');
+
+				$this->hitArticle();
 				break;
 		}
 
-		if ($this->article->text == '')
+		if ($this->data->article->text == '')
 		{
 			return '';
 		}
 
-		$string = $this->article->text;
+		$string = $this->data->article->text;
 
 		return $this->helpers->_('text')->process($string, $tag);
 	}
 
+	public function hitArticle()
+	{
+		if (!$this->params->increase_hits_on_text)
+		{
+			return;
+		}
+
+		require_once __DIR__ . '/article_model.php';
+
+		$model = new ArticlesAnywhereArticleModel;
+
+		$model->hit($this->data->article->id);
+	}
+
 	public function processTagImageIntro()
 	{
-		if (!isset($this->article->image_intro))
+		if (empty($this->data->article->image_intro))
 		{
 			return '';
 		}
 
-		$class = 'img-intro-' . $this->article->float_intro;
+		$class = 'img-intro-' . $this->data->article->float_intro;
 
-		return $this->getImageHtml($this->article->image_intro, $this->article->image_intro_alt, $this->article->image_intro_caption, $class);
+		return $this->getImageHtml($this->data->article->image_intro, $this->data->article->image_intro_alt, $this->data->article->image_intro_caption, $class);
 	}
 
 	public function processTagImageFulltext()
 	{
-		if (!isset($this->article->image_fulltext))
+		if (empty($this->data->article->image_fulltext))
 		{
 			return '';
 		}
 
-		$class = 'img-fulltext-' . $this->article->float_fulltext;
+		$class = 'img-fulltext-' . $this->data->article->float_fulltext;
 
-		return $this->getImageHtml($this->article->image_fulltext, $this->article->image_fulltext_alt, $this->article->image_fulltext_caption, $class);
+		return $this->getImageHtml($this->data->article->image_fulltext, $this->data->article->image_fulltext_alt, $this->data->article->image_fulltext_caption, $class);
 	}
 
 	public function getImageHtml($url, $alt = '', $caption = '', $class = '', $in_div = true)
@@ -800,8 +852,32 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		return '<img' . $caption . ' src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" class="' . $img_class . '">';
 	}
 
+	public function processTagLayout($tag)
+	{
+		if (
+			JFactory::getApplication()->input->get('option') == 'com_finder'
+			&& JFactory::getApplication()->input->get('format') == 'json'
+		)
+		{
+			// Force simple layout for finder indexing, as the setParams causes errors
+			return
+				'<h2>' . $this->data->article->title . '</h2>'
+				. $this->processTagText('text', $tag);
+		}
 
-	public function processTagDatabase($tag, $return_empty = false)
+		list($template, $layout) = $this->getTemplateAndLayout($tag);
+
+		require_once __DIR__ . '/article_view.php';
+
+		$view = new ArticlesAnywhereArticleView;
+
+		$view->setParams($this->data->article->id, $template, $layout, $this->params);
+
+		return $view->display();
+	}
+
+
+	protected function processTagDatabase($tag, $return_empty = false)
 	{
 		// Get data from data object, even, uneven, first, last
 		if (isset($this->data->{$tag->type}) && is_bool($this->data->{$tag->type}))
@@ -810,38 +886,48 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		}
 
 		// Get data from db columns
-		if (!isset($this->article->{$tag->type}) || is_array($this->article->{$tag->type}) || is_object($this->article->{$tag->type}))
+		if (!isset($this->data->article->{$tag->type}) || is_array($this->data->article->{$tag->type}) || is_object($this->data->article->{$tag->type}))
 		{
 			return $return_empty ? '' : false;
 		}
 
-		$string = $this->article->{$tag->type};
+		$string = $this->data->article->{$tag->type};
 
 		// Convert string if it is a date
-		$string = $this->convertDateToString($string, isset($tag->format) ? $tag->format : '');
+		$string = $this->convertDateToString($string, isset($tag->format) ? $tag->format : '', $tag->type);
 
 		return $string;
 	}
 
-	public function convertDateToString($string, $format = '')
+	public function convertDateToString($string, $format, $key)
 	{
 		// Check if string could be a date
-		if ((strpos($string, '-') == false)
+		if (
+			// These keys are never dates
+			in_array($key, array(
+				'title', 'alias',
+				'cat', 'cat_title', 'cat_alias',
+				'author', 'author_name',
+				'text', 'introtext', 'fulltext',
+			))
+			// Dates must contain a '-' and not letters
+			|| (strpos($string, '-') == false)
 			|| preg_match('#[a-z]#i', $string)
+			// Check string it passes a simple strtotime
 			|| !strtotime($string)
 		)
 		{
 			return $string;
 		}
 
-		if (empty($extra))
+		if (empty($format))
 		{
-			$extra = JText::_('DATE_FORMAT_LC2');
+			$format = JText::_('DATE_FORMAT_LC2');
 		}
 
-		if (strpos($extra, '%') !== false)
+		if (strpos($format, '%') !== false)
 		{
-			$extra = RLText::dateToDateFormat($format);
+			$format = RLText::dateToDateFormat($format);
 		}
 
 		return JHtml::_('date', $string, $format);
@@ -856,7 +942,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		}
 
 		$userId = $user->get('id');
-		$asset  = 'com_content.article.' . $this->article->id;
+		$asset  = 'com_content.article.' . $this->data->article->id;
 
 		// Check general edit permission first.
 		if ($user->authorise('core.edit', $asset))
@@ -871,7 +957,7 @@ class PlgSystemArticlesAnywhereHelperDataTags
 		}
 
 		// Check for a valid user and that they are the owner.
-		if ($userId != $this->article->created_by)
+		if ($userId != $this->data->article->created_by)
 		{
 			return false;
 		}
@@ -881,25 +967,29 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	public function getArticleUrl()
 	{
-		if (isset($this->article->url))
+		if (isset($this->data->article->url))
 		{
-			return $this->article->url;
+			return $this->data->article->url;
 		}
 
-		if (!isset($this->article->id))
+		if (!isset($this->data->article->id))
 		{
 			return false;
 		}
 
-		require_once JPATH_SITE . '/components/com_content/helpers/route.php';
-		$this->article->url = ContentHelperRoute::getArticleRoute($this->article->id, $this->article->catid, $this->article->language);
-
-		if (empty($this->article->has_access))
+		if (!class_exists('ContentHelperRoute'))
 		{
-			$this->article->url = $this->getRestrictedUrl($this->article->url);
+			require_once JPATH_SITE . '/components/com_content/helpers/route.php';
 		}
 
-		return $this->article->url;
+		$this->data->article->url = ContentHelperRoute::getArticleRoute($this->data->article->id, $this->data->article->catid, $this->data->article->language);
+
+		if (empty($this->data->article->has_access))
+		{
+			$this->data->article->url = $this->getRestrictedUrl($this->data->article->url);
+		}
+
+		return $this->data->article->url;
 	}
 
 	public function getRestrictedUrl($url)
@@ -916,46 +1006,89 @@ class PlgSystemArticlesAnywhereHelperDataTags
 
 	public function getArticleEditUrl()
 	{
-		if (isset($this->article->editurl))
+		if (isset($this->data->article->editurl))
 		{
-			return $this->article->editurl;
+			return $this->data->article->editurl;
 		}
 
-		if (!isset($this->article->id))
+		if (!isset($this->data->article->id))
 		{
 			return false;
 		}
 
-		$this->article->editurl = '';
+		$this->data->article->editurl = '';
 
 		if (!$this->canEdit())
 		{
 			return '';
 		}
 
-		$uri                    = JUri::getInstance();
-		$this->article->editurl = JRoute::_('index.php?option=com_content&task=article.edit&a_id=' . $this->article->id . '&return=' . base64_encode($uri));
+		$uri = JUri::getInstance();
 
-		return $this->article->editurl;
+		$this->data->article->editurl = JRoute::_('index.php?option=com_content&task=article.edit&a_id=' . $this->data->article->id . '&return=' . base64_encode($uri));
+
+		return $this->data->article->editurl;
 	}
 
-	public function getArticleImages()
-	{
-		if (!is_array($this->images))
-		{
-			$article_text = (isset($this->article->introtext) ? $this->article->introtext : '')
-				. (isset($this->article->fulltext) ? $this->article->fulltext : '');
 
-			preg_match_all(
-				'#<img\s[^>]*src=([\'"])(.*?)\1[^>]*>#si',
-				$article_text,
-				$this->images,
-				PREG_SET_ORDER
-			);
+	public function getLayoutFile($tag)
+	{
+		jimport('joomla.filesystem.path');
+		jimport('joomla.filesystem.file');
+
+		$template_layout = (isset($tag->template) ? $tag->template . ':' : '')
+			. (isset($tag->layout) ? $tag->layout . ':' : '');
+
+		list($template, $layout) = $this->getTemplateAndLayout($template_layout);
+
+		// Load the language file for the template
+		$lang = JFactory::getLanguage();
+		$lang->load('tpl_' . $template, JPATH_BASE, null, false, false)
+		|| $lang->load('tpl_' . $template, JPATH_THEMES . '/' . $template, null, false, false)
+		|| $lang->load('tpl_' . $template, JPATH_BASE, $lang->getDefault(), false, false)
+		|| $lang->load('tpl_' . $template, JPATH_THEMES . '/' . $template, $lang->getDefault(), false, false);
+
+		$paths = array(
+			JPATH_THEMES . '/' . $template . '/html/com_content/article',
+			JPATH_SITE . '/components/com_content/views/article/tmpl',
+		);
+
+		$file = JPath::find($paths, $layout . '.php');
+
+		// Check if layout exists
+		if (JFile::exists($file))
+		{
+			return $file;
 		}
 
-		return $this->images;
+		// Return default layout
+		return JPath::find($paths, 'default.php');
 	}
 
+	public function getTemplateAndLayout($data)
+	{
+		if (!isset($data->template) && isset($data->layout) && strpos($data->layout, ':') !== false)
+		{
+			list($data->template, $data->layout) = explode(':', $data->layout);
+		}
 
+		$layout   = !empty($data->layout) ? $data->layout : (!empty($this->data->article->article_layout) ? $this->data->article->article_layout : 'default');
+		$template = !empty($data->template) ? $data->template : JFactory::getApplication()->getTemplate();
+
+		if (strpos($layout, ':') !== false)
+		{
+			list($template, $layout) = explode(':', $layout);
+		}
+
+		jimport('joomla.filesystem.folder');
+
+		// Layout is a template, so return default layout
+		if (empty($data->template) && JFolder::exists(JPATH_THEMES . '/' . $layout))
+		{
+			return array($layout, 'default');
+		}
+
+		// Value is not a template, so a layout
+		return array($template, $layout);
+	}
 }

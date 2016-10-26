@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Sliders
- * @version         6.0.2
+ * @version         6.2.2
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -46,11 +46,11 @@ class PlgSystemSlidersHelperHead
 			';
 		JFactory::getDocument()->addScriptDeclaration('/* START: Sliders scripts */ ' . preg_replace('#\n\s*#s', ' ', trim($script)) . ' /* END: Sliders scripts */');
 
-		RLFunctions::script('sliders/script.min.js', ($this->params->media_versioning ? '6.0.2' : false));
+		RLFunctions::script('sliders/script.min.js', ($this->params->media_versioning ? '6.2.2' : false));
 
 		if ($this->params->load_stylesheet)
 		{
-			RLFunctions::stylesheet('sliders/style.min.css', ($this->params->media_versioning ? '6.0.2' : false));
+			RLFunctions::stylesheet('sliders/style.min.css', ($this->params->media_versioning ? '6.2.2' : false));
 		}
 
 	}

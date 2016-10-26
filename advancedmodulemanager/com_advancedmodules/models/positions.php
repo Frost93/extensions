@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -52,7 +52,7 @@ class AdvancedModulesModelPositions extends JModelList
 	 *
 	 * @return  void
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = 'value', $direction = 'asc')
 	{
 		$app = JFactory::getApplication('administrator');
 
@@ -77,7 +77,7 @@ class AdvancedModulesModelPositions extends JModelList
 		$this->setState('params', $params);
 
 		// List state information.
-		parent::populateState('value', 'asc');
+		parent::populateState($ordering, $direction);
 	}
 
 	/**

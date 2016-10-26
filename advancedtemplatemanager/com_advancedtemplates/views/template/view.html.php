@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Template Manager
- * @version         2.0.2
+ * @version         2.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -86,11 +86,6 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 	protected $font;
 
 	/**
-	 * For checking if the template is hathor
-	 */
-	protected $hathor;
-
-	/**
 	 * A nested array containing lst of files and folders
 	 */
 	protected $files;
@@ -105,7 +100,7 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 	 *
 	 * @param   string $tpl The name of the template file to parse; automatically searches through the template paths.
 	 *
-	 * @return  mixed  A string if successful, otherwise a Error object.
+	 * @return  mixed  A string if successful, otherwise an Error object.
 	 */
 	public function display($tpl = null)
 	{
@@ -118,7 +113,6 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 		$this->state    = $this->get('State');
 		$this->template = $this->get('Template');
 		$this->preview  = $this->get('Preview');
-		$this->hathor   = $this->get('Hathor');
 
 		$params       = JComponentHelper::getParams('com_advancedtemplates');
 		$imageTypes   = explode(',', $params->get('image_formats'));
@@ -167,6 +161,11 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 		$this->getConfig();
 		$this->addToolbar();
 
+		if (!JFactory::getUser()->authorise('core.admin'))
+		{
+			$this->setLayout('readonly');
+		}
+
 		return parent::display($tpl);
 	}
 
@@ -194,17 +193,12 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		JFactory::getApplication()->input->set('hidemainmenu', true);
-		$canDo = JHelperContent::getActions('com_templates');
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$app->input->set('hidemainmenu', true);
 
-		if ($canDo->get('core.edit') && $canDo->get('core.create') && $canDo->get('core.admin'))
-		{
-			$showButton = true;
-		}
-		else
-		{
-			$showButton = false;
-		}
+		// User is global SuperUser
+		$isSuperUser = $user->authorise('core.admin');
 
 		// Get the toolbar object instance
 		$bar          = JToolBar::getInstance('toolbar');
@@ -213,86 +207,69 @@ class AdvancedTemplatesViewTemplate extends JViewLegacy
 
 		if ($this->config->heading_title)
 		{
-			JToolbarHelper::title(JText::_('COM_TEMPLATES_MANAGER_VIEW_TEMPLATE'), 'eye thememanager');
+			JToolbarHelper::title(JText::sprintf('COM_TEMPLATES_MANAGER_VIEW_TEMPLATE', ucfirst($this->template->name)), 'eye thememanager');
 		}
 		else
 		{
-			JToolbarHelper::title(JText::sprintf('ATP_HEADING_TEMPLATE', $this->template->name), 'advancedtemplatemanager icon-reglab');
+			JToolbarHelper::title(JText::sprintf('ATP_HEADING_TEMPLATE', ucfirst($this->template->name)), 'advancedtemplatemanager icon-reglab');
 		}
 
-		// Add a Apply and save button
-		if ($this->type == 'file')
+		// Only show file edit buttons for global SuperUser
+		if ($isSuperUser)
 		{
-			if ($showButton)
+			// Add an Apply and save button
+			if ($this->type == 'file')
 			{
 				JToolbarHelper::apply('template.apply');
 				JToolbarHelper::save('template.save');
 			}
-		}
-		// Add a Crop and Resize button
-		elseif ($this->type == 'image')
-		{
-			if ($showButton)
+			// Add a Crop and Resize button
+			elseif ($this->type == 'image')
 			{
 				JToolbarHelper::custom('template.cropImage', 'move', 'move', 'COM_TEMPLATES_BUTTON_CROP', false);
-
 				JToolbarHelper::modal('resizeModal', 'icon-refresh', 'COM_TEMPLATES_BUTTON_RESIZE');
 			}
-		}
-		// Add an extract button
-		elseif ($this->type == 'archive')
-		{
-			if ($showButton)
+			// Add an extract button
+			elseif ($this->type == 'archive')
 			{
 				JToolbarHelper::custom('template.extractArchive', 'arrow-down', 'arrow-down', 'COM_TEMPLATES_BUTTON_EXTRACT_ARCHIVE', false);
 			}
-		}
 
-		// Add a copy template button
-		if ($this->hathor->home == 0)
-		{
-			if ($showButton)
+			// Add a copy template button (Hathor override doesn't need the button)
+			if ($app->getTemplate() != 'hathor')
 			{
-				JToolbarHelper::modal('collapseModal', 'icon-copy', 'COM_TEMPLATES_BUTTON_COPY_TEMPLATE');
+				JToolbarHelper::modal('copyModal', 'icon-copy', 'COM_TEMPLATES_BUTTON_COPY_TEMPLATE');
 			}
 		}
 
 		// Add a Template preview button
 		if ($this->preview->client_id == 0)
 		{
-			$bar->appendButton('Link', 'picture', 'COM_TEMPLATES_BUTTON_PREVIEW', JUri::root() . 'index.php?tp=1&templateStyle=' . $this->preview->id);
+			$bar->appendButton('Popup', 'picture', 'COM_TEMPLATES_BUTTON_PREVIEW', JUri::root() . 'index.php?tp=1&templateStyle=' . $this->preview->id, 800, 520);
 		}
 
-		// Add Manage folders button
-		if ($showButton)
+		// Only show file manage buttons for global SuperUser
+		if ($isSuperUser)
 		{
+			// Add Manage folders button
 			JToolbarHelper::modal('folderModal', 'icon-folder icon white', 'COM_TEMPLATES_BUTTON_FOLDERS');
-		}
 
-		// Add a new file button
-		if ($showButton)
-		{
+			// Add a new file button
 			JToolbarHelper::modal('fileModal', 'icon-file', 'COM_TEMPLATES_BUTTON_FILE');
-		}
 
-		// Add a Rename file Button
-		if ($this->hathor->home == 0)
-		{
-			if ($showButton && $this->type != 'home')
+			// Add a Rename file Button (Hathor override doesn't need the button)
+			if ($app->getTemplate() != 'hathor' && $this->type != 'home')
 			{
 				JToolbarHelper::modal('renameModal', 'icon-refresh', 'COM_TEMPLATES_BUTTON_RENAME_FILE');
 			}
-		}
 
-		// Add a Delete file Button
-		if ($showButton && $this->type != 'home')
-		{
-			JToolbarHelper::modal('deleteModal', 'icon-remove', 'COM_TEMPLATES_BUTTON_DELETE_FILE');
-		}
+			// Add a Delete file Button
+			if ($this->type != 'home')
+			{
+				JToolbarHelper::modal('deleteModal', 'icon-remove', 'COM_TEMPLATES_BUTTON_DELETE_FILE');
+			}
 
-		// Add a Compile Button
-		if ($showButton)
-		{
+			// Add a Compile Button
 			if ($ext == 'less')
 			{
 				JToolbarHelper::custom('template.less', 'play', 'play', 'COM_TEMPLATES_BUTTON_LESS', false);

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         DB Replacer
- * @version         5.1.0
+ * @version         5.1.3
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 JHtml::_('jquery.framework');
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
+require_once JPATH_LIBRARIES . '/regularlabs/helpers/text.php';
 
 /* SCRIPTS */
 $alert = "RLDBReplacer.protectSpaces();form.task.value = 'replace';form.submit();";
@@ -36,8 +37,8 @@ $script = "
 	var DBR_INVALID_QUERY = '" . addslashes(JText::_('DBR_INVALID_QUERY')) . "';
 ";
 JFactory::getDocument()->addScriptDeclaration($script);
-RLFunctions::script('dbreplacer/script.min.js', '5.1.0');
-RLFunctions::script('regularlabs/script.min.js', '16.5.10919');
+RLFunctions::script('dbreplacer/script.min.js', '5.1.3');
+RLFunctions::script('regularlabs/script.min.js');
 
 // Version check
 require_once JPATH_LIBRARIES . '/regularlabs/helpers/versions.php';
@@ -59,7 +60,7 @@ $r = str_replace('||space||', ' ', $r);
 			<div class="span3">
 				<div class="col dbr_select dbr_tables">
 					<fieldset class="adminform">
-						<legend><?php echo html_entity_decode(JText::_('DBR_TABLES')); ?></legend>
+						<legend><?php echo RLText::html_entity_decoder(JText::_('DBR_TABLES')); ?></legend>
 						<div id="dbr_tables"><?php echo $this->tables; ?></div>
 					</fieldset>
 				</div>
@@ -67,7 +68,7 @@ $r = str_replace('||space||', ' ', $r);
 			<div class="span3">
 				<div class="col dbr_select dbr_columns">
 					<fieldset class="adminform">
-						<legend><?php echo html_entity_decode(JText::_('DBR_COLUMNS')); ?></legend>
+						<legend><?php echo RLText::html_entity_decoder(JText::_('DBR_COLUMNS')); ?></legend>
 						<div id="dbr_columns">
 							<input type="hidden" name="columns"
 							       value="<?php echo implode(',', JFactory::getApplication()->input->get('columns', array(0), 'array')); ?>"
@@ -80,7 +81,7 @@ $r = str_replace('||space||', ' ', $r);
 
 				<div class="col dbr_select dbr_search">
 					<fieldset class="adminform">
-						<legend><?php echo html_entity_decode(JText::_('DBR_SEARCH')); ?></legend>
+						<legend><?php echo RLText::html_entity_decoder(JText::_('DBR_SEARCH')); ?></legend>
 						<div style="clear:both;margin-bottom: 5px;">
 							* = <?php echo JText::_('DBR_ALL'); ?> &nbsp; &nbsp;
 							NULL = <?php echo JText::_('DBR_NULL'); ?>
@@ -104,7 +105,7 @@ $r = str_replace('||space||', ' ', $r);
 
 				<div class="col dbr_select dbr_replace">
 					<fieldset class="adminform">
-						<legend><?php echo html_entity_decode(JText::_('DBR_REPLACE')); ?></legend>
+						<legend><?php echo RLText::html_entity_decoder(JText::_('DBR_REPLACE')); ?></legend>
 						<textarea name="replace" class="dbr_element" cols="30" rows="3"><?php echo $r; ?></textarea>
 
 						<div class="btn-group" id="dbr_submit">
@@ -120,7 +121,7 @@ $r = str_replace('||space||', ' ', $r);
 
 			<div class="col dbr_select">
 				<fieldset class="adminform">
-					<legend><?php echo html_entity_decode(JText::_('DBR_PREVIEW')); ?></legend>
+					<legend><?php echo RLText::html_entity_decoder(JText::_('DBR_PREVIEW')); ?></legend>
 					<div id="dbr_rows"></div>
 				</fieldset>
 			</div>

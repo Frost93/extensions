@@ -12,8 +12,7 @@ class CloudFlare
 {
 	public $email;
 	public $token;
-	public $zone;
-	public $CloudFlare_api = 'https://www.cloudflare.com/api_json.html';
+	public $api = 'https://www.cloudflare.com/api_json.html';
 
 	public function __construct($email, $token)
 	{
@@ -39,7 +38,7 @@ class CloudFlare
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 
 		// url
-		curl_setopt($ch, CURLOPT_URL, $this->CloudFlare_api);
+		curl_setopt($ch, CURLOPT_URL, $this->api);
 		curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

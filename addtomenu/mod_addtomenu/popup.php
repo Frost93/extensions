@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Add to Menu
- * @version         5.0.0
+ * @version         5.0.5
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -130,7 +130,7 @@ class AddToMenu
 		$menuitem         = JFactory::getApplication()->input->getVar('menuitem', 'mainmenu::0');
 		$menuitem         = explode('::', $menuitem);
 		$table->menutype  = $menuitem['0'];
-		$table->parent_id = isset($menuitem['1']) ? (int) $menuitem['1'] : 0;
+		$table->parent_id = !empty($menuitem['1']) ? (int) $menuitem['1'] : 1;
 		$table->access            = 1;
 		$table->language          = '*';
 		$table->template_style_id = 0;
@@ -139,7 +139,7 @@ class AddToMenu
 		$table->level = 1;
 		$table->path  = $table->alias;
 
-		if ($table->parent_id)
+		if ($table->parent_id > 1)
 		{
 			$query->clear()
 				->select('m.path, m.level')
@@ -224,6 +224,38 @@ class AddToMenu
 
 		// Set the new location in the tree for the node.
 		$table->setLocation($table->parent_id, 'last-child');
+
+		$menu_table = JTable::getInstance('menu');
+		$itemSearch = array('alias' => $table->alias, 'parent_id' => $table->parent_id, 'client_id' => (int) $table->client_id);
+
+		// Check if the alias already exists. For multilingual site.
+		if (JLanguageMultilang::isEnabled()
+			&& (
+				$menu_table->load(array_replace($itemSearch, array('language' => '*')))
+				|| $menu_table->load(array_replace($itemSearch, array('language' => $table->language)))
+				|| ($table->language == '*' && $menu_table->load($itemSearch))
+			)
+		)
+		{
+			$error = JText::_('JLIB_DATABASE_ERROR_MENU_UNIQUE_ALIAS');
+
+			JError::raiseWarning('1', $error);
+			$this->renderHTML($template);
+
+			return;
+		}
+
+		// Check if the alias already exists. For monolingual site.
+		if ($menu_table->load($itemSearch))
+		{
+			$error = JText::_('JLIB_DATABASE_ERROR_MENU_UNIQUE_ALIAS');
+
+			JError::raiseWarning('1', $error);
+			$this->renderHTML($template);
+
+			return;
+		}
+
 		$error = '';
 
 		if (!$table->check())
@@ -238,24 +270,15 @@ class AddToMenu
 
 		if ($error)
 		{
-			$error = str_replace('<br>', ' :: ', $table->getError());
-			$error = explode('SQL=', $error);
-			$error = trim($error['0']);
-
-			if (strpos($error, 'Duplicate entry') !== false)
-			{
-				$error = JText::_('JLIB_DATABASE_ERROR_MENU_UNIQUE_ALIAS');
-			}
-
 			$error = JText::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $error);
 
 			JError::raiseWarning('1', $error);
 			$this->renderHTML($template);
+
+			return;
 		}
-		else
-		{
-			echo "<script>window.parent.addtomenu_setMessage( '" . JText::_('COM_MENUS_MENU_ITEM_SAVE_SUCCESS', true) . "', 1 );</script>\n";
-		}
+
+		echo "<script>window.parent.addtomenu_setMessage( '" . JText::_('COM_MENUS_MENU_ITEM_SAVE_SUCCESS', true) . "', 1 );</script>\n";
 	}
 
 	function renderHTML(&$template)
@@ -712,7 +735,7 @@ class AddToMenu
 
 	function filterAlias($alias)
 	{
-		$alias = JApplication::stringURLSafe($alias);
+		$alias = JApplicationHelper::stringURLSafe($alias);
 
 		if (trim(str_replace('-', '', $alias)) == '')
 		{
@@ -727,9 +750,9 @@ class AddToMenu
 		JHtml::_('behavior.tooltip');
 		require_once JPATH_LIBRARIES . '/regularlabs/helpers/functions.php';
 
-		RLFunctions::script('regularlabs/script.min.js', '16.4.23089');
-		RLFunctions::script('regularlabs/toggler.min.js', '16.4.23089');
-		RLFunctions::stylesheet('regularlabs/style.min.css', '16.4.23089');
+		RLFunctions::script('regularlabs/script.min.js');
+		RLFunctions::script('regularlabs/toggler.min.js');
+		RLFunctions::stylesheet('regularlabs/style.min.css');
 
 		$uri = JUri::getInstance();
 		?>

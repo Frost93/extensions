@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Snippets
- * @version         5.0.0
+ * @version         5.0.4
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -225,7 +225,7 @@ class PlgSystemSnippetsHelper
 
 	function processSnippet($id, $vars)
 	{
-		$item = isset($this->items[$id]) ? $this->items[$id] : isset($this->items[html_entity_decode($id, ENT_COMPAT, 'UTF-8')]) ? $this->items[html_entity_decode($id, ENT_COMPAT, 'UTF-8')] : '';
+		$item = isset($this->items[$id]) ? $this->items[$id] : isset($this->items[RLText::html_entity_decoder($id)]) ? $this->items[RLText::html_entity_decoder($id)] : '';
 
 		if (!$item)
 		{

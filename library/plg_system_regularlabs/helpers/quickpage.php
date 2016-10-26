@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Regular Labs Library
- * @version         16.5.22807
+ * @version         16.10.22333
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -34,6 +34,7 @@ class PlgSystemRegularLabsQuickPageHelper
 			'administrator/modules/mod_addtomenu/popup.php',
 			'media/rereplacer/images/popup.php',
 			'plugins/editors-xtd/articlesanywhere/popup.php',
+			'plugins/editors-xtd/conditionalcontent/popup.php',
 			'plugins/editors-xtd/contenttemplater/data.php',
 			'plugins/editors-xtd/contenttemplater/popup.php',
 			'plugins/editors-xtd/dummycontent/popup.php',
@@ -103,7 +104,8 @@ class PlgSystemRegularLabsQuickPageHelper
 
 		JFactory::getDocument()->setBuffer($html, 'component');
 
-		RLApplication::render();
+		$app = new RLApplication();
+		$app->render();
 
 		$html = JFactory::getApplication()->toString(JFactory::getApplication()->getCfg('gzip'));
 		$html = preg_replace('#\s*<' . 'link [^>]*href="[^"]*templates/system/[^"]*\.css[^"]*"[^>]*( /)?>#s', '', $html);
@@ -118,19 +120,21 @@ class PlgSystemRegularLabsQuickPageHelper
 
 class RLApplication
 {
-	static function render()
+	public function render()
 	{
 		$app = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$app->loadDocument($document);
 
-		$options = array();
-		// Setup the document options.
-		$options['template']  = $app->get('theme');
-		$options['file']      = $app->get('themeFile', 'index.php');
-		$options['params']    = $app->get('themeParams');
-		$options['directory'] = self::getThemesDirectory();
+		$params = array(
+			'template'  => $app->get('theme'),
+			'file'      => $app->get('themeFile', 'index.php'),
+			'params'    => $app->get('themeParams'),
+			'directory' => self::getThemesDirectory(),
+		);
 
 		// Parse the document.
-		JFactory::getDocument()->parse($options);
+		$document->parse($params);
 
 		// Trigger the onBeforeRender event.
 		JPluginHelper::importPlugin('system');
@@ -144,7 +148,7 @@ class RLApplication
 		}
 
 		// Render the document.
-		$data = JFactory::getDocument()->render($caching, $options);
+		$data = $document->render($caching, $params);
 
 		// Set the application output data.
 		$app->setBody($data);

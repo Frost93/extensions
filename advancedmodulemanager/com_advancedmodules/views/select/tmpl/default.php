@@ -1,7 +1,7 @@
 <?php
 /**
  * @package         Advanced Module Manager
- * @version         6.0.1
+ * @version         6.2.6
  * 
  * @author          Peter van Westen <info@regularlabs.com>
  * @link            http://www.regularlabs.com
@@ -27,7 +27,7 @@ JHtml::_('bootstrap.popover');
 		<?php
 		// Prepare variables for the link.
 
-		$link       = 'index.php?option=com_modules&task=module.add&eid=' . $item->extension_id;
+		$link       = 'index.php?option=com_advancedmodules&task=module.add&eid=' . $item->extension_id;
 		$name       = $this->escape($item->name);
 		$desc       = JHtml::_('string.truncate', ($this->escape($item->desc)), 200);
 		$short_desc = JHtml::_('string.truncate', ($this->escape($item->desc)), 90);
